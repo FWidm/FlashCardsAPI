@@ -1,0 +1,128 @@
+package controllers;
+
+import java.util.List;
+
+import play.data.validation.Constraints;
+import util.JsonWrap;
+import models.User;
+import play.mvc.BodyParser;
+import play.mvc.Controller;
+import play.mvc.Result;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class UserController extends Controller {
+    public Result getUserIndex(){
+        return ok(JsonWrap.prepareJsonStatus(OK,"ok!"));
+    }
+
+	public Result getUserList() {
+		List<User> u = User.find.all();
+		return ok(JsonWrap.getJson(u));
+	}
+
+	/**
+	 * Adds a new user to the database, throws an error if the email, name or
+	 * password are missing.
+	 * 
+	 * @return
+	 */
+	@BodyParser.Of(BodyParser.Json.class)
+	public Result updateUser(Long id) {
+		JsonNode json = request().body().asJson();
+		
+		if (json.size() == 0)
+			return badRequest(JsonWrap.prepareJsonStatus(EXPECTATION_FAILED,
+					"No Json body was found. This is required to update the user with id="
+							+ id + "."));
+		
+		ObjectMapper mapper = new ObjectMapper();
+		User requestData = mapper.convertValue(json, User.class);
+		
+		// get the specific user
+		User u = User.find.byId(id);
+		// check for new values
+		if (json.has("email")) {
+			User tmpUser = User.find.where()
+					.eq("email", requestData.getEmail()).findUnique();
+			System.out.println("does email exist? " + tmpUser);
+			if (tmpUser == null)
+				u.setEmail(requestData.getEmail());
+			else
+				return forbidden(JsonWrap
+						.prepareJsonStatus(
+								FORBIDDEN,
+								"The server can't fulfill the request, as the specified email is already in use. Try again with a different email."));
+		}
+        Constraints.EmailValidator emailValidator=new Constraints.EmailValidator();
+        Constraints.MinLengthValidator minLengthValidator=new Constraints.MinLengthValidator();
+		if (json.has("password") && minLengthValidator.isValid(requestData.getPassword())) {
+			u.setPassword(requestData.getPassword());
+		}
+		if (json.has("rating"))
+			u.setRating(requestData.getRating());
+		if (json.has("name") && minLengthValidator.isValid(requestData.getPassword()))
+			u.setName(requestData.getName());
+		if (json.has("group") && emailValidator.isValid(requestData.getEmail()))
+			u.setGroup(requestData.getGroup());
+		u.update();
+		return ok(JsonWrap.prepareJsonStatus(OK, "User with id=" + id
+				+ " has been succesfully changed."));
+
+	}
+
+	public Result getUser(Long id) {
+		// Find a task by ID
+		User u = User.find.byId(id);
+		if (u == null)
+			return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,
+					"The user with the id=" + id + " could not be found."));
+		System.out.println(u);
+		return ok(JsonWrap.getJson(u));
+	}
+
+	public Result getUserByEmail(String email) {
+		// Find a task by ID
+		User u = User.find.where().eq("email", email).findUnique();
+		System.out.println(u);
+		return ok(JsonWrap.getJson(u));
+	}
+
+	public Result deleteUser(Long id) {
+		User.find.ref(id).delete();
+		return ok(JsonWrap.prepareJsonStatus(OK, "The user with the id=" + id
+				+ " has been deleted."));
+	}
+
+	/**
+	 * Adds a new user to the database, throws an error if the email, name or
+	 * password are missing.
+	 * 
+	 * @return
+	 */
+	@BodyParser.Of(BodyParser.Json.class)
+	public  Result addUser() {
+		JsonNode json = request().body().asJson();
+		ObjectMapper mapper = new ObjectMapper();
+
+		User tmp = mapper.convertValue(json, User.class);
+        //Checks if the constraints for @email are met via it's isValid method.
+        Constraints.EmailValidator emailValidator=new Constraints.EmailValidator();
+        Constraints.MinLengthValidator minLengthValidator=new Constraints.MinLengthValidator();
+		System.out.println("json=" + json + " - obj=" + tmp);
+		if (emailValidator.isValid(tmp.getEmail()) && minLengthValidator.isValid(tmp.getName()) && minLengthValidator.isValid(tmp.getPassword())) {
+			// if this entry with specified email does not exist, create, else
+			// throw an error.
+			if (User.find.where().eq("email", tmp.getEmail()).findUnique() == null) {
+				User u=new User(tmp);
+				u.save();
+				return created(JsonWrap.prepareJsonStatus(CREATED, "User with id="+u.getId()
+						 + " has been created."));
+			}
+		}
+		return forbidden(JsonWrap.prepareJsonStatus(FORBIDDEN,
+				"The user could not be created, please specify email, name, password. Email has to be valid (e.g. a@b.com)"));
+	}
+
+}
