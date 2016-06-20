@@ -4,7 +4,6 @@
 
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
-GET     /halp                       controllers.HomeController.halp
 # An example controller showing how to use dependency injection
 GET     /count                      controllers.CountController.count
 # An example controller showing how to write asynchronous code
@@ -14,17 +13,24 @@ GET     /message                    controllers.AsyncController.message
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
 #Flash Cards API
+GET     /testCards                 controllers.HomeController.testCards
+GET     /testGroups                 controllers.HomeController.testGroups
+
 #Users
-GET		/users							controllers.UserController.getUserList
-GET		/users/:id          			controllers.UserController.getUser(id:Long)
-GET		/users/e/:email          		controllers.UserController.getUserByEmail(email:String)
-POST	/users							controllers.UserController.addUser
-PUT		/users/:id						controllers.UserController.updateUser(id:Long)
-DELETE 	/users/:id						controllers.UserController.deleteUser(id:Long)
+GET		/users				controllers.UserController.getUserList
+GET		/users/:id          controllers.UserController.getUser(id:Long)
+GET		/users/e/:email     controllers.UserController.getUserByEmail(email:String)
+POST	/users				controllers.UserController.addUser
+PUT		/users/:id			controllers.UserController.updateUser(id:Long)
+DELETE 	/users/:id			controllers.UserController.deleteUser(id:Long)
 
 #Groups
-GET 	/groups								controllers.UserGroupController.getUserGroupList
-GET 	/groups/:id							controllers.UserGroupController.getUserGroup(id:Long)
-PUT 	/groups/:id							controllers.UserGroupController.updateUserGroup(id:Long)
-POST 	/groups								controllers.UserGroupController.addUserGroup
-DELETE	/groups/:id							controllers.UserGroupController.deleteUserGroup(id:Long)
+GET 	/groups				controllers.UserGroupController.getUserGroupList
+GET 	/groups/:id			controllers.UserGroupController.getUserGroup(id:Long)
+PUT 	/groups/:id			controllers.UserGroupController.updateUserGroup(id:Long)
+POST 	/groups				controllers.UserGroupController.addUserGroup
+DELETE	/groups/:id			controllers.UserGroupController.deleteUserGroup(id:Long)
+
+#Flashcards
+GET     /cards              controllers.FlashCardController.getFlashCardList
+POST    /cards              controllers.FlashCardController.addFlashCard

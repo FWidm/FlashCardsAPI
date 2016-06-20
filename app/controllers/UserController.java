@@ -2,6 +2,10 @@ package controllers;
 
 import java.util.List;
 
+import models.Answer;
+import models.FlashCard;
+import models.Question;
+import play.api.mvc.Flash;
 import play.data.validation.Constraints;
 import util.JsonWrap;
 import models.User;
@@ -72,6 +76,11 @@ public class UserController extends Controller {
 
 	}
 
+    /**
+     * Returns the user with a specific ID.
+     * @param id
+     * @return HTTP Status Result OK if found or NOT_FOUND if not found.
+     */
 	public Result getUser(Long id) {
 		// Find a task by ID
 		User u = User.find.byId(id);
@@ -82,17 +91,58 @@ public class UserController extends Controller {
 		return ok(JsonWrap.getJson(u));
 	}
 
+    /**
+     * Returns the user with a specific (unique!) Email.
+     * @param email
+     * @return OK when found, NOT_FOUND if it doesnt exist.
+     */
 	public Result getUserByEmail(String email) {
 		// Find a task by ID
 		User u = User.find.where().eq("email", email).findUnique();
+        if (u == null)
+            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,
+                    "The user with the email=" + email + " could not be found."));
 		System.out.println(u);
 		return ok(JsonWrap.getJson(u));
 	}
 
+    /**
+     * Deletes a user with the given id.
+     * @param id
+     * @return OK
+     */
 	public Result deleteUser(Long id) {
+
+        //TODO: check if it is neccesary to delete other things in the db. or make those entries cascade.
+        List<Answer> givenAnswers= Answer.find.where().eq("author_id", id).findList();
+        System.out.println("Answers from the user has size="+givenAnswers.size());
+
+        for(Answer a: givenAnswers){
+            System.out.println(">> Trying to delete answer a="+a+" where author was: "+a.getAuthor());
+            a.delete();
+        }
+
+
+        List<FlashCard> cards=FlashCard.find.where().eq("author_id",id).findList();
+        System.out.println("Created cards list has size="+cards.size());
+
+        for(FlashCard c: cards){
+            System.out.println(">> Trying to delete card c="+c+" where author was: "+c.getAuthor());
+            c.delete();
+        }
+
+
+        List<Question> questions=Question.find.where().eq("author_id",id).findList();
+        System.out.println("Questions from the user has size="+questions.size());
+        for(Question q: questions){
+            System.out.println(">> Trying to delete question q="+q+" where author was: "+q.getAuthor());
+            q.delete();
+        }
+
 		User.find.ref(id).delete();
+
 		return ok(JsonWrap.prepareJsonStatus(OK, "The user with the id=" + id
-				+ " has been deleted."));
+				+ " has been deleted. This includes questions, answers and cards mady by this user."));
 	}
 
 	/**
