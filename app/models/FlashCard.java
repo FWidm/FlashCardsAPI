@@ -49,8 +49,11 @@ public class FlashCard extends Model {
     private boolean multipleChoice;
 
     @Transient //not persistent.
+    @JsonIgnore //todo: jsonIgnore is not working, fields are serialized.
+    private boolean isSelected;
+    @Transient //not persistent.
     @JsonIgnore
-    private boolean isSelected, isMarked;
+    private boolean isMarked;
 
     public static Model.Finder<Long, FlashCard> find = new Model.Finder<Long, FlashCard>(FlashCard.class);
 

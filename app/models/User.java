@@ -123,6 +123,7 @@ public class User extends Model {
 
 	public void setGroup(UserGroup group) {
 		this.group = group;
+		group.addUser(this);
         this.update();
 	}
 

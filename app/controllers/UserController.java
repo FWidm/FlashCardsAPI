@@ -77,7 +77,7 @@ public class UserController extends Controller {
             modified=true;
         }
 		if (json.has("group") && emailValidator.isValid(requestData.getEmail())){
-			u.setGroup(requestData.getGroup());
+			u.setGroup(requestData.getGroup()); //todo: change this to just use the group id to update.
             modified=true;
         }
         if(modified) {
@@ -139,7 +139,7 @@ public class UserController extends Controller {
 		if (json.has("name") && minLengthValidator.isValid(requestData.getPassword()))
 			u.setName(requestData.getName());
 		if (json.has("group") && emailValidator.isValid(requestData.getEmail()))
-			u.setGroup(requestData.getGroup());
+			u.setGroup(requestData.getGroup()); //todo: change this to just use the group id to update.
 		u.update();
 		return ok(JsonWrap.prepareJsonStatus(OK, "User with id=" + id
 				+ " has been succesfully changed."));
@@ -227,6 +227,7 @@ public class UserController extends Controller {
 		ObjectMapper mapper = new ObjectMapper();
 
 		User tmp = mapper.convertValue(json, User.class);
+
         //Checks if the constraints for @email are met via it's isValid method.
         Constraints.EmailValidator emailValidator=new Constraints.EmailValidator();
         Constraints.MinLengthValidator minLengthValidator=new Constraints.MinLengthValidator();
@@ -237,6 +238,7 @@ public class UserController extends Controller {
 			// throw an error.
 			if (User.find.where().eq("email", tmp.getEmail()).findUnique() == null) {
 				User u=new User(tmp);
+                //todo: change this to just use the group id to update.
 				u.save();
 				return created(JsonWrap.prepareJsonStatus(CREATED, "User with id="+u.getId()
 						 + " has been created."));
