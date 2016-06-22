@@ -5,13 +5,13 @@
 
 create table answer (
   id                        bigint auto_increment not null,
-  rating                    integer,
   answer_text               varchar(255),
   hint                      varchar(255),
   media_uri                 varchar(255),
   author_id                 bigint,
   parent_card_id            bigint,
-  constraint uq_answer_author_id unique (author_id),
+  rating                    integer,
+  created                   datetime(6) not null,
   constraint pk_answer primary key (id))
 ;
 
@@ -24,7 +24,6 @@ create table flash_card (
   created                   datetime(6) not null,
   last_updated              datetime(6) not null,
   constraint uq_flash_card_question_id unique (question_id),
-  constraint uq_flash_card_author_id unique (author_id),
   constraint pk_flash_card primary key (flashcard_id))
 ;
 
@@ -33,7 +32,6 @@ create table question (
   question                  varchar(255),
   media_uri                 varchar(255),
   author_id                 bigint,
-  constraint uq_question_author_id unique (author_id),
   constraint pk_question primary key (id))
 ;
 

@@ -26,6 +26,72 @@ public class UserController extends Controller {
 		return ok(JsonWrap.getJson(u));
 	}
 
+    /**
+     * Partially updates the user when a patch method is used for updating. More infos here: https://tools.ietf.org/html/rfc5789#section-2.1
+     * Expects
+     * @param id
+     * @return
+     */
+	@BodyParser.Of(BodyParser.Json.class)
+	public Result partiallyUpdateUser(Long id){
+		JsonNode json = request().body().asJson();
+        boolean modified = false;
+		if (json.size() == 0)
+			return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
+					"No Json body was found. This is required to update the user with id="
+							+ id + "."));
+
+		ObjectMapper mapper = new ObjectMapper();
+		User requestData = mapper.convertValue(json, User.class);
+
+		// get the specific user
+		User u = User.find.byId(id);
+		// check for new values
+		if (json.has("email")) {
+            modified=true;
+			User tmpUser = User.find.where()
+					.eq("email", requestData.getEmail()).findUnique();
+			System.out.println("does email exist? " + tmpUser);
+			if (tmpUser == null)
+				u.setEmail(requestData.getEmail());
+			else
+				return badRequest(JsonWrap
+						.prepareJsonStatus(
+								BAD_REQUEST,
+								"The server can't fulfill the request, as the specified email is already in use. " +
+                                        "Try again with a different email."));
+		}
+		Constraints.EmailValidator emailValidator=new Constraints.EmailValidator();
+		Constraints.MinLengthValidator minLengthValidator=new Constraints.MinLengthValidator();
+		if (json.has("password") && minLengthValidator.isValid(requestData.getPassword())) {
+			u.setPassword(requestData.getPassword());
+            modified=true;
+		}
+		if (json.has("rating")){
+			u.setRating(requestData.getRating());
+            modified=true;
+        }
+
+        if (json.has("name") && minLengthValidator.isValid(requestData.getPassword())) {
+            u.setName(requestData.getName());
+            modified=true;
+        }
+		if (json.has("group") && emailValidator.isValid(requestData.getEmail())){
+			u.setGroup(requestData.getGroup());
+            modified=true;
+        }
+        if(modified) {
+            u.update();
+            return ok(JsonWrap.prepareJsonStatus(OK, "User with id=" + id
+                    + " has been partially changed."));
+        }
+        else
+            return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
+                    "No updates for any values could be applied."
+                            + id + "."));
+
+	}
+
 	/**
 	 * Adds a new user to the database, throws an error if the email, name or
 	 * password are missing.
@@ -35,10 +101,12 @@ public class UserController extends Controller {
 	@BodyParser.Of(BodyParser.Json.class)
 	public Result updateUser(Long id) {
 		JsonNode json = request().body().asJson();
-		
-		if (json.size() == 0)
-			return badRequest(JsonWrap.prepareJsonStatus(EXPECTATION_FAILED,
-					"No Json body was found. This is required to update the user with id="
+
+		if(!json.has("email") || !json.has("rating") || !json.has("name") ||
+                !json.has("group") || !json.has("password"))
+			return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
+					"The Update method needs all details of the user, such as email, " +
+                            "rating, name, group and password! An attribute was missing for id="
 							+ id + "."));
 		
 		ObjectMapper mapper = new ObjectMapper();
@@ -46,6 +114,7 @@ public class UserController extends Controller {
 		
 		// get the specific user
 		User u = User.find.byId(id);
+
 		// check for new values
 		if (json.has("email")) {
 			User tmpUser = User.find.where()
@@ -57,7 +126,8 @@ public class UserController extends Controller {
 				return forbidden(JsonWrap
 						.prepareJsonStatus(
 								FORBIDDEN,
-								"The server can't fulfill the request, as the specified email is already in use. Try again with a different email."));
+								"The server can't fulfill the request, as the specified email " +
+                                        "is already in use. Try again with a different email."));
 		}
         Constraints.EmailValidator emailValidator=new Constraints.EmailValidator();
         Constraints.MinLengthValidator minLengthValidator=new Constraints.MinLengthValidator();
@@ -161,7 +231,8 @@ public class UserController extends Controller {
         Constraints.EmailValidator emailValidator=new Constraints.EmailValidator();
         Constraints.MinLengthValidator minLengthValidator=new Constraints.MinLengthValidator();
 		System.out.println("json=" + json + " - obj=" + tmp);
-		if (emailValidator.isValid(tmp.getEmail()) && minLengthValidator.isValid(tmp.getName()) && minLengthValidator.isValid(tmp.getPassword())) {
+		if (emailValidator.isValid(tmp.getEmail()) && minLengthValidator.isValid(tmp.getName())
+                && minLengthValidator.isValid(tmp.getPassword())) {
 			// if this entry with specified email does not exist, create, else
 			// throw an error.
 			if (User.find.where().eq("email", tmp.getEmail()).findUnique() == null) {
@@ -172,7 +243,8 @@ public class UserController extends Controller {
 			}
 		}
 		return forbidden(JsonWrap.prepareJsonStatus(FORBIDDEN,
-				"The user could not be created, please specify email, name, password. Email has to be valid (e.g. a@b.com)"));
+				"The user could not be created, please specify email, name, password. " +
+                        "Email has to be valid (e.g. a@b.com)"));
 	}
 
 }

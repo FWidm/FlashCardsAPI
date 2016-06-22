@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static play.mvc.Controller.request;
+import static play.mvc.Results.noContent;
 import static play.mvc.Results.ok;
 
 /**
@@ -90,5 +91,11 @@ public class FlashCardController {
         card.save();
 
         return ok();
+    }
+
+    public Result deleteFlashCard(Long id){
+        FlashCard fc=FlashCard.find.byId(id);
+        fc.delete();
+        return noContent();
     }
 }

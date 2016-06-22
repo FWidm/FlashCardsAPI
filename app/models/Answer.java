@@ -1,33 +1,43 @@
 package models;
 
 import com.avaje.ebean.Model;
+import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import play.data.validation.Constraints;
 
 import javax.persistence.*;
 import java.net.URI;
+import java.util.Date;
 
 /**
- * Created by fabianwidmann on 17/06/16.
+ * @author Jonas Kraus
+ * @author Fabian Widmann
+ *         on 17/06/16.
  */
 @Entity
 public class Answer extends Model {
     @Id @GeneratedValue
     private long id;
-    private int rating;
 
     @Constraints.Required
     private String answerText;
     private String hint;
     private URI mediaURI;
-    @OneToOne(fetch=FetchType.LAZY) //OneToMany??
-    @JoinColumn(name="author_id", referencedColumnName="id")
+
+   @ManyToOne//OneToMany??
+   @JoinColumn(name="author_id", referencedColumnName="id")
     private User author;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name="parent_card_id")
     @JsonIgnore
     private FlashCard card;
+
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z") @CreatedTimestamp
+    private Date created;
+
+    private int rating;
 
     public static Model.Finder<Long, Answer> find = new Model.Finder<Long, Answer>(Answer.class);
 
@@ -37,16 +47,18 @@ public class Answer extends Model {
         this.author = author;
     }
 
+
     @Override
     public String toString() {
         return "Answer{" +
                 "id=" + id +
-                ", rating=" + rating +
                 ", answerText='" + answerText + '\'' +
                 ", hint='" + hint + '\'' +
                 ", mediaURI=" + mediaURI +
                 ", author=" + author +
                 ", card=" + card +
+                ", created=" + created +
+                ", rating=" + rating +
                 '}';
     }
 
@@ -100,6 +112,10 @@ public class Answer extends Model {
 
     public FlashCard getCard() {
         return card;
+    }
+
+    public Date getCreated() {
+        return created;
     }
 
     public void setCard(FlashCard card) {

@@ -9,6 +9,11 @@ import play.data.validation.Constraints;
 import javax.persistence.*;
 import java.util.List;
 
+/**
+ * @author Jonas Kraus
+ * @author Fabian Widmann
+ *         on 13/06/16.
+ */
 @Entity
 @JsonPropertyOrder({ "groupId" }) //ensure that groupID is the first element in json.
 public class UserGroup extends Model {
@@ -26,8 +31,7 @@ public class UserGroup extends Model {
 	// to prevent endless recursion.
 	private List<User> users;
 
-	public static Model.Finder<Long, UserGroup> find = new Model.Finder<Long, UserGroup>(
-			Long.class, UserGroup.class);
+	public static Model.Finder<Long, UserGroup> find = new Model.Finder<Long, UserGroup>(UserGroup.class);
 
 	public UserGroup(String name, String description, List<User> users) {
 		super();
@@ -75,10 +79,21 @@ public class UserGroup extends Model {
 		return users;
 	}
 
+	/**
+	 * Replaces the current users with the given users.
+	 * @param users
+     */
 	public void setUsers(List<User> users) {
 		this.users = users;
+		for(User u: users){
+			u.setGroup(this);
+		}
 	}
 
+	/**
+	 * Adds one user to this group, updates the user's group as well.
+	 * @param user
+     */
 	public void addUser(User user) {
 		if (!users.contains(user)) {
 			users.add(user);

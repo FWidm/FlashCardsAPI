@@ -20,7 +20,7 @@ public class Question extends Model {
     private String question;
     private URI mediaURI;
 
-    @OneToOne(fetch=FetchType.LAZY) //OneToMany??
+    @ManyToOne
     @JoinColumn(name="author_id", referencedColumnName="id")
     private User author;
 //    @OneToOne(fetch= FetchType.LAZY)

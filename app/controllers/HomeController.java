@@ -3,6 +3,7 @@ package controllers;
 import models.*;
 import play.mvc.*;
 
+import util.JsonWrap;
 import views.html.*;
 
 import java.net.URI;
@@ -27,21 +28,27 @@ public class HomeController extends Controller {
     }
 
     public Result testCards() {
-        User u=new User("hello","hello1@world.com","passwörd",1);
-        u.save();
+        User tmp=User.find.where().eq("email","hello1@world.com").findUnique();
+        if(tmp==null){
+            tmp=new User("hello","hello1@world.com","passwörd",1);
+            tmp.save();
+        }
+
+
 
         List<String> tags=new ArrayList<>();
         tags.add("Tag1");
         tags.add("Tag2");
 
-        FlashCard fc=new FlashCard(u,false,tags);
+        FlashCard fc=new FlashCard(tmp,false,tags);
         fc.save();
         System.out.println("Flashcard created: "+fc);
-        Question q = new Question("Question",u);
+        Question q = new Question("Question",tmp);
         q.save();
+
         fc.setQuestion(q);
 
-        Answer a=new Answer("Answer","No hint available - 404",u);
+        Answer a=new Answer("Answer","No hint available - 404",tmp);
         a.save();
         fc.addAnswer(a);
 
@@ -55,17 +62,21 @@ public class HomeController extends Controller {
     }
 
     public Result testGroups(){
-        		List<User> l=new ArrayList<User>();
-		l.add(new User("a","a","a",-1));
-		l.add(new User("b","b","b",-2));
+        List<User> l=new ArrayList<User>();
+		l.add(new User("aaa","a@b.com","abbbbb",-1));
+		l.add(new User("bbb","b@a.com","baaaaa",-2));
+
+        for(User u:l){
+            u.save();
+        }
 
 		UserGroup g=new UserGroup("y","y",l);
 		g.save();
-		for(User u:l){
-			u.setGroup(g);
-			u.save();
-		}
 
+        for(User u:l){
+            u.setGroup(g);
+            u.update();
+        }
 		System.out.println("Created group g="+g+" with users"+l);
         System.out.println("__________________________________");
         System.out.println("Querying the groups");
@@ -76,5 +87,10 @@ public class HomeController extends Controller {
         }
         UserGroup tmpGroup;
         return ok(index.render("Group test done!"));
+    }
+
+    public Result test(){
+
+        return ok(JsonWrap.prepareJsonStatus(OK, "hello world"));
     }
 }

@@ -10,7 +10,11 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import play.data.validation.Constraints.*;
 
 import javax.persistence.*;
-
+/**
+ * @author Jonas Kraus
+ * @author Fabian Widmann
+ *         on 13/06/16.
+ */
 @Entity
 @JsonPropertyOrder({"userId"}) //ensure that userID is the first element in json.
 public class User extends Model {
@@ -119,10 +123,6 @@ public class User extends Model {
 
 	public void setGroup(UserGroup group) {
 		this.group = group;
-		//update group definition as well.
-		if (group!=null && !group.getUsers().contains(this)) {
-			group.addUser(this);
-		}
         this.update();
 	}
 

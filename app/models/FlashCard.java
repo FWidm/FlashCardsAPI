@@ -27,23 +27,23 @@ public class FlashCard extends Model {
     @Column(name = "flashcard_id")
     private long id;
     private int rating;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm a z", timezone = "Germany")
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
     @CreatedTimestamp
     private Date created;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm a z", timezone = "Germany")
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
     @UpdatedTimestamp
     private Date lastUpdated;
     //todo: how do we implement tags? ElementCollection does not work with ebeans, we might have to make our own tag class that contains an id and a string...
 
     //orphanRemoval means, that no single questions without a specific card may exist. This helps us keep the db clean.
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(cascade=CascadeType.ALL)
     @PrivateOwned //this means, that if the element is deleted with its parent.
     private Question question;
 
-    @OneToMany(mappedBy = "card", cascade = CascadeType.REMOVE)
+    @OneToMany(cascade=CascadeType.ALL,mappedBy = "card")
     @PrivateOwned
     private List<Answer> answers;
-    @OneToOne //OneToMany??
+    @ManyToOne //OneToMany??
     @JoinColumn(name="author_id", referencedColumnName="id")
     private User author;
     private boolean multipleChoice;
