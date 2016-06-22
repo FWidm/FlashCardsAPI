@@ -4,6 +4,7 @@ import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import controllers.UserController;
 import play.data.validation.Constraints;
 
 import javax.persistence.*;
@@ -18,7 +19,6 @@ import java.util.List;
 @JsonPropertyOrder({ "groupId" }) //ensure that groupID is the first element in json.
 public class UserGroup extends Model {
 
-	private static final long serialVersionUID = -8033148832312413044L;
 	@Id
 	@GeneratedValue
 	@Column(name = "group_id")
@@ -46,8 +46,8 @@ public class UserGroup extends Model {
 		this.description=requestGroup.getDescription();
 		this.users=requestGroup.getUsers();
 		for(User u:users){
+//            System.out.println(">> updating user: "+u);
 			u.setGroup(this);
-			u.update();
 		}
 	}
 
@@ -108,4 +108,14 @@ public class UserGroup extends Model {
 				+ description+"]";
 	}
 
+    /**
+     * Removes a specific user from the users of this group.
+     * @param user
+     */
+    public void removeUser(User user) {
+        if(users.contains(user)){
+            users.remove(user);
+            this.update();
+        }
+    }
 }

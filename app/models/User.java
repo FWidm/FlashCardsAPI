@@ -34,9 +34,7 @@ public class User extends Model {
 	private Date created;
 	// fetchtype says, that this is loaded only on demand, thus when calling
 	// .getGroup().
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-	// JsonBackReference says, that this will be omitted while creating the Json
-	// to prevent recursion.
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "group_id")
 	private UserGroup group;
 
@@ -122,8 +120,12 @@ public class User extends Model {
 	}
 
 	public void setGroup(UserGroup group) {
+//        System.out.println(">> setting usergroup from "+this.getGroup()+" to "+group);
 		this.group = group;
-		group.addUser(this);
+		//update group definition as well.
+		if (group!=null && !group.getUsers().contains(this)) {
+			group.addUser(this);
+		}
         this.update();
 	}
 

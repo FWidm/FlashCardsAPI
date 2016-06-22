@@ -28,16 +28,55 @@ GET     /cards              controllers.FlashCardController.getFlashCardList
 POST    /cards              controllers.FlashCardController.addFlashCard
 DELETE /cards/:id           controllers.FlashCardController.deleteFlashCard(id:Long)
 ```
+## Example Calls
+### Users
+**Elements needed for REST calls:**
+-*String*: name, password, email
+- *int*: rating
 
+**Create a new User:**
+Use a `POST`  request to `localhost:9000/users` with `Content-Type:Application/JSON`.  The body **must** contain name, password, email (*unique*) and **may** contain a rating.
+```json
+{
+    "name": "name",
+    "password": "passwörd",
+    "email": "a@a.com",
+    "rating": 1
+}
+```
+
+### Groups
+**Elements needed for REST calls:**
+- *String*: name, description
+- *Array of users*: users
+
+**Create a new Group:**
+Post a request to the host with `Content-Type:Application/JSON`.
+The body **must** contain name and description and **may** contain a list of users.
+
+`POST localhost:9000/groups`
+```json
+{
+    "name":"xyxxxx",
+    "description": "desc",
+    "users":[{"userId":8},{"userId":9}]
+}
+```
+
+**Update a Group:**
+Send a `PATCH`or `PUT` request to `localhost:9000/groups/<id>` with `Content-Type:Application/JSON`.  For `PATCH`**any** attributes may be modified via the request. `PUT` expects **every** attribute to be there.
+
+**Delete a Group:**
+Use `DELETE` request to `localhost:9000/groups/<id>`.
 ## Expected/Possible JSON for the different Objects
-##### User
+#### User
 Currently creation works without specifying a group, which sets the group of the user to null. The group can then be set via `PATCH` or `PUT` if it is specified like this:
-```Json  
+```Json
 {
     "name": "hello",
     "password": "passwörd",
     "email": "hello1@world.com",
-    "rating": 1,
+    "rating": 1
     "group":{
                 "groupId": 3,
                 "name": "y",
@@ -45,33 +84,27 @@ Currently creation works without specifying a group, which sets the group of the
             }
 }
 ```
-##### Group
-```json  
-{
-    "groupId": 1,
-    "name": "y",
-    "description": "y"
- }
-```
-##### Group
+#### Group
 ```json
 {
       "groupId": 3,
       "name": "y",
       "description": "y"
+      "users":[{"userID":1}, ...]
     }
 ```
 
 
-##### Card
-```json  
+#### Card
+```json
   {
     "id": 4,
     "rating": 0,
     "created": "2016-06-22 10:10:06 UTC",
     "lastUpdated": "2016-06-22 10:10:06 UTC",
-    "question": {},
-    "answers": [{}],
+    "question": {}
+    "answers": [{},{},..]
+    ],
     "author": { <see user> },
     "multipleChoice": false,
     "marked": false,
@@ -79,7 +112,7 @@ Currently creation works without specifying a group, which sets the group of the
   }
 ]
 ```
-##### Questions
+#### Questions
 ```json
 {
       "id": 4,
@@ -91,8 +124,8 @@ Currently creation works without specifying a group, which sets the group of the
 }
 ```
 
-##### Answers
-```json  
+#### Answers
+```json
  {
         "id": 4,
         "answerText": "Answer",

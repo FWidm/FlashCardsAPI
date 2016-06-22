@@ -5,13 +5,8 @@ package util;
  * @author Fabian Widmann
  *         on 20/06/16.
  */
-public enum JsonKeys {
-    USER_ID("userId"), CARD_ID(""), ANSWER_ID(""), GROUP_ID("groupId"), QUESTION_ID("");
+public class JsonKeys {
+    public static final String USER_ID="userId";
+    public static final String GROUP_ID="groupId";
 
-
-    private String name;
-
-    private JsonKeys(String s) {
-        name = s;
-    }
 }

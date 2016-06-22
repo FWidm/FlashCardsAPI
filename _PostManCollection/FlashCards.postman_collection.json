@@ -1,0 +1,163 @@
+{
+	"variables": [],
+	"info": {
+		"name": "FlashCards",
+		"_postman_id": "f63a8173-014a-ed95-bf6a-e02b88ff0f29",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Groups",
+			"description": "",
+			"item": [
+				{
+					"name": "localhost:9000/groups",
+					"request": {
+						"url": "localhost:9000/groups",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Creates a new Group and adds two users."
+					},
+					"response": []
+				},
+				{
+					"name": "localhost:9000/groups",
+					"request": {
+						"url": "localhost:9000/groups",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all groups"
+					},
+					"response": []
+				},
+				{
+					"name": "localhost:9000/groups/20",
+					"request": {
+						"url": "localhost:9000/groups/20",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves a specific group"
+					},
+					"response": []
+				},
+				{
+					"name": "localhost:9000/groups/20",
+					"request": {
+						"url": "localhost:9000/groups/20",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Deletes the specific group 20. Also deletes memberships."
+					},
+					"response": []
+				},
+				{
+					"name": "put localhost:9000/groups/20",
+					"request": {
+						"url": "localhost:9000/groups/21",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"wewfeqwef\",\n    \"description\": \"fwqefwqw    \",\n    \"users\":null\n}"
+						},
+						"description": "Deletes the specific group 20. Also deletes memberships."
+					},
+					"response": []
+				},
+				{
+					"name": "patch localhost:9000/groups/20",
+					"request": {
+						"url": "localhost:9000/groups/21",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"users\":null\n}"
+						},
+						"description": "updates group 20 with a new userlist."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"description": "",
+			"item": [
+				{
+					"name": "Create a new User",
+					"request": {
+						"url": "localhost:9000/users",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"xy\",\n    \"password\": \"passwörd\",\n    \"email\": \"xy@world.com\",\n    \"rating\": 1\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

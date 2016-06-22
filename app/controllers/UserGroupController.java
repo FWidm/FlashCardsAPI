@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import models.User;
 import models.UserGroup;
 import play.mvc.*;
+import util.JsonKeys;
 import util.JsonWrap;
 
 public class UserGroupController extends Controller {
@@ -43,16 +44,25 @@ public class UserGroupController extends Controller {
 	 * Updates the specified UserGroup. The Json Body can contain "name",
 	 * "description" as Strings or "users" as array of UserIds. If anything else
 	 * is sent no update will be made. Example Body: { "name": "345",
-	 * "description": "345", "users": [{"id": 4}, {"id": 5}, ...] }
+	 * "description": "345", "users": [{"JsonKeys.USER_ID": 4}, {"JsonKeys.USER_ID": 5}, ...] }
 	 * 
 	 * @param id GroupID of the group we want to update
 	 * @return either ok or bad_request with an explanation
 	 */
 	@BodyParser.Of(BodyParser.Json.class)
 	public Result updateUserGroup(Long id) {
+        System.out.println(request().method());
 		String information = "";
 		JsonNode json = request().body().asJson();
 		ObjectMapper mapper = new ObjectMapper();
+
+        //Check whether the request was a put and if it was check if a param is missing, if that is the case --> bad req.
+        if(request().method().equals("PUT") && (!json.has("name") || !json.has("description") || !json.has("users"))){
+            return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
+                    "The Update method needs all details of the group, such as name, " +
+                            "description and a user group (array of users or null). An attribute was missing for id="
+                            + id + "."));
+        }
 
 		try {
 			UserGroup requestGroup = mapper.convertValue(json, UserGroup.class);
@@ -82,8 +92,8 @@ public class UserGroupController extends Controller {
 				for (JsonNode n : users) {
 					// when a user id is found we will get the object and
 					// update the usergroup.
-					if (n.has("id")) {
-						User u = User.find.byId(n.get("id").asLong());
+					if (n.has(JsonKeys.USER_ID)) {
+						User u = User.find.byId(n.get(JsonKeys.USER_ID).asLong());
 						u.setGroup(toUpdate);
 						u.update();
 					} else {
@@ -125,24 +135,27 @@ public class UserGroupController extends Controller {
 				userList = new ArrayList<User>();
 				//get the specific nods in the json
 				JsonNode users = json.findValue("users");
-				System.out.println("Users=" + users + " isArray? "
-						+ users.isArray());
+				System.out.println("Users=" + users);
 				// Loop through all objects in the values associated with the
 				// "users" key.
 				for (JsonNode n : users) {
 					// when a user id is found we will get the object and add them to the userList.
-					if (n.has("id")) {
-						User u = User.find.byId(n.get("id").asLong());
+                    Long l=n.get(JsonKeys.USER_ID).asLong();
+                    System.out.println("User id="+l+" found for node="+n);
+					if (n.has(JsonKeys.USER_ID)) {
+						User u = User.find.byId(l);
 						userList.add(u);
 					} 
 				}
+                //set the list for the group created from the content of the json body
+                System.out.println("Adding users to the group: "+userList);
 			}
-			//set the list for the group created from the content of the json body
-			requestGroup.setUsers(userList);
-			//constructor now does update each user in the list to be in the new group.
-			UserGroup group = new UserGroup(requestGroup);
+
+            UserGroup group = new UserGroup(requestGroup);
+            group.save();
+            group.setUsers(userList);
 			System.out.println(group);
-			group.save();
+
 			return ok(JsonWrap.prepareJsonStatus(OK, "Usergroup with the id="
 					+ group.getId() + " has been created!"));
 		} catch (IllegalArgumentException e) {

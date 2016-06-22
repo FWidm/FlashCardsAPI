@@ -31,6 +31,7 @@ DELETE 	/users/:id			controllers.UserController.deleteUser(id:Long)
 GET 	/groups				controllers.UserGroupController.getUserGroupList
 GET 	/groups/:id			controllers.UserGroupController.getUserGroup(id:Long)
 PUT 	/groups/:id			controllers.UserGroupController.updateUserGroup(id:Long)
+PATCH 	/groups/:id			controllers.UserGroupController.updateUserGroup(id:Long)
 POST 	/groups				controllers.UserGroupController.addUserGroup
 DELETE	/groups/:id			controllers.UserGroupController.deleteUserGroup(id:Long)
 

@@ -2,13 +2,10 @@ package controllers;
 
 import java.util.List;
 
-import models.Answer;
-import models.FlashCard;
-import models.Question;
+import models.*;
 import play.api.mvc.Flash;
 import play.data.validation.Constraints;
 import util.JsonWrap;
-import models.User;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -63,6 +60,7 @@ public class UserController extends Controller {
 		}
 		Constraints.EmailValidator emailValidator=new Constraints.EmailValidator();
 		Constraints.MinLengthValidator minLengthValidator=new Constraints.MinLengthValidator();
+
 		if (json.has("password") && minLengthValidator.isValid(requestData.getPassword())) {
 			u.setPassword(requestData.getPassword());
             modified=true;
@@ -76,9 +74,12 @@ public class UserController extends Controller {
             u.setName(requestData.getName());
             modified=true;
         }
-		if (json.has("group") && emailValidator.isValid(requestData.getEmail())){
-			u.setGroup(requestData.getGroup()); //todo: change this to just use the group id to update.
-            modified=true;
+        if(json.has("email") && emailValidator.isValid(requestData.getEmail())){
+            u.setEmail(requestData.getEmail());
+        }
+        if (json.has("group")){
+            UserGroup g = UserGroup.find.byId(requestData.getGroup().getId());
+            u.setGroup(g);
         }
         if(modified) {
             u.update();
@@ -123,9 +124,9 @@ public class UserController extends Controller {
 			if (tmpUser == null)
 				u.setEmail(requestData.getEmail());
 			else
-				return forbidden(JsonWrap
+				return badRequest(JsonWrap
 						.prepareJsonStatus(
-								FORBIDDEN,
+								BAD_REQUEST,
 								"The server can't fulfill the request, as the specified email " +
                                         "is already in use. Try again with a different email."));
 		}
@@ -138,8 +139,16 @@ public class UserController extends Controller {
 			u.setRating(requestData.getRating());
 		if (json.has("name") && minLengthValidator.isValid(requestData.getPassword()))
 			u.setName(requestData.getName());
-		if (json.has("group") && emailValidator.isValid(requestData.getEmail()))
-			u.setGroup(requestData.getGroup()); //todo: change this to just use the group id to update.
+        if(json.has("email") && emailValidator.isValid(requestData.getEmail())){
+            u.setEmail(requestData.getEmail());
+        }
+		if (json.has("group")){
+            //todo: write a test to check if removeUser works as intended.
+            requestData.getGroup().removeUser(requestData);
+            UserGroup g=UserGroup.find.byId(requestData.getId());
+            System.out.println("Found Group: "+g);
+//            u.setGroup(g);
+        }
 		u.update();
 		return ok(JsonWrap.prepareJsonStatus(OK, "User with id=" + id
 				+ " has been succesfully changed."));
@@ -182,8 +191,7 @@ public class UserController extends Controller {
      * @return OK
      */
 	public Result deleteUser(Long id) {
-
-        //TODO: check if it is neccesary to delete other things in the db. or make those entries cascade.
+        //TODO: If we do not want to delete the answers, questions, cards we have to assign a std. user like anon
         List<Answer> givenAnswers= Answer.find.where().eq("author_id", id).findList();
         System.out.println("Answers from the user has size="+givenAnswers.size());
 
@@ -225,7 +233,10 @@ public class UserController extends Controller {
 	public  Result addUser() {
 		JsonNode json = request().body().asJson();
 		ObjectMapper mapper = new ObjectMapper();
-
+        if(json.has("group")){
+            return forbidden(JsonWrap.prepareJsonStatus(FORBIDDEN,
+                    "The user could not be created, a user group has to be set via PATCH or PUT. It may not be content of POST."));
+        }
 		User tmp = mapper.convertValue(json, User.class);
 
         //Checks if the constraints for @email are met via it's isValid method.
@@ -238,7 +249,7 @@ public class UserController extends Controller {
 			// throw an error.
 			if (User.find.where().eq("email", tmp.getEmail()).findUnique() == null) {
 				User u=new User(tmp);
-                //todo: change this to just use the group id to update.
+
 				u.save();
 				return created(JsonWrap.prepareJsonStatus(CREATED, "User with id="+u.getId()
 						 + " has been created."));
