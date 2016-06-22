@@ -37,7 +37,7 @@ Currently creation works without specifying a group, which sets the group of the
     "name": "hello",
     "password": "passwörd",
     "email": "hello1@world.com",
-    "rating": 1
+    "rating": 1,
     "group":{
                 "groupId": 3,
                 "name": "y",
@@ -70,9 +70,8 @@ Currently creation works without specifying a group, which sets the group of the
     "rating": 0,
     "created": "2016-06-22 10:10:06 UTC",
     "lastUpdated": "2016-06-22 10:10:06 UTC",
-    "question": {}
-    "answers": [{},{},..]
-    ],
+    "question": {},
+    "answers": [{}],
     "author": { <see user> },
     "multipleChoice": false,
     "marked": false,
@@ -93,7 +92,6 @@ Currently creation works without specifying a group, which sets the group of the
 ```
 
 ##### Answers
-##### Answer
 ```json  
  {
         "id": 4,
