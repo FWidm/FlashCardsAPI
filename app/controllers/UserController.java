@@ -5,6 +5,7 @@ import java.util.List;
 import models.*;
 import play.api.mvc.Flash;
 import play.data.validation.Constraints;
+import util.JsonKeys;
 import util.JsonWrap;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
@@ -23,79 +24,9 @@ public class UserController extends Controller {
 		return ok(JsonWrap.getJson(u));
 	}
 
-    /**
-     * Partially updates the user when a patch method is used for updating. More infos here: https://tools.ietf.org/html/rfc5789#section-2.1
-     * Expects
-     * @param id
-     * @return
-     */
-	@BodyParser.Of(BodyParser.Json.class)
-	public Result partiallyUpdateUser(Long id){
-		JsonNode json = request().body().asJson();
-        boolean modified = false;
-		if (json.size() == 0)
-			return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
-					"No Json body was found. This is required to update the user with id="
-							+ id + "."));
 
-		ObjectMapper mapper = new ObjectMapper();
-		User requestData = mapper.convertValue(json, User.class);
-
-		// get the specific user
-		User u = User.find.byId(id);
-		// check for new values
-		if (json.has("email")) {
-            modified=true;
-			User tmpUser = User.find.where()
-					.eq("email", requestData.getEmail()).findUnique();
-			System.out.println("does email exist? " + tmpUser);
-			if (tmpUser == null)
-				u.setEmail(requestData.getEmail());
-			else
-				return badRequest(JsonWrap
-						.prepareJsonStatus(
-								BAD_REQUEST,
-								"The server can't fulfill the request, as the specified email is already in use. " +
-                                        "Try again with a different email."));
-		}
-		Constraints.EmailValidator emailValidator=new Constraints.EmailValidator();
-		Constraints.MinLengthValidator minLengthValidator=new Constraints.MinLengthValidator();
-
-		if (json.has("password") && minLengthValidator.isValid(requestData.getPassword())) {
-			u.setPassword(requestData.getPassword());
-            modified=true;
-		}
-		if (json.has("rating")){
-			u.setRating(requestData.getRating());
-            modified=true;
-        }
-
-        if (json.has("name") && minLengthValidator.isValid(requestData.getPassword())) {
-            u.setName(requestData.getName());
-            modified=true;
-        }
-        if(json.has("email") && emailValidator.isValid(requestData.getEmail())){
-            u.setEmail(requestData.getEmail());
-        }
-        if (json.has("group")){
-            UserGroup g = UserGroup.find.byId(requestData.getGroup().getId());
-            u.setGroup(g);
-        }
-        if(modified) {
-            u.update();
-            return ok(JsonWrap.prepareJsonStatus(OK, "User with id=" + id
-                    + " has been partially changed."));
-        }
-        else
-            return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
-                    "No updates for any values could be applied."
-                            + id + "."));
-
-	}
 
 	/**
-	 * Adds a new user to the database, throws an error if the email, name or
-	 * password are missing.
 	 * 
 	 * @return
 	 */
@@ -103,26 +34,28 @@ public class UserController extends Controller {
 	public Result updateUser(Long id) {
 		JsonNode json = request().body().asJson();
 
-		if(!json.has("email") || !json.has("rating") || !json.has("name") ||
+		if(request().method().equals("PUT") && !json.has("email") || !json.has("rating") || !json.has("name") ||
                 !json.has("group") || !json.has("password"))
 			return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
 					"The Update method needs all details of the user, such as email, " +
                             "rating, name, group and password! An attribute was missing for id="
 							+ id + "."));
 		
-		ObjectMapper mapper = new ObjectMapper();
-		User requestData = mapper.convertValue(json, User.class);
+//		ObjectMapper mapper = new ObjectMapper();
+//		User requestData = mapper.convertValue(json, User.class);
 		
 		// get the specific user
 		User u = User.find.byId(id);
 
 		// check for new values
-		if (json.has("email")) {
-			User tmpUser = User.find.where()
-					.eq("email", requestData.getEmail()).findUnique();
-			System.out.println("does email exist? " + tmpUser);
-			if (tmpUser == null)
-				u.setEmail(requestData.getEmail());
+        Constraints.EmailValidator emailValidator=new Constraints.EmailValidator();
+
+        if (json.has("email") && emailValidator.isValid(json.get("email").asText())) {
+			User checkEmail = User.find.where()
+					.eq("email", json.get("email").asText()).findUnique();
+			System.out.println("does email exist? " + checkEmail);
+			if (checkEmail == null)
+				u.setEmail(json.get("email").asText());
 			else
 				return badRequest(JsonWrap
 						.prepareJsonStatus(
@@ -130,24 +63,21 @@ public class UserController extends Controller {
 								"The server can't fulfill the request, as the specified email " +
                                         "is already in use. Try again with a different email."));
 		}
-        Constraints.EmailValidator emailValidator=new Constraints.EmailValidator();
         Constraints.MinLengthValidator minLengthValidator=new Constraints.MinLengthValidator();
-		if (json.has("password") && minLengthValidator.isValid(requestData.getPassword())) {
-			u.setPassword(requestData.getPassword());
+		if (json.has("password") && minLengthValidator.isValid(json.get("password").asText())) {
+            u.setPassword(json.get("password").asText());
 		}
 		if (json.has("rating"))
-			u.setRating(requestData.getRating());
-		if (json.has("name") && minLengthValidator.isValid(requestData.getPassword()))
-			u.setName(requestData.getName());
-        if(json.has("email") && emailValidator.isValid(requestData.getEmail())){
-            u.setEmail(requestData.getEmail());
-        }
+			u.setRating(json.get("rating").asInt());
+		if (json.has("name") && minLengthValidator.isValid(json.get("name").asText()))
+			u.setName(json.get("name").asText());
 		if (json.has("group")){
-            //todo: write a test to check if removeUser works as intended.
-            requestData.getGroup().removeUser(requestData);
-            UserGroup g=UserGroup.find.byId(requestData.getId());
-            System.out.println("Found Group: "+g);
-//            u.setGroup(g);
+            System.out.println("groupnode: "+json.get("group"));
+            Long groupId=json.get("group").get(JsonKeys.GROUP_ID).asLong();
+            UserGroup group = UserGroup.find.byId(groupId);
+            System.out.println("setting group to gid="+groupId+", group="+group);
+            u.setGroup(group);
+
         }
 		u.update();
 		return ok(JsonWrap.prepareJsonStatus(OK, "User with id=" + id
@@ -217,6 +147,12 @@ public class UserController extends Controller {
             q.delete();
         }
 
+//        User u= User.find.byId(id);
+//
+//        UserGroup group = u.getGroup();
+//        u.setGroup(null);
+//        u.update();
+//        group.removeUser(User.find.byId(id));
 		User.find.ref(id).delete();
 
 		return ok(JsonWrap.prepareJsonStatus(OK, "The user with the id=" + id

@@ -2,12 +2,14 @@ package controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import models.User;
 import models.UserGroup;
+import play.data.Form;
 import play.mvc.*;
 import util.JsonKeys;
 import util.JsonWrap;
@@ -20,8 +22,22 @@ public class UserGroupController extends Controller {
 	 * @return
 	 */
 	public Result getUserGroupList() {
-		List<UserGroup> g = UserGroup.find.all();
-		return ok(JsonWrap.getJson(g));
+        Map<String, String[]> urlParams = Controller.request().queryString();
+        if(urlParams.keySet().contains("empty")){
+            System.out.println("only print empty or nonempty groups");
+            //only print the first val we get for the key, this is possible as /groups?empty=true&empty=false could return
+            //multiple values.
+            if(urlParams.get("empty")[0].equals("true")){
+                System.out.println("print empty.");
+                List<UserGroup> groups = UserGroup.find.where().isNotNull("users").findList();
+                System.out.println(groups);
+            }
+            else{
+                return ok(JsonWrap.getJson(UserGroup.find.where().isNotNull("users").findList()));
+            }
+        }
+
+		return ok(JsonWrap.getJson(UserGroup.find.all()));
 	}
 
 	/**

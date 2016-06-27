@@ -1,6 +1,6 @@
 # FlashCards RESTful API
 ## Current HTTP Methods that should be working:
-```Scala
+```
 #Flash Cards API
 GET     /testCards          controllers.HomeController.testCards
 GET     /testGroups         controllers.HomeController.testGroups
@@ -20,6 +20,7 @@ DELETE 	/users/:id			controllers.UserController.deleteUser(id:Long)
 GET 	/groups				controllers.UserGroupController.getUserGroupList
 GET 	/groups/:id			controllers.UserGroupController.getUserGroup(id:Long)
 PUT 	/groups/:id			controllers.UserGroupController.updateUserGroup(id:Long)
+PATCH 	/groups/:id			controllers.UserGroupController.updateUserGroup(id:Long)
 POST 	/groups				controllers.UserGroupController.addUserGroup
 DELETE	/groups/:id			controllers.UserGroupController.deleteUserGroup(id:Long)
 
@@ -90,7 +91,7 @@ Currently creation works without specifying a group, which sets the group of the
       "groupId": 3,
       "name": "y",
       "description": "y",
-      "users":[{"userID":1}, ...]
+      "users":[{"userID":1}, {}]
     }
 ```
 
