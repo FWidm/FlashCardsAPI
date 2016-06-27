@@ -17,7 +17,8 @@ import util.JsonWrap;
 public class UserGroupController extends Controller {
 
 	/**
-	 * Returns all groups in the JSON format.
+	 * Returns all groups in the JSON format. Optional URL Paramerer is "?empty" which can either be true or false and
+     * only returns groups that contain or do not contain users.
 	 * 
 	 * @return
 	 */
@@ -28,15 +29,23 @@ public class UserGroupController extends Controller {
             //only print the first val we get for the key, this is possible as /groups?empty=true&empty=false could return
             //multiple values.
             if(urlParams.get("empty")[0].equals("true")){
-                System.out.println("print empty.");
-                List<UserGroup> groups = UserGroup.find.where().isNotNull("users").findList();
-                System.out.println(groups);
+                // TODO: 27/06/16 check why the opposite of UserGroup.find.where().isNotNull("users").findList() does not work for this. Always returns 0.
+                List<UserGroup> nonemptyGroups=UserGroup.find.where().isNotNull("users").findList();
+                List<UserGroup> emptyGroups=UserGroup.find.all();
+                emptyGroups.removeAll(nonemptyGroups);
+                return ok(JsonWrap.getJson(emptyGroups));
             }
             else{
                 return ok(JsonWrap.getJson(UserGroup.find.where().isNotNull("users").findList()));
             }
         }
-
+        for(UserGroup ug:UserGroup.find.all()){
+            System.out.print("id="+ug.getId()+" | users size="+ug.getUsers().size()+" | users is null? "+(ug.getUsers()==null)+" | users=");
+            for(User u: ug.getUsers()){
+                System.out.print("["+u+"];");
+            }
+            System.out.println();
+        }
 		return ok(JsonWrap.getJson(UserGroup.find.all()));
 	}
 

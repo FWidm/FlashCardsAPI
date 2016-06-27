@@ -19,6 +19,10 @@ public class UserController extends Controller {
         return ok(JsonWrap.prepareJsonStatus(OK,"ok!"));
     }
 
+    /**
+     * Return all users in the database.
+     * @return
+     */
 	public Result getUserList() {
 		List<User> u = User.find.all();
 		return ok(JsonWrap.getJson(u));
@@ -27,7 +31,7 @@ public class UserController extends Controller {
 
 
 	/**
-	 * 
+	 * Either PATCHes single values or PUTs all values into the entity with the specified id.
 	 * @return
 	 */
 	@BodyParser.Of(BodyParser.Json.class)
@@ -40,9 +44,7 @@ public class UserController extends Controller {
 					"The Update method needs all details of the user, such as email, " +
                             "rating, name, group and password! An attribute was missing for id="
 							+ id + "."));
-		
-//		ObjectMapper mapper = new ObjectMapper();
-//		User requestData = mapper.convertValue(json, User.class);
+
 		
 		// get the specific user
 		User u = User.find.byId(id);

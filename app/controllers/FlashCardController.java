@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static play.mvc.Controller.request;
+import static play.mvc.Http.Status.OK;
 import static play.mvc.Results.noContent;
 import static play.mvc.Results.ok;
 
@@ -22,10 +23,25 @@ import static play.mvc.Results.ok;
  *         on 17/06/16.
  */
 public class FlashCardController {
-
+    /**
+     * Retrieves all Flashcards.
+     * @return
+     */
     public Result getFlashCardList() {
         List<FlashCard> flashCardList = FlashCard.find.all();
         return ok(JsonWrap.getJson(flashCardList));
+    }
+
+    /**
+     * Deletes the specific Flashcard including questions and answers.
+     * @param id
+     * @return
+     */
+    public Result deleteFlashCard(long id){
+        FlashCard.find.byId(id).delete();
+
+        return ok(JsonWrap.prepareJsonStatus(OK, "The card with the id=" + id
+                + " has been deleted. This includes questions and answers"));
     }
 
     /**

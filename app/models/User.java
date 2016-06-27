@@ -24,8 +24,8 @@ public class User extends Model {
 	@GeneratedValue
 	@JsonProperty("userId")
 	private Long id;
-	@Required @MinLength(3)
-	private String name, password;
+	@Required @MinLength(3) // TODO: 27/06/16 Password should be ignored when outputting this to users in the future - @JsonIgnore
+    private String name, password;
 	@Required @Column(unique = true) @Email
 	private String email;
 
