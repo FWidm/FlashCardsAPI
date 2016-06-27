@@ -9,10 +9,15 @@ import com.avaje.ebean.annotation.PrivateOwned;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import util.JsonKeys;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+
+import static util.JsonKeys.FLASHCARD_ID;
 
 
 /**
@@ -21,10 +26,12 @@ import java.util.List;
  *
  */
 @Entity
+@JsonPropertyOrder({ JsonKeys.FLASHCARD_ID})
 public class FlashCard extends Model {
     @Id
     @GeneratedValue
-    @Column(name = "flashcard_id")
+    @Column(name = JsonKeys.FLASHCARD_ID)
+    @JsonProperty(JsonKeys.FLASHCARD_ID)
     private long id;
     private int rating;
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
@@ -37,6 +44,7 @@ public class FlashCard extends Model {
 
     //orphanRemoval means, that no single questions without a specific card may exist. This helps us keep the db clean.
     @OneToOne(cascade=CascadeType.ALL)
+    @JoinColumn(name="question_id", referencedColumnName = JsonKeys.QUESTION_ID)
     @PrivateOwned //this means, that if the element is deleted with its parent.
     private Question question;
 
@@ -44,16 +52,16 @@ public class FlashCard extends Model {
     @PrivateOwned
     private List<Answer> answers;
     @ManyToOne //OneToMany??
-    @JoinColumn(name="author_id", referencedColumnName="id")
+    @JoinColumn(name="author_id", referencedColumnName=JsonKeys.USER_ID)
     private User author;
     private boolean multipleChoice;
 
-    @Transient //not persistent.
-    @JsonIgnore //todo: jsonIgnore is not working, fields are serialized.
-    private boolean isSelected;
-    @Transient //not persistent.
-    @JsonIgnore
-    private boolean isMarked;
+//    @Transient //not persistent.
+//    @JsonIgnore //todo: jsonIgnore is not working, fields are serialized.
+//    private boolean isSelected;
+//    @Transient //not persistent.
+//    @JsonIgnore
+//    private boolean isMarked;
 
     public static Model.Finder<Long, FlashCard> find = new Model.Finder<Long, FlashCard>(FlashCard.class);
 
@@ -133,8 +141,6 @@ public class FlashCard extends Model {
                 ", lastUpdated=" + lastUpdated +
                 ", author=" + author +
                 ", multipleChoice=" + multipleChoice +
-                ", isSelected=" + isSelected +
-                ", isMarked=" + isMarked +
                 '}';
     }
 
@@ -197,21 +203,5 @@ public class FlashCard extends Model {
 
     public void setMultipleChoice(boolean multipleChoice) {
         this.multipleChoice = multipleChoice;
-    }
-
-    public boolean isSelected() {
-        return isSelected;
-    }
-
-    public void setSelected(boolean selected) {
-        isSelected = selected;
-    }
-
-    public boolean isMarked() {
-        return isMarked;
-    }
-
-    public void setMarked(boolean marked) {
-        isMarked = marked;
     }
 }

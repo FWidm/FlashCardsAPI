@@ -4,7 +4,10 @@ import com.avaje.ebean.Model;
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import play.data.validation.Constraints;
+import util.JsonKeys;
 
 import javax.persistence.*;
 import java.net.URI;
@@ -16,8 +19,11 @@ import java.util.Date;
  *         on 17/06/16.
  */
 @Entity
+@JsonPropertyOrder({ JsonKeys.ANSWER_ID})
 public class Answer extends Model {
     @Id @GeneratedValue
+    @Column(name = JsonKeys.ANSWER_ID)
+    @JsonProperty(JsonKeys.ANSWER_ID)
     private long id;
 
     @Constraints.Required
@@ -26,7 +32,7 @@ public class Answer extends Model {
     private URI mediaURI;
 
    @ManyToOne//OneToMany??
-   @JoinColumn(name="author_id", referencedColumnName="id")
+   @JoinColumn(name="author_id", referencedColumnName=JsonKeys.USER_ID)
     private User author;
 
     @ManyToOne

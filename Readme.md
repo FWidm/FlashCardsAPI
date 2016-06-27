@@ -2,6 +2,7 @@
 ## Current HTTP Methods that should be working:
 ```
 #Flash Cards API
+#Flash Cards API
 GET     /testCards          controllers.HomeController.testCards
 GET     /testGroups         controllers.HomeController.testGroups
 GET     /test               controllers.HomeController.test
@@ -12,7 +13,7 @@ GET		/users/:id          controllers.UserController.getUser(id:Long)
 GET		/users/e/:email     controllers.UserController.getUserByEmail(email:String)
 POST	/users				controllers.UserController.addUser
 PUT		/users/:id			controllers.UserController.updateUser(id:Long)
-PATCH	/users/:id			controllers.UserController.partiallyUpdateUser(id:Long)
+PATCH	/users/:id			controllers.UserController.updateUser(id:Long)
 
 DELETE 	/users/:id			controllers.UserController.deleteUser(id:Long)
 
@@ -26,8 +27,14 @@ DELETE	/groups/:id			controllers.UserGroupController.deleteUserGroup(id:Long)
 
 #Flashcards
 GET     /cards              controllers.FlashCardController.getFlashCardList
+GET     /cards/:id          controllers.FlashCardController.getFlashCard(id:Long)
+GET     /cards/:id/question controllers.FlashCardController.getQuestion(id:Long)
+GET     /cards/:id/answers  controllers.FlashCardController.getAnswers(id:Long)
+GET     /cards/:id/author   controllers.FlashCardController.getAuthor(id:Long)
 POST    /cards              controllers.FlashCardController.addFlashCard
-DELETE /cards/:id           controllers.FlashCardController.deleteFlashCard(id:Long)
+DELETE  /cards/:id          controllers.FlashCardController.deleteFlashCard(id:Long)
+PATCH   /cards/:id          controllers.FlashCardController.updateFlashCard(id:Long)
+PUT     /cards/:id          controllers.FlashCardController.updateFlashCard(id:Long)
 ```
 ## Example Calls
 ### Users
@@ -69,6 +76,9 @@ Send a `PATCH`or `PUT` request to `localhost:9000/groups/<id>` with `Content-Typ
 
 **Delete a Group:**
 Use `DELETE` request to `localhost:9000/groups/<id>`.
+
+### Further Information
+see the Postman Collection for more detailled information: [here](https://github.com/FWidm/FlashCardsAPI/blob/master/_PostManCollection/FlashCards.postman_collection.json).
 ## Expected/Possible JSON for the different Objects
 #### User
 Currently creation works without specifying a group, which sets the group of the user to null. The group can then be set via `PATCH` or `PUT` if it is specified like this:

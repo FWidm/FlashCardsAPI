@@ -8,6 +8,152 @@
 	},
 	"item": [
 		{
+			"name": "Cards",
+			"description": "",
+			"item": [
+				{
+					"name": "get all cards",
+					"request": {
+						"url": "localhost:9000/cards",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all cards"
+					},
+					"response": []
+				},
+				{
+					"name": "deletes card with the given id",
+					"request": {
+						"url": "localhost:9000/cards/1",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "create new card with a custom question.",
+					"request": {
+						"url": "localhost:9000/cards",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"rating\": 0,\n    \"question\": {\n      \"question\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerId\": 1\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false\n  }"
+						},
+						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "retrieve a specific card",
+					"request": {
+						"url": "localhost:9000/cards/3",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves one card"
+					},
+					"response": []
+				},
+				{
+					"name": "retrieve a specific cards question",
+					"request": {
+						"url": "localhost:9000/cards/3/question",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves one question"
+					},
+					"response": []
+				},
+				{
+					"name": "retrieve a specific cards answers (with param)",
+					"request": {
+						"url": "localhost:9000/cards/3/answers?size=1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all answers, can be limited with the parameter size=(int)."
+					},
+					"response": []
+				},
+				{
+					"name": "get the author of a specific card.",
+					"request": {
+						"url": "localhost:9000/cards/3/author",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Groups",
 			"description": "",
 			"item": [
@@ -32,7 +178,47 @@
 					"response": []
 				},
 				{
-					"name": "localhost:9000/groups",
+					"name": "localhost:9000/groups - get non-empty groups",
+					"request": {
+						"url": "localhost:9000/groups?empty=false",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all groups"
+					},
+					"response": []
+				},
+				{
+					"name": "localhost:9000/groups - get empty groups",
+					"request": {
+						"url": "localhost:9000/groups?empty=true",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all groups"
+					},
+					"response": []
+				},
+				{
+					"name": "localhost:9000/groups - get all groups",
 					"request": {
 						"url": "localhost:9000/groups",
 						"method": "GET",
@@ -152,6 +338,86 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"name\": \"xy\",\n    \"password\": \"passwörd\",\n    \"email\": \"xy@world.com\",\n    \"rating\": 1\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:9000/users/8",
+					"request": {
+						"url": "http://localhost:9000/users/8",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"patchtest\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:9000/users",
+					"request": {
+						"url": "http://localhost:9000/users",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"patchtest\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE http://localhost:9000/users/8",
+					"request": {
+						"url": "http://localhost:9000/users/8",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"patchtest\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "localhost:9000/users/9",
+					"request": {
+						"url": "localhost:9000/users/9",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"patch\",\n    \"password\": \"patch\",\n    \"rating\": -2,\n    \"group\":{\"groupId\":24}\n}"
 						},
 						"description": ""
 					},

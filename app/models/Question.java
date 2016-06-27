@@ -2,7 +2,10 @@ package models;
 
 import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import play.data.validation.Constraints;
+import util.JsonKeys;
 
 import javax.persistence.*;
 import java.net.URI;
@@ -11,9 +14,12 @@ import java.net.URI;
  * Created by fabianwidmann on 17/06/16.
  */
 @Entity
+@JsonPropertyOrder({ JsonKeys.QUESTION_ID})
 public class Question extends Model {
     @Id
     @GeneratedValue
+    @Column(name = JsonKeys.QUESTION_ID)
+    @JsonProperty(JsonKeys.QUESTION_ID)
     private long id;
 
     @Constraints.Required
@@ -21,7 +27,7 @@ public class Question extends Model {
     private URI mediaURI;
 
     @ManyToOne
-    @JoinColumn(name="author_id", referencedColumnName="id")
+    @JoinColumn(name="author_id", referencedColumnName=JsonKeys.USER_ID)
     private User author;
 //    @OneToOne(fetch= FetchType.LAZY)
 //    @JoinColumn(name="parent_card_id")

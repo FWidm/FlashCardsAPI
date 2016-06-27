@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import controllers.UserController;
 import play.data.validation.Constraints;
+import util.JsonKeys;
 
 import javax.persistence.*;
 import java.util.List;
@@ -16,13 +17,13 @@ import java.util.List;
  *         on 13/06/16.
  */
 @Entity
-@JsonPropertyOrder({ "groupId" }) //ensure that groupID is the first element in json.
+@JsonPropertyOrder({ JsonKeys.GROUP_ID}) //ensure that groupID is the first element in json.
 public class UserGroup extends Model {
 
 	@Id
 	@GeneratedValue
-	@Column(name = "group_id")
-	@JsonProperty("groupId")
+	@Column(name = JsonKeys.GROUP_ID)
+	@JsonProperty(JsonKeys.GROUP_ID)
 	private Long id;
 	@Constraints.Required
 	private String name, description;

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import play.data.validation.Constraints.*;
+import util.JsonKeys;
 
 import javax.persistence.*;
 /**
@@ -16,13 +17,14 @@ import javax.persistence.*;
  *         on 13/06/16.
  */
 @Entity
-@JsonPropertyOrder({"userId"}) //ensure that userID is the first element in json.
+@JsonPropertyOrder({ JsonKeys.USER_ID})
 public class User extends Model {
 	private static final long serialVersionUID = -6538683107994877014L;
 
 	@Id
 	@GeneratedValue
-	@JsonProperty("userId")
+    @Column(name = JsonKeys.USER_ID)
+    @JsonProperty(JsonKeys.USER_ID)
 	private Long id;
 	@Required @MinLength(3) // TODO: 27/06/16 Password should be ignored when outputting this to users in the future - @JsonIgnore
     private String name, password;
