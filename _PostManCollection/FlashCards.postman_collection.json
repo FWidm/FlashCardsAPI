@@ -65,9 +65,29 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"rating\": 0,\n    \"question\": {\n      \"question\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerId\": 1\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false\n  }"
+							"raw": "{\n\"rating\": 0,\n    \"question\": {\n      \"question\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false\n  }"
 						},
 						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "create new card with a custom question and custom answers.",
+					"request": {
+						"url": "localhost:9000/cards",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"rating\": 0,\n    \"question\": {\n      \"questionText\": \"question!\",\n      \"mediaURI\": \"www.question.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"hintText\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false\n  }"
+						},
+						"description": "Inserts question and answers to the db instead of using their id."
 					},
 					"response": []
 				},

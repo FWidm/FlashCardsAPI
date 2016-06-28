@@ -29,7 +29,7 @@ DELETE	/groups/:id			controllers.UserGroupController.deleteUserGroup(id:Long)
 GET     /cards              controllers.FlashCardController.getFlashCardList
 GET     /cards/:id          controllers.FlashCardController.getFlashCard(id:Long)
 GET     /cards/:id/questionText controllers.FlashCardController.getQuestion(id:Long)
-GET     /cards/:id/answers  controllers.FlashCardController.getAnswers(id:Long)
+GET     /cards/:id/answers?size  controllers.FlashCardController.getAnswers(id:Long)
 GET     /cards/:id/author   controllers.FlashCardController.getAuthor(id:Long)
 POST    /cards              controllers.FlashCardController.addFlashCard
 DELETE  /cards/:id          controllers.FlashCardController.deleteFlashCard(id:Long)

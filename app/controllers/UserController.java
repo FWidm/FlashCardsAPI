@@ -21,7 +21,7 @@ public class UserController extends Controller {
 
     /**
      * Return all users in the database.
-     * @return
+     * @return HTTP Status OK with a list of all users.
      */
 	public Result getUserList() {
 		List<User> u = User.find.all();
@@ -32,7 +32,7 @@ public class UserController extends Controller {
 
 	/**
 	 * Either PATCHes single values or PUTs all values into the entity with the specified id.
-	 * @return
+	 * @return HTTP Status ok when everything works out or badRequest if not.
 	 */
 	@BodyParser.Of(BodyParser.Json.class)
 	public Result updateUser(Long id) {
@@ -123,7 +123,6 @@ public class UserController extends Controller {
      * @return OK
      */
 	public Result deleteUser(Long id) {
-        //TODO: If we do not want to delete the answers, questions, cards we have to assign a std. user like anon
         List<Answer> givenAnswers= Answer.find.where().eq("author_id", id).findList();
         System.out.println("Answers from the user has size="+givenAnswers.size());
 

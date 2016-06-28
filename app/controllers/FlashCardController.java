@@ -25,7 +25,7 @@ import static play.mvc.Results.*;
  * @author Jonas Kraus
  * @author Fabian Widmann
  *         on 17/06/16.
- *         
+ *
  * This class handles all operations for Flashcards.
  * Used routes are:
  *  ip:9000/cards                       - GET; POST
@@ -141,7 +141,7 @@ public class FlashCardController {
         FlashCard card = new FlashCard(requestObject);
         card.save();
 
-        return ok(JsonWrap.prepareJsonStatus(OK, "FlashCard with id="+0+" has been created!"));
+        return ok(JsonWrap.prepareJsonStatus(OK, "FlashCard with id="+card.getId()+" has been created!"));
     }
     /**
      * Parses answers from the given JsonNode node.
@@ -208,79 +208,82 @@ public class FlashCardController {
     public Result updateFlashCard(long id){
         JsonNode json = request().body().asJson();
         ObjectMapper mapper = new ObjectMapper();
-        FlashCard toUpdate = FlashCard.find.byId(id);
+        try {
+            FlashCard toUpdate = FlashCard.find.byId(id);
+            if(request().method().equals("PUT") && (!json.has("answers") || !json.has("questionText")
+                    || !json.has("author") || !json.has("multipleChoice") || json.has("tags"))){
+                return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
+                        "The Update method needs all details of the group, such as name, " +
+                                "description and a user group (array of users or null). An attribute was missing for id="
+                                + id + "."));
+            }
 
-        if(request().method().equals("PUT") && (!json.has("answers") || !json.has("questionText")
-                || !json.has("author") || !json.has("multipleChoice") || json.has("tags"))){
-            return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
-                    "The Update method needs all details of the group, such as name, " +
-                            "description and a user group (array of users or null). An attribute was missing for id="
-                            + id + "."));
-        }
+            List<Answer> answers;
 
-        List<Answer> answers;
+            if (json.has("answers")) {
+                //create a new list
+                answers = new ArrayList<>();
+                //get the specific nods in the json
+                JsonNode answersNode = json.findValue("answers");
+                // Loop through all objects in the values associated with the
+                // "users" key.
+                for (JsonNode node : answersNode) {
+                    // when a user id is found we will get the object and add them to the userList.
+                    System.out.println("Node="+node);
+                    if (node.has(JsonKeys.ANSWER_ID)) {
+                        Answer found = Answer.find.byId(node.get(JsonKeys.ANSWER_ID).asLong());
+                        System.out.println(">> answer: "+found);
+                        answers.add(found);
+                    }
+                    else{
+                        try {
+                            Answer tmpA = parseAnswer(node);
+                            System.out.println(">> answer: "+tmpA);
+                            answers.add(tmpA);
+                        } catch (URISyntaxException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                toUpdate.setAnswers(answers);
+            }
 
-        if (json.has("answers")) {
-            //create a new list
-            answers = new ArrayList<>();
-            //get the specific nods in the json
-            JsonNode answersNode = json.findValue("answers");
-            // Loop through all objects in the values associated with the
-            // "users" key.
-            for (JsonNode node : answersNode) {
-                // when a user id is found we will get the object and add them to the userList.
-                System.out.println("Node="+node);
-                if (node.has(JsonKeys.ANSWER_ID)) {
-                    Answer found = Answer.find.byId(node.get(JsonKeys.ANSWER_ID).asLong());
-                    System.out.println(">> answer: "+found);
-                    answers.add(found);
+            if(json.has("question")){
+                if(json.get("question").has(JsonKeys.QUESTION_ID)){
+                    Question question= Question.find.byId(json.findValue("question").findValue(JsonKeys.QUESTION_ID).asLong());
+                    toUpdate.setQuestion(question);
                 }
                 else{
                     try {
-                        Answer tmpA = parseAnswer(node);
-                        System.out.println(">> answer: "+tmpA);
-                        answers.add(tmpA);
+                        Question q=parseQuestion(json.get("question"));
+                        q.save();
+                        toUpdate.setQuestion(q);
                     } catch (URISyntaxException e) {
                         e.printStackTrace();
                     }
                 }
             }
-            toUpdate.setAnswers(answers);
-        }
 
-        if(json.has("question")){
-            if(json.get("question").has(JsonKeys.QUESTION_ID)){
-                Question question= Question.find.byId(json.findValue("question").findValue(JsonKeys.QUESTION_ID).asLong());
-                toUpdate.setQuestion(question);
+            if(json.has("author")){
+                User u=mapper.convertValue(json.findValue("author"), User.class);
+                User author = User.find.byId(u.getId());
+                toUpdate.setAuthor(author);
             }
-            else{
-                try {
-                    Question q=parseQuestion(json.get("question"));
-                    q.save();
-                    toUpdate.setQuestion(q);
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        if(json.has("author")){
-            User u=mapper.convertValue(json.findValue("author"), User.class);
-            User author = User.find.byId(u.getId());
-            toUpdate.setAuthor(author);
-        }
 
         /*if(json.has("tags")){
             //todo: implement tags as json array.
         }*/
 
-        if(json.has("multipleChoice")){
-            toUpdate.setMultipleChoice(json.findValue("multipleChoice").asBoolean());
+            if(json.has("multipleChoice")){
+                toUpdate.setMultipleChoice(json.findValue("multipleChoice").asBoolean());
+            }
+
+            toUpdate.update();
+
+            return ok(JsonWrap.prepareJsonStatus(OK, "FlashCard with id="+id+" has been updated!"));
+        }catch (Exception e){
+            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no card with id="+id+" exists."));
         }
-
-        toUpdate.update();
-
-        return ok(JsonWrap.prepareJsonStatus(OK, "FlashCard with id="+id+" has been updated!"));
 
     }
 
