@@ -1,7 +1,6 @@
 package models;
 
 import com.avaje.ebean.Model;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import play.data.validation.Constraints;
@@ -23,7 +22,7 @@ public class Question extends Model {
     private long id;
 
     @Constraints.Required
-    private String question;
+    private String questionText;
     private URI mediaURI;
 
     @ManyToOne
@@ -36,8 +35,8 @@ public class Question extends Model {
 
     public static Model.Finder<Long, Question> find = new Model.Finder<Long, Question>(Question.class);
 
-    public Question(String question, User author) {
-        this.question = question;
+    public Question(String questionText, User author) {
+        this.questionText = questionText;
         this.author = author;
     }
 
@@ -45,7 +44,7 @@ public class Question extends Model {
     public String toString() {
         return "Question{" +
                 "id=" + id +
-                ", question='" + question + '\'' +
+                ", questionText='" + questionText + '\'' +
                 ", mediaURI=" + mediaURI +
                 ", author=" + author +
                 '}';
@@ -59,12 +58,12 @@ public class Question extends Model {
         this.id = id;
     }
 
-    public String getQuestion() {
-        return question;
+    public String getQuestionText() {
+        return questionText;
     }
 
-    public void setQuestion(String question) {
-        this.question = question;
+    public void setQuestionText(String questionText) {
+        this.questionText = questionText;
     }
 
     public URI getMediaURI() {

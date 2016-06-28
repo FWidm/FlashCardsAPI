@@ -128,7 +128,7 @@ public class FlashCard extends Model {
      * @param question
      */
     public void setQuestion(Question question) {
-        System.out.println("Flashcard: setQuestion q="+question);
+        System.out.println("Flashcard: setQuestionText q="+question);
         this.question = question;
     }
 

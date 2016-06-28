@@ -28,7 +28,7 @@ DELETE	/groups/:id			controllers.UserGroupController.deleteUserGroup(id:Long)
 #Flashcards
 GET     /cards              controllers.FlashCardController.getFlashCardList
 GET     /cards/:id          controllers.FlashCardController.getFlashCard(id:Long)
-GET     /cards/:id/question controllers.FlashCardController.getQuestion(id:Long)
+GET     /cards/:id/questionText controllers.FlashCardController.getQuestion(id:Long)
 GET     /cards/:id/answers  controllers.FlashCardController.getAnswers(id:Long)
 GET     /cards/:id/author   controllers.FlashCardController.getAuthor(id:Long)
 POST    /cards              controllers.FlashCardController.addFlashCard
@@ -113,7 +113,7 @@ Currently creation works without specifying a group, which sets the group of the
     "rating": 0,
     "created": "2016-06-22 10:10:06 UTC",
     "lastUpdated": "2016-06-22 10:10:06 UTC",
-    "question": {},
+    "questionText": {},
     "answers": [{},{}],
     "author": { <see user> },
     "multipleChoice": false,
@@ -126,7 +126,7 @@ Currently creation works without specifying a group, which sets the group of the
 ```json
 {
       "id": 4,
-      "question": "Question",
+      "questionText": "Question",
       "mediaURI": null,
       "author": {
         <see user>
@@ -139,7 +139,7 @@ Currently creation works without specifying a group, which sets the group of the
  {
         "id": 4,
         "answerText": "Answer",
-        "hint": "No hint available - 404",
+        "hintText": "No hintText available - 404",
         "mediaURI": null,
         "author": { <see user> },
         "created": "2016-06-22 10:10:06 UTC",

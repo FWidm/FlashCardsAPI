@@ -6,7 +6,7 @@
 create table answer (
   answerId                  bigint auto_increment not null,
   answer_text               varchar(255),
-  hint                      varchar(255),
+  hint_text                 varchar(255),
   media_uri                 varchar(255),
   author_id                 bigint,
   parent_card_id            bigint,
@@ -29,7 +29,7 @@ create table flash_card (
 
 create table question (
   questionId                bigint auto_increment not null,
-  question                  varchar(255),
+  question_text             varchar(255),
   media_uri                 varchar(255),
   author_id                 bigint,
   constraint pk_question primary key (questionId))

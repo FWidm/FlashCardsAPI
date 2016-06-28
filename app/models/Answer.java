@@ -28,7 +28,7 @@ public class Answer extends Model {
 
     @Constraints.Required
     private String answerText;
-    private String hint;
+    private String hintText;
     private URI mediaURI;
 
    @ManyToOne//OneToMany??
@@ -47,9 +47,9 @@ public class Answer extends Model {
 
     public static Model.Finder<Long, Answer> find = new Model.Finder<Long, Answer>(Answer.class);
 
-    public Answer(String answerText, String hint, User author) {
+    public Answer(String answerText, String hintText, User author) {
         this.answerText = answerText;
-        this.hint = hint;
+        this.hintText = hintText;
         this.author = author;
     }
 
@@ -59,7 +59,7 @@ public class Answer extends Model {
         return "Answer{" +
                 "id=" + id +
                 ", answerText='" + answerText + '\'' +
-                ", hint='" + hint + '\'' +
+                ", hintText='" + hintText + '\'' +
                 ", mediaURI=" + mediaURI +
                 ", author=" + author +
                 ", card=" + card +
@@ -92,12 +92,12 @@ public class Answer extends Model {
         this.answerText = answerText;
     }
 
-    public String getHint() {
-        return hint;
+    public String getHintText() {
+        return hintText;
     }
 
-    public void setHint(String hint) {
-        this.hint = hint;
+    public void setHintText(String hintText) {
+        this.hintText = hintText;
     }
 
     public URI getMediaURI() {

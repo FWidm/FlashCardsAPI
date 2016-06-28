@@ -3,10 +3,8 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import models.*;
-import org.apache.http.auth.AUTH;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
-import play.mvc.Http;
 import play.mvc.Result;
 import util.JsonKeys;
 import util.JsonWrap;
@@ -27,11 +25,19 @@ import static play.mvc.Results.*;
  * @author Jonas Kraus
  * @author Fabian Widmann
  *         on 17/06/16.
+ *         
+ * This class handles all operations for Flashcards.
+ * Used routes are:
+ *  ip:9000/cards                       - GET; POST
+ *         /cards/:id                   - GET; PUT; PATCH
+ *         /cards/:id/answers?size=x    - GET
+ *         /cards/:id/question          - GET
+ *         /cards/:id/author            - GET
  */
 public class FlashCardController {
     /**
      * Retrieves all Flashcards.
-     * @return
+     * @return HTTPResult
      */
     public Result getFlashCardList() {
         List<FlashCard> flashCardList = FlashCard.find.all();
@@ -40,8 +46,8 @@ public class FlashCardController {
 
     /**
      * Retrieves everything from a flashcard with the given id.
-     * @param id
-     * @return
+     * @param id of a card
+     * @return HTTPResult
      */
     public Result getFlashCard(long id) {
         FlashCard card = FlashCard.find.byId(id);
@@ -50,8 +56,8 @@ public class FlashCardController {
 
     /**
      * Deletes the specific Flashcard including questions and answers.
-     * @param id
-     * @return
+     * @param id of a card
+     * @return HTTPResult
      */
     public Result deleteFlashCard(long id){
         FlashCard.find.byId(id).delete();
@@ -63,22 +69,21 @@ public class FlashCardController {
     /**
      * Adds a new Flashcard, expects a question (if an id is specified, we load it from the db, else we create a new one),
      * answers (if id is given --> DB, else create new), author (must specify id), isMultiplechoice flag.
-     * @return
+     * @return HTTPResult
      */
     @BodyParser.Of(BodyParser.Json.class)
     public Result addFlashCard(){
-        // TODO: 27/06/16 write answer part completely
         JsonNode json = request().body().asJson();
         ObjectMapper mapper = new ObjectMapper();
         FlashCard requestObject = mapper.convertValue(json, FlashCard.class);
 
-        List<Answer> answers = null;
+        List<Answer> answers;
 
         //We expect just id's to set answers/questions/authors - we then check the db for the id's and retrieve all values
         // we nee ourselves.
         if (json.has("answers")) {
             //create a new list
-            answers = new ArrayList<Answer>();
+            answers = new ArrayList<>();
             //get the specific nods in the json
             JsonNode answersNode = json.findValue("answers");
             // Loop through all objects in the values associated with the
@@ -92,7 +97,13 @@ public class FlashCardController {
                     answers.add(found);
                 }
                 else{
-                    // TODO: 20/06/16 create new Answers from the json if no id was sent.
+                    try {
+                        Answer tmpA = parseAnswer(node);
+                        System.out.println(">> answer: "+tmpA);
+                        answers.add(tmpA);
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             requestObject.setAnswers(answers);
@@ -114,7 +125,6 @@ public class FlashCardController {
                 }
             }
         }
-        System.out.println(requestObject);
 
         if(json.has("author")){
             User author = User.find.byId(json.get("author").get(JsonKeys.USER_ID).asLong());
@@ -133,11 +143,41 @@ public class FlashCardController {
 
         return ok(JsonWrap.prepareJsonStatus(OK, "FlashCard with id="+0+" has been created!"));
     }
+    /**
+     * Parses answers from the given JsonNode node.
+     * @param node the json node to parse
+     * @return list of answers
+     * @throws URISyntaxException
+     */
+    private Answer parseAnswer(JsonNode node) throws URISyntaxException {
+        User author=null;
+        String answerText=null;
+        String hintText=null;
+        if(node.has("hintText")){
+            hintText=node.get("hintText").asText();
+        }
+        if(node.has("author")){
+            if(node.get("author").has(JsonKeys.USER_ID)){
+                long uid=node.get("author").get(JsonKeys.USER_ID).asLong();
+                author=User.find.byId(uid);
+                System.out.println("Search for user with id="+uid+" details="+author);
+            }
+        }
+        if(node.has("answerText")){
+            answerText=node.get("answerText").asText();
+        }
+        Answer answer=new Answer(answerText,hintText,author);
+
+        if(node.has("mediaURI")){
+            answer.setMediaURI(new URI(node.get("mediaURI").asText()));
+        }
+        return answer;
+    }
 
     /**
      * Parses a question from the given JsonNode node.
-     * @param node
-     * @return
+     * @param node the json node to parse
+     * @return a question object containing the information
      * @throws URISyntaxException
      */
     private Question parseQuestion(JsonNode node) throws URISyntaxException {
@@ -150,8 +190,8 @@ public class FlashCardController {
                 System.out.println("Search for user with id="+uid+" details="+author);
             }
         }
-        if(node.has("question")){
-            questionText=node.get("question").asText();
+        if(node.has("questionText")){
+            questionText=node.get("questionText").asText();
         }
         Question question=new Question(questionText, author);
 
@@ -162,17 +202,15 @@ public class FlashCardController {
     }
     /**
      * Update a  Flashcard either completely via put or partially via patch.
-     * @return
+     * @return httpResult
      */
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateFlashCard(long id){
-        // TODO: 27/06/16 write answer part completely
         JsonNode json = request().body().asJson();
         ObjectMapper mapper = new ObjectMapper();
-        FlashCard requestObject = mapper.convertValue(json, FlashCard.class);
         FlashCard toUpdate = FlashCard.find.byId(id);
 
-        if(request().method().equals("PUT") && (!json.has("answers") || !json.has("question")
+        if(request().method().equals("PUT") && (!json.has("answers") || !json.has("questionText")
                 || !json.has("author") || !json.has("multipleChoice") || json.has("tags"))){
             return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
                     "The Update method needs all details of the group, such as name, " +
@@ -180,22 +218,31 @@ public class FlashCardController {
                             + id + "."));
         }
 
-        List<Answer> answers = null;
+        List<Answer> answers;
 
-        //We expect just id's to set answers/questions/authors - we then check the db for the id's and retrieve all values
-        // we nee ourselves.
         if (json.has("answers")) {
             //create a new list
-            answers = new ArrayList<Answer>();
-            //get the specific nodes in the json
+            answers = new ArrayList<>();
+            //get the specific nods in the json
             JsonNode answersNode = json.findValue("answers");
             // Loop through all objects in the values associated with the
             // "users" key.
             for (JsonNode node : answersNode) {
                 // when a user id is found we will get the object and add them to the userList.
-                if (node.has("id")) {
-                    Answer found = Answer.find.byId(node.get("id").asLong());
+                System.out.println("Node="+node);
+                if (node.has(JsonKeys.ANSWER_ID)) {
+                    Answer found = Answer.find.byId(node.get(JsonKeys.ANSWER_ID).asLong());
+                    System.out.println(">> answer: "+found);
                     answers.add(found);
+                }
+                else{
+                    try {
+                        Answer tmpA = parseAnswer(node);
+                        System.out.println(">> answer: "+tmpA);
+                        answers.add(tmpA);
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             toUpdate.setAnswers(answers);
@@ -239,11 +286,11 @@ public class FlashCardController {
 
     /**
      * A method that allows us to retrieve the question for a specific card under the URI /cards/:id/question
-     * @param id
-     * @return
+     * @param id of a card
+     * @return httpresult
      */
     public Result getQuestion(long id){
-        Question ret=null;
+        Question ret;
         try{
             ret=FlashCard.find.byId(id).getQuestion();
         }catch (Exception e){
@@ -254,11 +301,11 @@ public class FlashCardController {
 
     /**
      * Gets the author of a specific card.
-     * @param id
-     * @return
+     * @param id of a card
+     * @return author of the card including a http result ok OR not found if nothing was found
      */
     public Result getAuthor(long id){
-        User ret=null;
+        User ret;
         try{
             ret=FlashCard.find.byId(id).getAuthor();
         }catch (Exception e){
@@ -269,12 +316,12 @@ public class FlashCardController {
 
     /**
      * A method that allows us to retrieve answers for a specific card under the URI /cards/:id/answers
-     * @param id
-     * @return
+     * @param id of a card
+     * @return answers of the card including a http result ok OR not found if nothing was found
      */
     public Result getAnswers(long id){
         Map<String, String[]> urlParams = Controller.request().queryString();
-        int answersSize=10;
+        int answersSize=-1;
         if(urlParams.containsKey("size")){
             try {
                 answersSize = Integer.parseInt(urlParams.get("size")[0]);
@@ -284,10 +331,14 @@ public class FlashCardController {
             }
         }
         System.out.println("answers size="+answersSize);
-        List<Answer> ret=null;
+        List<Answer> ret;
         try{
             // TODO: 27/06/16 Allow sorting by date, rating o.A., handle multichoice etc.
-            ret=FlashCard.find.byId(id).getAnswers().subList(0,answersSize);
+            ret=FlashCard.find.byId(id).getAnswers();
+            //Return a sublist from 0 to either the size of answers OR the cap we get via parameter.
+            ret=ret.subList(0,Math.min(answersSize,ret.size()));
+
+
         }catch (Exception e){
             return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no card with id="+id+" or answers exist."));
         }
