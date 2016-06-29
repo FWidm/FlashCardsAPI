@@ -29,14 +29,14 @@ public class UserGroupController extends Controller {
             //only print the first val we get for the key, this is possible as /groups?empty=true&empty=false could return
             //multiple values.
             if(urlParams.get("empty")[0].equals("true")){
-                // TODO: 27/06/16 check why the opposite of UserGroup.find.where().isNotNull("users").findList() does not work for this. Always returns 0.
-                List<UserGroup> nonemptyGroups=UserGroup.find.where().isNotNull("users").findList();
+                // TODO: 27/06/16 check why the opposite of UserGroup.find.where().isNotNull(JsonKeys.GROUP_USERS).findList() does not work for this. Always returns 0.
+                List<UserGroup> nonemptyGroups=UserGroup.find.where().isNotNull(JsonKeys.GROUP_USERS).findList();
                 List<UserGroup> emptyGroups=UserGroup.find.all();
                 emptyGroups.removeAll(nonemptyGroups);
                 return ok(JsonWrap.getJson(emptyGroups));
             }
             else{
-                return ok(JsonWrap.getJson(UserGroup.find.where().isNotNull("users").findList()));
+                return ok(JsonWrap.getJson(UserGroup.find.where().isNotNull(JsonKeys.GROUP_USERS).findList()));
             }
         }
         for(UserGroup ug:UserGroup.find.all()){
@@ -67,9 +67,9 @@ public class UserGroupController extends Controller {
 
 	/**
 	 * Updates the specified UserGroup. The Json Body can contain "name",
-	 * "description" as Strings or "users" as array of UserIds. If anything else
+	 * JsonKeys.GROUP_DESCRIPTION as Strings or JsonKeys.GROUP_USERS as array of UserIds. If anything else
 	 * is sent no update will be made. Example Body: { "name": "345",
-	 * "description": "345", "users": [{"JsonKeys.USER_ID": 4}, {"JsonKeys.USER_ID": 5}, ...] }
+	 * JsonKeys.GROUP_DESCRIPTION: "345", JsonKeys.GROUP_USERS: [{"JsonKeys.USER_ID": 4}, {"JsonKeys.USER_ID": 5}, ...] }
 	 * 
 	 * @param id GroupID of the group we want to update
 	 * @return either ok or bad_request with an explanation
@@ -82,7 +82,7 @@ public class UserGroupController extends Controller {
 		ObjectMapper mapper = new ObjectMapper();
 
         //Check whether the request was a put and if it was check if a param is missing, if that is the case --> bad req.
-        if(request().method().equals("PUT") && (!json.has("name") || !json.has("description") || !json.has("users"))){
+        if(request().method().equals("PUT") && (!json.has(JsonKeys.GROUP_NAME) || !json.has(JsonKeys.GROUP_DESCRIPTION) || !json.has(JsonKeys.GROUP_USERS))){
             return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
                     "The Update method needs all details of the group, such as name, " +
                             "description and a user group (array of users or null). An attribute was missing for id="
@@ -101,19 +101,19 @@ public class UserGroupController extends Controller {
 						"No Json body was found. This is required to update the group with id="
 								+ id + "."));
 			// check for new values
-			if (json.has("name")) {
+			if (json.has(JsonKeys.GROUP_NAME)) {
 				toUpdate.setName(requestGroup.getName());
 			}
-			if (json.has("description")) {
+			if (json.has(JsonKeys.GROUP_DESCRIPTION)) {
 				toUpdate.setDescription(requestGroup.getDescription());
 			}
-			if (json.has("users")) {
-				JsonNode users = json.findValue("users");
+			if (json.has(JsonKeys.GROUP_USERS)) {
+				JsonNode users = json.findValue(JsonKeys.GROUP_USERS);
 
 				System.out.println("Users=" + users + " isArray? "
 						+ users.isArray());
 				// Loop through all objects in the values associated with the
-				// "users" key.
+				// JsonKeys.GROUP_USERS key.
 				for (JsonNode n : users) {
 					// when a user id is found we will get the object and
 					// update the usergroup.
@@ -135,14 +135,14 @@ public class UserGroupController extends Controller {
 			return badRequest(JsonWrap
 					.prepareJsonStatus(
 							BAD_REQUEST,
-							"Body did contain elements that are not allowd in a group. No Update could be made to the group with id="
+							"Body did contain elements that are not allowed in a group. No Update could be made to the group with id="
 									+ id
 									+ ". Expected/Available Updates are name:String, description:String and users:Array with elements that contain user-ids"));
 		}
 	}
 
 	/**
-	 * Adds a new UserGroup and modifies the groups of all users that were found in the body's "users" array element via id.
+	 * Adds a new UserGroup and modifies the groups of all users that were found in the body's JsonKeys.GROUP_USERS array element via id.
 	 * Result is the creation of the group and changes to all users that will new be connected to this group instead.
 	 * @return either ok with the id of the group, or bad_request with an explanation
 	 */
@@ -155,14 +155,14 @@ public class UserGroupController extends Controller {
 			UserGroup requestGroup = mapper.convertValue(json, UserGroup.class);
 			//we do not want the app to send complete users, thus the mapper cant create the list from itself.
 			List<User> userList = null;
-			if (json.has("users")) {
+			if (json.has(JsonKeys.GROUP_USERS)) {
 				//create a new list of users
 				userList = new ArrayList<User>();
 				//get the specific nods in the json
-				JsonNode users = json.findValue("users");
+				JsonNode users = json.findValue(JsonKeys.GROUP_USERS);
 				System.out.println("Users=" + users);
 				// Loop through all objects in the values associated with the
-				// "users" key.
+				// JsonKeys.GROUP_USERS key.
 				for (JsonNode n : users) {
 					// when a user id is found we will get the object and add them to the userList.
                     Long l=n.get(JsonKeys.USER_ID).asLong();
@@ -187,7 +187,7 @@ public class UserGroupController extends Controller {
 			return badRequest(JsonWrap
 					.prepareJsonStatus(
 							BAD_REQUEST,
-							"Body did contain elements that are not allowd in a group. Expected/Available Updates are name:String, description:String and users:Array with elements that contain user-ids"));
+							"Body did contain elements that are not allowed in a group. Expected/Available Updates are name:String, description:String and users:Array with elements that contain user-ids"));
 		}
 	}
 	

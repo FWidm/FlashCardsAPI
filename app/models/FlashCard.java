@@ -33,12 +33,15 @@ public class FlashCard extends Model {
     @Column(name = JsonKeys.FLASHCARD_ID)
     @JsonProperty(JsonKeys.FLASHCARD_ID)
     private long id;
+    @JsonProperty(JsonKeys.RATING)
     private int rating;
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
     @CreatedTimestamp
+    @JsonProperty(JsonKeys.DATE_CREATED)
     private Date created;
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
     @UpdatedTimestamp
+    @JsonProperty(JsonKeys.DATE_UPDATED)
     private Date lastUpdated;
     //todo: how do we implement tags? ElementCollection does not work with ebeans, we might have to make our own tag class that contains an id and a string...
 
@@ -46,22 +49,26 @@ public class FlashCard extends Model {
     @OneToOne(cascade=CascadeType.ALL)
     @JoinColumn(name="question_id", referencedColumnName = JsonKeys.QUESTION_ID)
     @PrivateOwned //this means, that if the element is deleted with its parent.
+    @JsonProperty(JsonKeys.FLASHCARD_QUESTION)
     private Question question;
 
     @OneToMany(cascade=CascadeType.ALL,mappedBy = "card")
     @PrivateOwned
+    @JsonProperty(JsonKeys.FLASHCARD_ANSWERS)
     private List<Answer> answers;
     @ManyToOne //OneToMany??
     @JoinColumn(name="author_id", referencedColumnName=JsonKeys.USER_ID)
+    @JsonProperty(JsonKeys.AUTHOR)
     private User author;
+    @JsonProperty(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)
     private boolean multipleChoice;
 
-//    @Transient //not persistent.
-//    @JsonIgnore //todo: jsonIgnore is not working, fields are serialized.
-//    private boolean isSelected;
-//    @Transient //not persistent.
-//    @JsonIgnore
-//    private boolean isMarked;
+    @Transient //not persistent.
+    @JsonIgnore
+    private boolean isSelected;
+    @Transient //not persistent.
+    @JsonIgnore
+    private boolean isMarked;
 
     public static Model.Finder<Long, FlashCard> find = new Model.Finder<Long, FlashCard>(FlashCard.class);
 
@@ -203,5 +210,22 @@ public class FlashCard extends Model {
 
     public void setMultipleChoice(boolean multipleChoice) {
         this.multipleChoice = multipleChoice;
+    }
+
+    @JsonIgnore
+    public boolean isSelected() {
+        return isSelected;
+    }
+    @JsonIgnore
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
+    @JsonIgnore
+    public boolean isMarked() {
+        return isMarked;
+    }
+    @JsonIgnore
+    public void setMarked(boolean marked) {
+        isMarked = marked;
     }
 }

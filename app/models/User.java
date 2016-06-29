@@ -5,6 +5,7 @@ import java.util.Date;
 import com.avaje.ebean.Model;
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import play.data.validation.Constraints.*;
@@ -26,18 +27,26 @@ public class User extends Model {
     @Column(name = JsonKeys.USER_ID)
     @JsonProperty(JsonKeys.USER_ID)
 	private Long id;
-	@Required @MinLength(3) // TODO: 27/06/16 Password should be ignored when outputting this to users in the future - @JsonIgnore
-    private String name, password;
+	@Required @MinLength(3)
+    @JsonProperty(JsonKeys.USER_NAME)
+    private String name;
+    @Required @MinLength(3)
+    @JsonProperty(JsonKeys.USER_PASSWORD)
+    @JsonIgnore
+    private String password;
 	@Required @Column(unique = true) @Email
+    @JsonProperty(JsonKeys.USER_EMAIL)
 	private String email;
 
+    @JsonProperty(JsonKeys.RATING)
 	private int rating;
 	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z") @CreatedTimestamp
+    @JsonProperty(JsonKeys.DATE_CREATED)
 	private Date created;
-	// fetchtype says, that this is loaded only on demand, thus when calling
-	// .getGroup().
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "group_id")
+    @JsonProperty(JsonKeys.USER_GROUP)
 	private UserGroup group;
 
 	public static Model.Finder<Long, User> find = new Model.Finder<Long, User>(User.class);
@@ -85,6 +94,7 @@ public class User extends Model {
 		this.email = email;
 	}
 
+    @JsonIgnore
 	public String getPassword() {
 		return password;
 	}

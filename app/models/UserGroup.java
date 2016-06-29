@@ -26,10 +26,14 @@ public class UserGroup extends Model {
 	@JsonProperty(JsonKeys.GROUP_ID)
 	private Long id;
 	@Constraints.Required
-	private String name, description;
+    @JsonProperty(JsonKeys.GROUP_NAME)
+    private String name;
+
+    @Constraints.Required
+    @JsonProperty(JsonKeys.GROUP_DESCRIPTION)
+    private String description;
 	@OneToMany(mappedBy = "group")
-	@JsonIgnore
-	// to prevent endless recursion.
+    @JsonIgnore	// to prevent endless recursion.
 	private List<User> users;
 
 	public static Model.Finder<Long, UserGroup> find = new Model.Finder<Long, UserGroup>(UserGroup.class);

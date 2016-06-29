@@ -27,12 +27,16 @@ public class Answer extends Model {
     private long id;
 
     @Constraints.Required
+    @JsonProperty(JsonKeys.ANSWER_TEXT)
     private String answerText;
+    @JsonProperty(JsonKeys.ANSWER_HINT)
     private String hintText;
+    @JsonProperty(JsonKeys.URI)
     private URI mediaURI;
 
-   @ManyToOne//OneToMany??
+   @ManyToOne
    @JoinColumn(name="author_id", referencedColumnName=JsonKeys.USER_ID)
+   @JsonProperty(JsonKeys.AUTHOR)
     private User author;
 
     @ManyToOne
@@ -41,8 +45,9 @@ public class Answer extends Model {
     private FlashCard card;
 
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z") @CreatedTimestamp
+    @JsonProperty(JsonKeys.DATE_CREATED)
     private Date created;
-
+    @JsonProperty(JsonKeys.RATING)
     private int rating;
 
     public static Model.Finder<Long, Answer> find = new Model.Finder<Long, Answer>(Answer.class);
@@ -115,7 +120,7 @@ public class Answer extends Model {
     public void setAuthor(User author) {
         this.author = author;
     }
-
+    @JsonIgnore
     public FlashCard getCard() {
         return card;
     }

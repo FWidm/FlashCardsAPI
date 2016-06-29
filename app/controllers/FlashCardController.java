@@ -81,11 +81,11 @@ public class FlashCardController {
 
         //We expect just id's to set answers/questions/authors - we then check the db for the id's and retrieve all values
         // we nee ourselves.
-        if (json.has("answers")) {
+        if (json.has(JsonKeys.FLASHCARD_ANSWERS)) {
             //create a new list
             answers = new ArrayList<>();
             //get the specific nods in the json
-            JsonNode answersNode = json.findValue("answers");
+            JsonNode answersNode = json.findValue(JsonKeys.FLASHCARD_ANSWERS);
             // Loop through all objects in the values associated with the
             // "users" key.
             for (JsonNode node : answersNode) {
@@ -135,8 +135,8 @@ public class FlashCardController {
             //todo: implement tags as json array.
         }*/
 
-        if(json.has("multipleChoice")){
-            requestObject.setMultipleChoice(json.findValue("multipleChoice").asBoolean());
+        if(json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)){
+            requestObject.setMultipleChoice(json.findValue(JsonKeys.FLASHCARD_MULTIPLE_CHOICE).asBoolean());
         }
         FlashCard card = new FlashCard(requestObject);
         card.save();
@@ -153,23 +153,23 @@ public class FlashCardController {
         User author=null;
         String answerText=null;
         String hintText=null;
-        if(node.has("hintText")){
-            hintText=node.get("hintText").asText();
+        if(node.has(JsonKeys.ANSWER_HINT)){
+            hintText=node.get(JsonKeys.ANSWER_HINT).asText();
         }
-        if(node.has("author")){
-            if(node.get("author").has(JsonKeys.USER_ID)){
-                long uid=node.get("author").get(JsonKeys.USER_ID).asLong();
+        if(node.has(JsonKeys.AUTHOR)){
+            if(node.get(JsonKeys.AUTHOR).has(JsonKeys.USER_ID)){
+                long uid=node.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong();
                 author=User.find.byId(uid);
                 System.out.println("Search for user with id="+uid+" details="+author);
             }
         }
-        if(node.has("answerText")){
-            answerText=node.get("answerText").asText();
+        if(node.has(JsonKeys.ANSWER_TEXT)){
+            answerText=node.get(JsonKeys.ANSWER_TEXT).asText();
         }
         Answer answer=new Answer(answerText,hintText,author);
 
-        if(node.has("mediaURI")){
-            answer.setMediaURI(new URI(node.get("mediaURI").asText()));
+        if(node.has(JsonKeys.URI)){
+            answer.setMediaURI(new URI(node.get(JsonKeys.URI).asText()));
         }
         return answer;
     }
@@ -183,20 +183,20 @@ public class FlashCardController {
     private Question parseQuestion(JsonNode node) throws URISyntaxException {
         User author=null;
         String questionText=null;
-        if(node.has("author")){
-            if(node.get("author").has(JsonKeys.USER_ID)){
-                long uid=node.get("author").get(JsonKeys.USER_ID).asLong();
+        if(node.has(JsonKeys.AUTHOR)){
+            if(node.get(JsonKeys.AUTHOR).has(JsonKeys.USER_ID)){
+                long uid=node.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong();
                 author=User.find.byId(uid);
                 System.out.println("Search for user with id="+uid+" details="+author);
             }
         }
-        if(node.has("questionText")){
-            questionText=node.get("questionText").asText();
+        if(node.has(JsonKeys.QUESTION_TEXT)){
+            questionText=node.get(JsonKeys.QUESTION_TEXT).asText();
         }
         Question question=new Question(questionText, author);
 
-        if(node.has("mediaURI")){
-            question.setMediaURI(new URI(node.get("mediaURI").asText()));
+        if(node.has(JsonKeys.URI)){
+            question.setMediaURI(new URI(node.get(JsonKeys.URI).asText()));
         }
         return question;
     }
@@ -210,21 +210,23 @@ public class FlashCardController {
         ObjectMapper mapper = new ObjectMapper();
         try {
             FlashCard toUpdate = FlashCard.find.byId(id);
-            if(request().method().equals("PUT") && (!json.has("answers") || !json.has("questionText")
-                    || !json.has("author") || !json.has("multipleChoice") || json.has("tags"))){
+            if(request().method().equals("PUT") && (!json.has(JsonKeys.FLASHCARD_ANSWERS) || !json.has(JsonKeys.FLASHCARD_QUESTION)
+                    || !json.has(JsonKeys.AUTHOR) || !json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE) || !json.has(JsonKeys.FLASHCARD_TAGS))){
+                System.out.println(!json.has(JsonKeys.FLASHCARD_ANSWERS) +" "+ !json.has(JsonKeys.FLASHCARD_QUESTION)
+                        +" "+ !json.has(JsonKeys.AUTHOR) +" "+ !json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE) +" "+ json.has(JsonKeys.FLASHCARD_TAGS));
                 return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
-                        "The Update method needs all details of the group, such as name, " +
+                        "The Update method needs all details of the card, such as name, " +
                                 "description and a user group (array of users or null). An attribute was missing for id="
                                 + id + "."));
             }
 
             List<Answer> answers;
 
-            if (json.has("answers")) {
+            if (json.has(JsonKeys.FLASHCARD_ANSWERS)) {
                 //create a new list
                 answers = new ArrayList<>();
                 //get the specific nods in the json
-                JsonNode answersNode = json.findValue("answers");
+                JsonNode answersNode = json.findValue(JsonKeys.FLASHCARD_ANSWERS);
                 // Loop through all objects in the values associated with the
                 // "users" key.
                 for (JsonNode node : answersNode) {
@@ -248,14 +250,14 @@ public class FlashCardController {
                 toUpdate.setAnswers(answers);
             }
 
-            if(json.has("question")){
-                if(json.get("question").has(JsonKeys.QUESTION_ID)){
-                    Question question= Question.find.byId(json.findValue("question").findValue(JsonKeys.QUESTION_ID).asLong());
+            if(json.has(JsonKeys.FLASHCARD_QUESTION)){
+                if(json.get(JsonKeys.FLASHCARD_QUESTION).has(JsonKeys.QUESTION_ID)){
+                    Question question= Question.find.byId(json.findValue(JsonKeys.FLASHCARD_QUESTION).findValue(JsonKeys.QUESTION_ID).asLong());
                     toUpdate.setQuestion(question);
                 }
                 else{
                     try {
-                        Question q=parseQuestion(json.get("question"));
+                        Question q=parseQuestion(json.get(JsonKeys.FLASHCARD_QUESTION));
                         q.save();
                         toUpdate.setQuestion(q);
                     } catch (URISyntaxException e) {
@@ -264,8 +266,8 @@ public class FlashCardController {
                 }
             }
 
-            if(json.has("author")){
-                User u=mapper.convertValue(json.findValue("author"), User.class);
+            if(json.has(JsonKeys.AUTHOR)){
+                User u=mapper.convertValue(json.findValue(JsonKeys.AUTHOR), User.class);
                 User author = User.find.byId(u.getId());
                 toUpdate.setAuthor(author);
             }
@@ -274,8 +276,8 @@ public class FlashCardController {
             //todo: implement tags as json array.
         }*/
 
-            if(json.has("multipleChoice")){
-                toUpdate.setMultipleChoice(json.findValue("multipleChoice").asBoolean());
+            if(json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)){
+                toUpdate.setMultipleChoice(json.findValue(JsonKeys.FLASHCARD_MULTIPLE_CHOICE).asBoolean());
             }
 
             toUpdate.update();
@@ -325,7 +327,7 @@ public class FlashCardController {
     public Result getAnswers(long id){
         Map<String, String[]> urlParams = Controller.request().queryString();
         int answersSize=-1;
-        if(urlParams.containsKey("size")){
+        if(urlParams.containsKey(JsonKeys.FLASHCARD_PARAM_SIZE)){
             try {
                 answersSize = Integer.parseInt(urlParams.get("size")[0]);
             }catch(NumberFormatException e){

@@ -115,12 +115,11 @@ Currently creation works without specifying a group, which sets the group of the
     "lastUpdated": "2016-06-22 10:10:06 UTC",
     "questionText": {},
     "answers": [{},{}],
-    "author": { <see user> },
+    "author": { /*see user*/ },
     "multipleChoice": false,
     "marked": false,
     "selected": false
   }
-]
 ```
 #### Questions
 ```json
@@ -129,7 +128,7 @@ Currently creation works without specifying a group, which sets the group of the
       "questionText": "Question",
       "mediaURI": null,
       "author": {
-        <see user>
+        /*see user*/
       }
 }
 ```
@@ -141,7 +140,7 @@ Currently creation works without specifying a group, which sets the group of the
         "answerText": "Answer",
         "hintText": "No hintText available - 404",
         "mediaURI": null,
-        "author": { <see user> },
+        "author": { /*see user*/ },
         "created": "2016-06-22 10:10:06 UTC",
         "rating": 0
  }

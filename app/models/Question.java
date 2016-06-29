@@ -22,11 +22,14 @@ public class Question extends Model {
     private long id;
 
     @Constraints.Required
+    @JsonProperty(JsonKeys.QUESTION_TEXT)
     private String questionText;
+    @JsonProperty(JsonKeys.URI)
     private URI mediaURI;
 
     @ManyToOne
     @JoinColumn(name="author_id", referencedColumnName=JsonKeys.USER_ID)
+    @JsonProperty(JsonKeys.AUTHOR)
     private User author;
 //    @OneToOne(fetch= FetchType.LAZY)
 //    @JoinColumn(name="parent_card_id")
