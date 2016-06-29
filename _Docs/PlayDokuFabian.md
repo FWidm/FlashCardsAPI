@@ -109,6 +109,7 @@ public static JsonNode getJson(Object o) {
 ```java
 for (JsonNode node : answersNode) {
         try {
+            //node conains now the single vals in th aray [v1,v2,..]
             Answer tmpA = parseAnswer(node);
             answers.add(tmpA);
         } catch (URISyntaxException e) {
@@ -117,6 +118,8 @@ for (JsonNode node : answersNode) {
     }
 }
 ```
+### JSON Proprty Names
+Können in der Klasse mittels `@JsonProperty(<Strng>)` festgeleg wrden. Wenn eine Konstante als String eingesetzt wird, kannes nötig sein die Klasse erneut zu speihern, damit sich die Änderung durchsetzt.
 ___
 ## JPA/EBEAN
 In diesem [Wikibook](https://en.wikibooks.org/wiki/Java_Persistence) gibt es eine schöne Einleitung über die Elementaren Beziehungen, nicht alle der vorgestellten Operationen funktionieren mit jeder konkreten ORM Implementierung, die Relationen aber definitiv. Wir benutzen zur Zeit Ebean, Link zur  [Dokumentation](https://en.wikibooks.org/wiki/Java_Persistence).

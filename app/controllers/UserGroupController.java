@@ -132,13 +132,13 @@ public class UserGroupController extends Controller {
 			return ok(JsonWrap.prepareJsonStatus(200, "Group with id=" + id
 					+ " has been succesfully changed. " + information));
 		} catch (IllegalArgumentException e) {
-			return badRequest(JsonWrap
-					.prepareJsonStatus(
-							BAD_REQUEST,
-							"Body did contain elements that are not allowed in a group. No Update could be made to the group with id="
-									+ id
-									+ ". Expected/Available Updates are name:String, description:String and users:Array with elements that contain user-ids"));
-		}
+            return badRequest(JsonWrap
+                    .prepareJsonStatus(
+                            BAD_REQUEST, "Body did contain elements that are not allowed/expected. A group can contain: " + JsonKeys.GROUP_JSON_ELEMENTS));
+        }
+        catch (NullPointerException e){
+            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no group with id="+id+" exists."));
+        }
 	}
 
 	/**
@@ -186,8 +186,7 @@ public class UserGroupController extends Controller {
 		} catch (IllegalArgumentException e) {
 			return badRequest(JsonWrap
 					.prepareJsonStatus(
-							BAD_REQUEST,
-							"Body did contain elements that are not allowed in a group. Expected/Available Updates are name:String, description:String and users:Array with elements that contain user-ids"));
+                            BAD_REQUEST, "Body did contain elements that are not allowed/expected. A group can contain: " + JsonKeys.GROUP_JSON_ELEMENTS));
 		}
 	}
 	

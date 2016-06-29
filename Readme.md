@@ -79,6 +79,8 @@ Use `DELETE` request to `localhost:9000/groups/<id>`.
 
 ### Further Information
 see the Postman Collection for more detailled information: [here](https://github.com/FWidm/FlashCardsAPI/blob/master/_PostManCollection/FlashCards.postman_collection.json).
+
+Also refer to the [JsonKeys.java](https://github.com/FWidm/FlashCardsAPI/blob/master/app/util/JsonKeys.java) for more inforations about naming conventions.
 ## Expected/Possible JSON for the different Objects
 #### User
 Currently creation works without specifying a group, which sets the group of the user to null. The group can then be set via `PATCH` or `PUT` if it is specified like this:

@@ -50,8 +50,13 @@ public class FlashCardController {
      * @return HTTPResult
      */
     public Result getFlashCard(long id) {
-        FlashCard card = FlashCard.find.byId(id);
-        return ok(JsonWrap.getJson(card));
+        try{
+            FlashCard card = FlashCard.find.byId(id);
+            return ok(JsonWrap.getJson(card));
+        }
+        catch (NullPointerException e){
+            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no card with id="+id+" exists."));
+        }
     }
 
     /**
@@ -73,75 +78,82 @@ public class FlashCardController {
      */
     @BodyParser.Of(BodyParser.Json.class)
     public Result addFlashCard(){
-        JsonNode json = request().body().asJson();
-        ObjectMapper mapper = new ObjectMapper();
-        FlashCard requestObject = mapper.convertValue(json, FlashCard.class);
+        try{
+            JsonNode json = request().body().asJson();
+            ObjectMapper mapper = new ObjectMapper();
+            FlashCard requestObject = mapper.convertValue(json, FlashCard.class);
 
-        List<Answer> answers;
+            List<Answer> answers;
 
-        //We expect just id's to set answers/questions/authors - we then check the db for the id's and retrieve all values
-        // we nee ourselves.
-        if (json.has(JsonKeys.FLASHCARD_ANSWERS)) {
-            //create a new list
-            answers = new ArrayList<>();
-            //get the specific nods in the json
-            JsonNode answersNode = json.findValue(JsonKeys.FLASHCARD_ANSWERS);
-            // Loop through all objects in the values associated with the
-            // "users" key.
-            for (JsonNode node : answersNode) {
-                // when a user id is found we will get the object and add them to the userList.
-                System.out.println("Node="+node);
-                if (node.has(JsonKeys.ANSWER_ID)) {
-                    Answer found = Answer.find.byId(node.get(JsonKeys.ANSWER_ID).asLong());
-                    System.out.println(">> answer: "+found);
-                    answers.add(found);
+            //We expect just id's to set answers/questions/authors - we then check the db for the id's and retrieve all values
+            // we nee ourselves.
+            if (json.has(JsonKeys.FLASHCARD_ANSWERS)) {
+                //create a new list
+                answers = new ArrayList<>();
+                //get the specific nods in the json
+                JsonNode answersNode = json.findValue(JsonKeys.FLASHCARD_ANSWERS);
+                // Loop through all objects in the values associated with the
+                // "users" key.
+                for (JsonNode node : answersNode) {
+                    // when a user id is found we will get the object and add them to the userList.
+                    System.out.println("Node="+node);
+                    if (node.has(JsonKeys.ANSWER_ID)) {
+                        Answer found = Answer.find.byId(node.get(JsonKeys.ANSWER_ID).asLong());
+                        System.out.println(">> answer: "+found);
+                        answers.add(found);
+                    }
+                    else{
+                        try {
+                            Answer tmpA = parseAnswer(node);
+                            System.out.println(">> answer: "+tmpA);
+                            answers.add(tmpA);
+                        } catch (URISyntaxException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                requestObject.setAnswers(answers);
+            }
+
+
+            if(json.has("question")){
+                if(json.get("question").has(JsonKeys.QUESTION_ID)){
+                    Question question= Question.find.byId(json.findValue("question").findValue(JsonKeys.QUESTION_ID).asLong());
+                    requestObject.setQuestion(question);
                 }
                 else{
                     try {
-                        Answer tmpA = parseAnswer(node);
-                        System.out.println(">> answer: "+tmpA);
-                        answers.add(tmpA);
+                        Question q=parseQuestion(json.get("question"));
+                        q.save();
+                        requestObject.setQuestion(q);
                     } catch (URISyntaxException e) {
                         e.printStackTrace();
                     }
                 }
             }
-            requestObject.setAnswers(answers);
-        }
 
-
-        if(json.has("question")){
-            if(json.get("question").has(JsonKeys.QUESTION_ID)){
-                Question question= Question.find.byId(json.findValue("question").findValue(JsonKeys.QUESTION_ID).asLong());
-                requestObject.setQuestion(question);
+            if(json.has("author")){
+                User author = User.find.byId(json.get("author").get(JsonKeys.USER_ID).asLong());
+                requestObject.setAuthor(author);
             }
-            else{
-                try {
-                    Question q=parseQuestion(json.get("question"));
-                    q.save();
-                    requestObject.setQuestion(q);
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        if(json.has("author")){
-            User author = User.find.byId(json.get("author").get(JsonKeys.USER_ID).asLong());
-            requestObject.setAuthor(author);
-        }
 
         /*if(json.has("tags")){
             //todo: implement tags as json array.
         }*/
 
-        if(json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)){
-            requestObject.setMultipleChoice(json.findValue(JsonKeys.FLASHCARD_MULTIPLE_CHOICE).asBoolean());
-        }
-        FlashCard card = new FlashCard(requestObject);
-        card.save();
+            if(json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)){
+                requestObject.setMultipleChoice(json.findValue(JsonKeys.FLASHCARD_MULTIPLE_CHOICE).asBoolean());
+            }
+            FlashCard card = new FlashCard(requestObject);
+            card.save();
 
-        return ok(JsonWrap.prepareJsonStatus(OK, "FlashCard with id="+card.getId()+" has been created!"));
+            return ok(JsonWrap.prepareJsonStatus(OK, "FlashCard with id="+card.getId()+" has been created!"));
+        }
+        catch (IllegalArgumentException e) {
+            return badRequest(JsonWrap
+                    .prepareJsonStatus(
+                            BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+        }
     }
     /**
      * Parses answers from the given JsonNode node.
@@ -283,8 +295,13 @@ public class FlashCardController {
             toUpdate.update();
 
             return ok(JsonWrap.prepareJsonStatus(OK, "FlashCard with id="+id+" has been updated!"));
-        }catch (Exception e){
+        }catch (NullPointerException e){
             return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no card with id="+id+" exists."));
+        }
+        catch (IllegalArgumentException e) {
+            return badRequest(JsonWrap
+                    .prepareJsonStatus(
+                            BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
         }
 
     }
@@ -299,7 +316,7 @@ public class FlashCardController {
         try{
             ret=FlashCard.find.byId(id).getQuestion();
         }catch (Exception e){
-            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"No card with the id="+id+" does exist."));
+            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no card with id="+id+" exists."));
         }
         return ok(JsonWrap.getJson(ret));
     }
@@ -314,7 +331,7 @@ public class FlashCardController {
         try{
             ret=FlashCard.find.byId(id).getAuthor();
         }catch (Exception e){
-            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"No card with the id="+id+" does exist."));
+            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no card with id="+id+" exists."));
         }
         return ok(JsonWrap.getJson(ret));
     }
@@ -345,7 +362,7 @@ public class FlashCardController {
 
 
         }catch (Exception e){
-            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no card with id="+id+" or answers exist."));
+            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no card with id="+id+" exists."));
         }
         return ok(JsonWrap.getJson(ret));
     }

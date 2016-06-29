@@ -92,7 +92,9 @@ public class UserController extends Controller {
                             BAD_REQUEST,
                             "Body did contain elements that are not allowed/expected. A user can contain: "+JsonKeys.USER_JSON_ELEMENTS));
         }
-
+        catch (NullPointerException e){
+            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no user with id="+id+" exists."));
+        }
 	}
 
     /**
@@ -131,30 +133,31 @@ public class UserController extends Controller {
      * @return OK
      */
 	public Result deleteUser(Long id) {
-        List<Answer> givenAnswers= Answer.find.where().eq("author_id", id).findList();
-        System.out.println("Answers from the user has size="+givenAnswers.size());
+        try {
+            List<Answer> givenAnswers = Answer.find.where().eq("author_id", id).findList();
+            System.out.println("Answers from the user has size=" + givenAnswers.size());
 
-        for(Answer a: givenAnswers){
-            System.out.println(">> Trying to delete answer a="+a+" where author was: "+a.getAuthor());
-            a.delete();
-        }
-
-
-        List<FlashCard> cards=FlashCard.find.where().eq("author_id",id).findList();
-        System.out.println("Created cards list has size="+cards.size());
-
-        for(FlashCard c: cards){
-            System.out.println(">> Trying to delete card c="+c+" where author was: "+c.getAuthor());
-            c.delete();
-        }
+            for (Answer a : givenAnswers) {
+                System.out.println(">> Trying to delete answer a=" + a + " where author was: " + a.getAuthor());
+                a.delete();
+            }
 
 
-        List<Question> questions=Question.find.where().eq("author_id",id).findList();
-        System.out.println("Questions from the user has size="+questions.size());
-        for(Question q: questions){
-            System.out.println(">> Trying to delete question q="+q+" where author was: "+q.getAuthor());
-            q.delete();
-        }
+            List<FlashCard> cards = FlashCard.find.where().eq("author_id", id).findList();
+            System.out.println("Created cards list has size=" + cards.size());
+
+            for (FlashCard c : cards) {
+                System.out.println(">> Trying to delete card c=" + c + " where author was: " + c.getAuthor());
+                c.delete();
+            }
+
+
+            List<Question> questions = Question.find.where().eq("author_id", id).findList();
+            System.out.println("Questions from the user has size=" + questions.size());
+            for (Question q : questions) {
+                System.out.println(">> Trying to delete question q=" + q + " where author was: " + q.getAuthor());
+                q.delete();
+            }
 
 //        User u= User.find.byId(id);
 //
@@ -162,10 +165,14 @@ public class UserController extends Controller {
 //        u.setGroup(null);
 //        u.update();
 //        group.removeUser(User.find.byId(id));
-		User.find.ref(id).delete();
+            User.find.ref(id).delete();
 
-		return ok(JsonWrap.prepareJsonStatus(OK, "The user with the id=" + id
-				+ " has been deleted. This includes questions, answers and cards mady by this user."));
+            return ok(JsonWrap.prepareJsonStatus(OK, "The user with the id=" + id
+                    + " has been deleted. This includes questions, answers and cards mady by this user."));
+        }
+        catch (NullPointerException e){
+            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no user with id="+id+" exists."));
+        }
 	}
 
 	/**
