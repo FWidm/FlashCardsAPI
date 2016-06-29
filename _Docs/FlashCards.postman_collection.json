@@ -85,7 +85,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"rating\": 0,\n    \"question\": {\n      \"questionText\": \"question!\",\n      \"mediaURI\": \"www.question.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"hintText\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false\n  }"
+							"raw": "{\n\"rating\": 0,\n    \"question\": {\n      \"questionText\": \"sadvsdavsadvfasf efqf vwvqwvwqfewewrvwqwqvvsdakwsödkcm   wpikvnowqidnvowqsndvoij!\",\n      \"mediaURI\": \"www.sadcsadqwv.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"ewinowvwvnowevonwevonj\",\n        \"answerHint\": \"casasasccsaacs\",\n        \"mediaURI\": \"www.csacssacsca.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false\n  }"
 						},
 						"description": "Inserts question and answers to the db instead of using their id."
 					},
@@ -170,6 +170,46 @@
 						"description": ""
 					},
 					"response": []
+				},
+				{
+					"name": "Patch card with id3 to be multichoice and have a new answer.",
+					"request": {
+						"url": "localhost:9000/cards/3",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"rating\": 0,\n    \"question\": {\n      \"question\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer1\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      },\n      {\n        \"answerText\": \"answer2\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      },\n      {\n        \"answerText\": \"answer3\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": true\n  }"
+						},
+						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "Update card with id 3 completely with relevant data.",
+					"request": {
+						"url": "localhost:9000/cards/3",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"rating\": 3,\n    \"question\": {\n      \"question\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"tags\": null,\n    \"answers\": [\n      {\n        \"answerText\": \"answer1\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      },\n      {\n        \"answerText\": \"answer2\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      },\n      {\n        \"answerText\": \"answer3\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": true\n  }"
+						},
+						"description": ""
+					},
+					"response": []
 				}
 			]
 		},
@@ -191,7 +231,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"oojo\": \"xyz\",\n    \"users\":[{\"userId\":1\n    }]\n}"
 						},
 						"description": "Creates a new Group and adds two users."
 					},
@@ -300,7 +340,7 @@
 				{
 					"name": "put localhost:9000/groups/20",
 					"request": {
-						"url": "localhost:9000/groups/21",
+						"url": "localhost:9000/groups/2",
 						"method": "PUT",
 						"header": [
 							{
