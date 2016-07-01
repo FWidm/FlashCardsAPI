@@ -67,11 +67,22 @@ public class FlashCardController {
      */
     public Result deleteFlashCard(long id){
         try {
+            FlashCard fc = FlashCard.find.byId(id);
+            List<Tag> tags = fc.getTags();
+            //Get all tags and unlink them from this card. Tag still exists to this point.
+            for (Tag tmptag:tags){
+                tmptag.removeFlashCard(fc);
+                if(tmptag.getCards().size()==0){
+                    // TODO: 01/07/16 do we want to delete if no reference to the tag exists?
+                }
+                System.out.println("Removing link to tag="+tmptag);
+            }
+
             FlashCard.find.byId(id).delete();
 
             return ok(JsonWrap.prepareJsonStatus(OK, "The card with the id=" + id
-                    + " has been deleted. This includes questions and answers"));
-        }catch (Exception e){
+                    + " has been deleted. This includes questions and answers. All Tags for this card were disconnected and persist."));
+        }catch (NullPointerException e){
             return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no card with id="+id+" exists."));
         }
     }

@@ -25,7 +25,7 @@ public class Tag extends Model {
     @JsonProperty(JsonKeys.TAG_NAME)
     private String name;
     //this cascade from the "tag" to "join_cards_tag" - e.g. tag.delete -> delete evey entry with tag.id
-    @ManyToMany(mappedBy = "tags", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "tags"/*, cascade = CascadeType.ALL*/)
     @JsonProperty(JsonKeys.TAG_CARDS)
     @JsonIgnore
     private List<FlashCard> cards;
@@ -72,6 +72,16 @@ public class Tag extends Model {
         }
     }
 
+    /**
+     *  Deletes the given card from he list hen it is an element
+     * @param flashCard - will be removed
+     */
+    public void removeFlashCard(FlashCard flashCard){
+        if (cards.contains( flashCard)){
+            cards.remove(flashCard);
+            this.update();
+        }
+    }
     @Override
     public String toString() {
         return "Tag{" +

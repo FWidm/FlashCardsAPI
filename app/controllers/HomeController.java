@@ -53,10 +53,13 @@ public class HomeController extends Controller {
         a.save();
         fc.addAnswer(a);
 
-        Tag t =new Tag("Tag "+ new Date());
-        t.save();
+        for(int i=0; i<Math.random()*10+1; i++){
+            Tag t =new Tag("Tag "+i+": "+ new Date());
+            t.save();
+            fc.addTag(t);
+        }
+
         //we only ned to call update from one side it'll call he other side as well.
-        fc.addTag(t);
         fc.update();
 
         System.out.println("Flashcard added Question and Answer: "+fc);
@@ -65,12 +68,14 @@ public class HomeController extends Controller {
         System.out.println("IsMultiChoice? "+fc.isMultipleChoice());
 
 
-        System.out.println("Card tags: "+fc.getTags());
-        System.out.println("Tag Cards: "+t.getCards());
 
-        t.delete();
-        System.out.println("from db: "+ FlashCard.find.byId(fc.getId()).getTags().size());
         System.out.println("Card tags: "+fc.getTags());
+        List<Tag> fc_tags = FlashCard.find.byId(fc.getId()).getTags();
+        for (Tag tmptag:fc_tags){
+            tmptag.removeFlashCard(fc);
+            System.out.println("Tag="+tmptag);
+        }
+
         return ok(index.render("Card test done!"));
     }
 

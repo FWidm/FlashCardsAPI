@@ -44,7 +44,7 @@ public class FlashCard extends Model {
     @JsonProperty(JsonKeys.DATE_UPDATED)
     private Date lastUpdated;
     //todo: maybe remove the cascade and handle the rest, up until no this removes all tags and the join table enries.
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany/*(cascade = CascadeType.ALL)*/
     @JoinTable(name="join_cards_tag",
             joinColumns = @JoinColumn(name="card_id", referencedColumnName=JsonKeys.FLASHCARD_ID),
             inverseJoinColumns = @JoinColumn(name="tag_id", referencedColumnName = JsonKeys.TAG_ID))
