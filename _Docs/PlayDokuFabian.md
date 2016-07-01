@@ -1,4 +1,7 @@
-# Play Framework
+# Play Framework - FlashCards API
+___
+![FlashCards Logo](img/flash_icon_250.png)
+___
 [Play Framework Website](https://www.playframework.com/)
 ___
 ## Allgemeines für Play v2.2
@@ -103,7 +106,7 @@ public static JsonNode getJson(Object o) {
 		mapper.setDateFormat(outputFormat);
 		Json.setObjectMapper(mapper);
 		return Json.toJson(o);
-	}
+}
 ```
 ### Parsen von JSON Arrays
 ```java
@@ -118,9 +121,52 @@ for (JsonNode node : answersNode) {
     }
 }
 ```
-### JSON Proprty Names
+### JSON Property Names
 Können in der Klasse mittels `@JsonProperty(<Strng>)` festgeleg wrden. Wenn eine Konstante als String eingesetzt wird, kannes nötig sein die Klasse erneut zu speihern, damit sich die Änderung durchsetzt.
 ___
 ## JPA/EBEAN
 In diesem [Wikibook](https://en.wikibooks.org/wiki/Java_Persistence) gibt es eine schöne Einleitung über die Elementaren Beziehungen, nicht alle der vorgestellten Operationen funktionieren mit jeder konkreten ORM Implementierung, die Relationen aber definitiv. Wir benutzen zur Zeit Ebean, Link zur  [Dokumentation](https://en.wikibooks.org/wiki/Java_Persistence).
+### Relationen
+Können uni- oder bidirektional sein, und ein Objekt ist immer der Owner der Relation. Im folgenden werden benutzte Relationen kurz vorgestellt:
+k``````````````
+### OneToOne (1:1)
+Ermöglicht eine 1:1 Vebindung und wird dazu genutzt um `FlashCard` Attribute von den `Question` Attributen zu trennen, obwohl beide voneinander voll abhängig sind.
 
+In `FlashCard` finden sich dann folgende Annotationen über dem `Question`-Objekt.
+```java
+    @OneToOne(cascade=CascadeType.ALL)
+    @JoinColumn(name="question_id", referencedColumnName = JsonKeys.QUESTION_ID)
+    private Question question;
+```
+Damit hat die `FlashCard` die `ID`der Frage in ihrer Datenbank und es entsteht die unidirektionale 1:1 Verbindung: `FlashCard` &rarr; `Question`. Da die Frage meist sowieso nach der Karte geladen wird reicht diese Relation aus.
+
+### OneToMany/ManyToOne (1:n, n:1)
+`FlashCard`: Keine Spalte in der DB mit ids, aber durch das mappedby erhält die Klasse direkt alle zugehörigen Antworten.
+```java
+@OneToMany(cascade=CascadeType.ALL,mappedBy = "card")
+private List<Answer> answers;
+```
+`Answer`: Eine Spalte mit `parent_card_id` in der eigenen Tabelle, die eine Antwort genau einer Frage zuordnet.
+```java
+@ManyToOne
+@JoinColumn(name="parent_card_id")
+@JsonIgnore
+private FlashCard card;
+```
+
+### ManyToMany (N:M)
+`Flashcard` besitzt die Relation und definiert die `JoinTable`, diese erzeugt eine Tabelle in der Datenbank mit zwei Spalten`||card_id|tag_id||`, die die N:M Zuordnung ermöglicht. Ohne Cascade ist es jetzt nötig vorher zu definieren, was mit den Tags passiert wenn die Klasse gelöscht wird. Entweder entfernt man von allen Tags die Referenz auf dieses Objekt. Ein Löschen des Tags wäre auch möglich aber macht wenig Sinn.
+```java
+@ManyToMany
+@JoinTable(name="join_cards_tag",
+        joinColumns = @JoinColumn(name="card_id", referencedColumnName=JsonKeys.FLASHCARD_ID),
+        inverseJoinColumns = @JoinColumn(name="tag_id", referencedColumnName = JsonKeys.TAG_ID))
+private List<Tag> tags;
+```
+
+Die Gegenseite `Tag` muss jetzt nur angeben wie sie gemappt werden soll. Wird ein Tag gelöscht verschwinden auch zugehörige Relationen in der `JoinTable`.
+```java
+@ManyToMany(mappedBy = "tags")
+@JsonProperty(JsonKeys.TAG_CARDS)
+private List<FlashCard> cards;
+```

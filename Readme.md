@@ -3,39 +3,41 @@
 ```
 #Flash Cards API
 #Flash Cards API
-GET     /testCards          controllers.HomeController.testCards
-GET     /testGroups         controllers.HomeController.testGroups
-GET     /test               controllers.HomeController.test
+GET     /testCards              controllers.HomeController.testCards
+GET     /testGroups             controllers.HomeController.testGroups
+GET     /test                   controllers.HomeController.test
 
 #Users
-GET		/users				controllers.UserController.getUserList
-GET		/users/:id          controllers.UserController.getUser(id:Long)
-GET		/users/e/:email     controllers.UserController.getUserByEmail(email:String)
-POST	/users				controllers.UserController.addUser
-PUT		/users/:id			controllers.UserController.updateUser(id:Long)
-PATCH	/users/:id			controllers.UserController.updateUser(id:Long)
-
-DELETE 	/users/:id			controllers.UserController.deleteUser(id:Long)
+GET		/users				    controllers.UserController.getUserList
+GET		/users/:id              controllers.UserController.getUser(id:Long)
+GET		/users/e/:email         controllers.UserController.getUserByEmail(email:String)
+POST	/users				    controllers.UserController.addUser
+PUT		/users/:id			    controllers.UserController.updateUser(id:Long)
+PATCH	/users/:id			    controllers.UserController.updateUser(id:Long)
+DELETE 	/users/:id			    controllers.UserController.deleteUser(id:Long)
 
 #Groups
-GET 	/groups				controllers.UserGroupController.getUserGroupList
-GET 	/groups/:id			controllers.UserGroupController.getUserGroup(id:Long)
-PUT 	/groups/:id			controllers.UserGroupController.updateUserGroup(id:Long)
-PATCH 	/groups/:id			controllers.UserGroupController.updateUserGroup(id:Long)
-POST 	/groups				controllers.UserGroupController.addUserGroup
-DELETE	/groups/:id			controllers.UserGroupController.deleteUserGroup(id:Long)
+GET 	/groups				    controllers.UserGroupController.getUserGroupList
+GET 	/groups/:id			    controllers.UserGroupController.getUserGroup(id:Long)
+PUT 	/groups/:id			    controllers.UserGroupController.updateUserGroup(id:Long)
+PATCH 	/groups/:id			    controllers.UserGroupController.updateUserGroup(id:Long)
+POST 	/groups				    controllers.UserGroupController.addUserGroup
+DELETE	/groups/:id			    controllers.UserGroupController.deleteUserGroup(id:Long)
 
 #Flashcards
-GET     /cards              controllers.FlashCardController.getFlashCardList
-GET     /cards/:id          controllers.FlashCardController.getFlashCard(id:Long)
+GET     /cards                  controllers.FlashCardController.getFlashCardList
+GET     /cards/:id              controllers.FlashCardController.getFlashCard(id:Long)
 GET     /cards/:id/questionText controllers.FlashCardController.getQuestion(id:Long)
-GET     /cards/:id/answers?size  controllers.FlashCardController.getAnswers(id:Long)
-GET     /cards/:id/author   controllers.FlashCardController.getAuthor(id:Long)
-POST    /cards              controllers.FlashCardController.addFlashCard
-DELETE  /cards/:id          controllers.FlashCardController.deleteFlashCard(id:Long)
-PATCH   /cards/:id          controllers.FlashCardController.updateFlashCard(id:Long)
-PUT     /cards/:id          controllers.FlashCardController.updateFlashCard(id:Long)
+GET     /cards/:id/answers?size controllers.FlashCardController.getAnswers(id:Long)
+GET     /cards/:id/author       controllers.FlashCardController.getAuthor(id:Long)
+POST    /cards                  controllers.FlashCardController.addFlashCard
+DELETE  /cards/:id              controllers.FlashCardController.deleteFlashCard(id:Long)
+PATCH   /cards/:id              controllers.FlashCardController.updateFlashCard(id:Long)
+PUT     /cards/:id              controllers.FlashCardController.updateFlashCard(id:Long)
 ```
+
+##
+If you're interested in reading about the things we use, there is a dev log file that describes problems and other topics we came across in german: [here]((https://github.com/FWidm/FlashCardsAPI/blob/master/_Docs/PlayDokuFabian.md)).
 ## Example Calls
 ### Users
 **Elements needed for REST calls:**
@@ -78,7 +80,7 @@ Send a `PATCH`or `PUT` request to `localhost:9000/groups/<id>` with `Content-Typ
 Use `DELETE` request to `localhost:9000/groups/<id>`.
 
 ### Further Information
-see the Postman Collection for more detailled information: [here](https://github.com/FWidm/FlashCardsAPI/blob/master/_PostManCollection/FlashCards.postman_collection.json).
+see the Postman Collection for more detailled information: [here](https://github.com/FWidm/FlashCardsAPI/blob/master/_Docs/FlashCards.postman_collection.json).
 
 Also refer to the [JsonKeys.java](https://github.com/FWidm/FlashCardsAPI/blob/master/app/util/JsonKeys.java) for more inforations about naming conventions.
 ## Expected/Possible JSON for the different Objects
