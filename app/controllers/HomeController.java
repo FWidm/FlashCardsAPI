@@ -9,6 +9,7 @@ import views.html.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -52,12 +53,24 @@ public class HomeController extends Controller {
         a.save();
         fc.addAnswer(a);
 
+        Tag t =new Tag("Tag "+ new Date());
+        t.save();
+        //we only ned to call update from one side it'll call he other side as well.
+        fc.addTag(t);
+        fc.update();
+
         System.out.println("Flashcard added Question and Answer: "+fc);
         System.out.println("_____________________");
         System.out.println("Question for Card no. "+fc.getId()+": "+fc.getQuestion());
         System.out.println("IsMultiChoice? "+fc.isMultipleChoice());
-        fc.save();
-        System.out.println(FlashCard.find.all());
+
+
+        System.out.println("Card tags: "+fc.getTags());
+        System.out.println("Tag Cards: "+t.getCards());
+
+        t.delete();
+        System.out.println("from db: "+ FlashCard.find.byId(fc.getId()).getTags().size());
+        System.out.println("Card tags: "+fc.getTags());
         return ok(index.render("Card test done!"));
     }
 
@@ -88,6 +101,7 @@ public class HomeController extends Controller {
         UserGroup tmpGroup;
         return ok(index.render("Group test done!"));
     }
+
 
     public Result test(){
 

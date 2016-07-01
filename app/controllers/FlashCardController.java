@@ -2,6 +2,7 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.typesafe.config.ConfigException;
 import models.*;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
@@ -65,10 +66,14 @@ public class FlashCardController {
      * @return HTTPResult
      */
     public Result deleteFlashCard(long id){
-        FlashCard.find.byId(id).delete();
+        try {
+            FlashCard.find.byId(id).delete();
 
-        return ok(JsonWrap.prepareJsonStatus(OK, "The card with the id=" + id
-                + " has been deleted. This includes questions and answers"));
+            return ok(JsonWrap.prepareJsonStatus(OK, "The card with the id=" + id
+                    + " has been deleted. This includes questions and answers"));
+        }catch (Exception e){
+            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no card with id="+id+" exists."));
+        }
     }
 
     /**

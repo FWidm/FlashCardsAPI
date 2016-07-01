@@ -37,8 +37,8 @@ create table question (
 
 create table tag (
   tagId                     bigint auto_increment not null,
-  tag                       varchar(255),
-  constraint uq_tag_tag unique (tag),
+  name                      varchar(255),
+  constraint uq_tag_name unique (name),
   constraint pk_tag primary key (tagId))
 ;
 
@@ -61,6 +61,12 @@ create table user_group (
   constraint pk_user_group primary key (groupId))
 ;
 
+
+create table join_cards_tag (
+  card_id                        bigint not null,
+  tag_id                         bigint not null,
+  constraint pk_join_cards_tag primary key (card_id, tag_id))
+;
 alter table answer add constraint fk_answer_author_1 foreign key (author_id) references user (userId) on delete restrict on update restrict;
 create index ix_answer_author_1 on answer (author_id);
 alter table answer add constraint fk_answer_card_2 foreign key (parent_card_id) references flash_card (flashcardId) on delete restrict on update restrict;
@@ -76,6 +82,10 @@ create index ix_user_group_6 on user (group_id);
 
 
 
+alter table join_cards_tag add constraint fk_join_cards_tag_flash_card_01 foreign key (card_id) references flash_card (flashcardId) on delete restrict on update restrict;
+
+alter table join_cards_tag add constraint fk_join_cards_tag_tag_02 foreign key (tag_id) references tag (tagId) on delete restrict on update restrict;
+
 # --- !Downs
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -83,6 +93,8 @@ SET FOREIGN_KEY_CHECKS=0;
 drop table answer;
 
 drop table flash_card;
+
+drop table join_cards_tag;
 
 drop table question;
 

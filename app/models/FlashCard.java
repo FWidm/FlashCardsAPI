@@ -43,9 +43,13 @@ public class FlashCard extends Model {
     @UpdatedTimestamp
     @JsonProperty(JsonKeys.DATE_UPDATED)
     private Date lastUpdated;
-    //todo: how do we implement tags? ElementCollection does not work with ebeans, we might have to make our own tag class that contains an id and a string...
+    //todo: maybe remove the cascade and handle the rest, up until no this removes all tags and the join table enries.
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name="join_cards_tag",
+            joinColumns = @JoinColumn(name="card_id", referencedColumnName=JsonKeys.FLASHCARD_ID),
+            inverseJoinColumns = @JoinColumn(name="tag_id", referencedColumnName = JsonKeys.TAG_ID))
+    private List<Tag> tags;
 
-    //orphanRemoval means, that no single questions without a specific card may exist. This helps us keep the db clean.
     @OneToOne(cascade=CascadeType.ALL)
     @JoinColumn(name="question_id", referencedColumnName = JsonKeys.QUESTION_ID)
     @PrivateOwned //this means, that if the element is deleted with its parent.
@@ -227,5 +231,20 @@ public class FlashCard extends Model {
     @JsonIgnore
     public void setMarked(boolean marked) {
         isMarked = marked;
+    }
+
+    public void addTag(Tag tag){
+        if(!tags.contains(tag)){
+            tags.add(tag);
+            tag.addFlashCard(this);
+        }
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 }

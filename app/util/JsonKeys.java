@@ -36,6 +36,9 @@ public class JsonKeys {
     public static final String USER_JSON_ELEMENTS=USER_NAME+", "+USER_EMAIL+", "+USER_PASSWORD+", "+USER_GROUP;
     //Tag
     public static final String TAG_ID = "tagId";
+    public static final String TAG_NAME = "tagName";
+    public static final String TAG_CARDS = "cads";
+
 
     //Group
     public static final String GROUP_ID = "groupId";

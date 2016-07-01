@@ -1,15 +1,13 @@
 package models;
 
 import com.avaje.ebean.Model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import play.data.validation.Constraints;
 import util.JsonKeys;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 /**
  * @author Jonas Kraus
@@ -24,7 +22,62 @@ public class Tag extends Model {
     private long id;
     @Constraints.Required
     @Column(unique = true) @Constraints.MinLength(3) @Constraints.MaxLength(16)
-    private String tag;
+    @JsonProperty(JsonKeys.TAG_NAME)
+    private String name;
+    //this cascade from the "tag" to "join_cards_tag" - e.g. tag.delete -> delete evey entry with tag.id
+    @ManyToMany(mappedBy = "tags", cascade = CascadeType.ALL)
+    @JsonProperty(JsonKeys.TAG_CARDS)
+    @JsonIgnore
+    private List<FlashCard> cards;
 
+    public Tag(String name) {
+        this.name = name;
+    }
 
+    public Tag(String name, List<FlashCard> cards) {
+        this.name = name;
+        this.cards = cards;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @JsonIgnore
+    public List<FlashCard> getCards() {
+        return cards;
+    }
+
+    public void setCards(List<FlashCard> cards) {
+        this.cards = cards;
+    }
+
+    public void addFlashCard(FlashCard flashCard){
+        if(!cards.contains(flashCard)){
+            cards.add(flashCard);
+            this.update();
+            flashCard.addTag(this);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Tag{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", cards=" + cards +
+                '}';
+    }
 }
