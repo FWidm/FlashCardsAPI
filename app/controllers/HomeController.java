@@ -109,7 +109,6 @@ public class HomeController extends Controller {
 
 
     public Result test(){
-
         return ok(JsonWrap.prepareJsonStatus(OK, "hello world"));
     }
 }

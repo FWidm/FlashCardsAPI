@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.avaje.ebean.Model;
 import models.Answer;
+import models.User;
 import play.libs.Json;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -46,6 +47,39 @@ public class JsonWrap {
         return result;
     }
 
+    /**
+     * Generates an objectnode that will contain a given statuscode and the
+     * description in human readable form.
+     *
+     * @param statuscode
+     * @param description
+     * @return
+     */
+    public static ObjectNode prepareJsonStatus(int statuscode,
+                                               String description, int id) {
+        ObjectNode result = Json.newObject();
+        result.put("statuscode", statuscode);
+        result.put("description", description);
+        result.put("id",id);
+        return result;
+    }
+
+//    /**
+//     * Generates an objectnode that will contain a given statuscode and the
+//     * description in human readable form.
+//     *
+//     * @param statuscode
+//     * @param description
+//     * @return
+//     */
+//    public static ObjectNode prepareJsonStatus(int statuscode,
+//                                               String description, User u) {
+//        ObjectNode result = Json.newObject();
+//        result.put("statuscode", statuscode);
+//        result.put("description", description);
+//        result.put("user", getJson(u));
+//        return result;
+//    }
     /*public static <T> List<T> getListFromJSONArray(Class<T> tClass, String jsonKey, JsonNode json) {
 
         System.out.println("Extends ebean model? ");
