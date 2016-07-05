@@ -176,7 +176,26 @@ Postman erlaubt es uns einfache HTTP Requests mit verschiedensten Methoden, Head
 
 Zusätzlich erlaubt es ein abspeichern von Requests in Collections und das Anlegen von Umgebungsvariablen, die dann wiederum in den Requests genutzt werden können. **Collections** und  **Umgebungsvariablen** lassen sich als Json Datei exportieren. Das ermöglicht zusätzlich das teilen dieser Dateien im Team. Für die FlashCards API gibt es beide files zum download.
 
- - Collection: [Link](FlashCardsApi.postman_collection.json)
+ - Collection: [Link](FlashCards.postman_collection.json)
  - Environment: [Link](FlashCardsApi.postman_environment.json)
+
 ### Tutorial für das Nutzen von Variablen:
-[Link](http://blog.getpostman.com/2014/02/20/using-variables-inside-postman-and-collection-runner/)
+Anlegen bzw. managen der **Umgebung** über das Dropdown.
+![Environment Dropdown.](img/1-env_dropdown.png)
+
+Zusätzlich gibt es eine Preview , direkt neben der Umgebungsauswahl, die alle definierten Variablen beinhaltet:
+
+![Environment Vorschau](img/2-env_preview.png)
+
+Die Variablen werden im key-value Format angelegt, nachdem eine environment angelegt wurde:
+
+![Environment Editor](img/3-edit_env.png)
+
+Nutzen kann man die Variablen jetzt, nachdem man wie im ersten Bild gezeigt, die richtige Umgebung aktiviert hat.
+
+### Nutzung der Variablen
+- In URLs: `{{url}}{{port}}/users/{{userId}}`
+- Im Json-Body: `"email": "{{userEmail}}"`
+
+
+Quelle: [Link](http://blog.getpostman.com/2014/02/20/using-variables-inside-postman-and-collection-runner/)
