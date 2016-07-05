@@ -386,7 +386,7 @@
 				{
 					"name": "Create a new User",
 					"request": {
-						"url": "localhost:9000/users",
+						"url": "{{url}}{{port}}/users",
 						"method": "POST",
 						"header": [
 							{
@@ -397,24 +397,18 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"xy\",\n    \"password\": \"passwörd\",\n    \"email\": \"xy@world.com\",\n    \"rating\": 1\n}"
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
 						},
 						"description": ""
 					},
 					"response": []
 				},
 				{
-					"name": "http://localhost:9000/users/8",
+					"name": "Get the user with id {{userId}}",
 					"request": {
-						"url": "http://localhost:9000/users/8",
+						"url": "{{url}}{{port}}/users/{{userId}}",
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"name\":\"patchtest\"\n}"
@@ -424,17 +418,11 @@
 					"response": []
 				},
 				{
-					"name": "http://localhost:9000/users",
+					"name": "Get all users in a list",
 					"request": {
-						"url": "http://localhost:9000/users",
+						"url": "{{url}}{{port}}/users",
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"name\":\"patchtest\"\n}"
@@ -444,29 +432,23 @@
 					"response": []
 				},
 				{
-					"name": "DELETE http://localhost:9000/users/8",
+					"name": "Delete user with id {{userId}}",
 					"request": {
-						"url": "http://localhost:9000/users/8",
+						"url": "{{url}}{{port}}/users/{{userId}}",
 						"method": "DELETE",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\":\"patchtest\"\n}"
+							"raw": ""
 						},
 						"description": ""
 					},
 					"response": []
 				},
 				{
-					"name": "localhost:9000/users/9",
+					"name": "Partially update a user with the id {{userId}}",
 					"request": {
-						"url": "localhost:9000/users/9",
+						"url": "{{url}}{{port}}/users/{{userId}}",
 						"method": "PATCH",
 						"header": [
 							{
@@ -477,7 +459,27 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"patch\",\n    \"password\": \"patch\",\n    \"rating\": -2,\n    \"group\":{\"groupId\":24}\n}"
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"group\":{\"groupId\":\"{{groupId}}\"}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Completely update a user with the id {{userId}}",
+					"request": {
+						"url": "{{url}}{{port}}/users/{{userId}}",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"rating\": \"{{userRating}}\",\n    \"email\": \"{{userEmail}}\",\n    \"group\": null\n}"
 						},
 						"description": ""
 					},

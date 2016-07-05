@@ -38,9 +38,9 @@ public class UserController extends Controller {
 	public Result updateUser(Long id) {
         try {
             JsonNode json = request().body().asJson();
-
-            if (request().method().equals("PUT") && !json.has(JsonKeys.USER_EMAIL) || !json.has(JsonKeys.RATING)
-                    || !json.has(JsonKeys.USER_NAME) || !json.has(JsonKeys.USER_GROUP) || !json.has(JsonKeys.USER_PASSWORD))
+            System.out.println("Update method="+request().method());
+            if (request().method().equals("PUT") && (!json.has(JsonKeys.USER_EMAIL) || !json.has(JsonKeys.RATING)
+                    || !json.has(JsonKeys.USER_NAME) || !json.has(JsonKeys.USER_GROUP) || !json.has(JsonKeys.USER_PASSWORD)))
                 return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
                         "The Update method needs all details of the user, such as email, " +
                                 "rating, name, group and password! An attribute was missing for id="
@@ -75,10 +75,15 @@ public class UserController extends Controller {
             if (json.has(JsonKeys.USER_NAME) && minLengthValidator.isValid(json.get(JsonKeys.USER_NAME).asText()))
                 u.setName(json.get(JsonKeys.USER_NAME).asText());
             if (json.has(JsonKeys.USER_GROUP)) {
-                System.out.println("groupnode: " + json.get(JsonKeys.USER_GROUP));
-                Long groupId = json.get(JsonKeys.USER_GROUP).get(JsonKeys.GROUP_ID).asLong();
-                UserGroup group = UserGroup.find.byId(groupId);
-                System.out.println("setting group to gid=" + groupId + ", group=" + group);
+                UserGroup group=null;
+                System.err.println("Json Value="+json.get(JsonKeys.USER_GROUP)+ " is empty?" + json.get(JsonKeys.USER_GROUP).size());
+
+                if(json.get(JsonKeys.USER_GROUP).size()>0 && json.get(JsonKeys.USER_GROUP).has(JsonKeys.GROUP_ID)){
+                    Long groupId = json.get(JsonKeys.USER_GROUP).get(JsonKeys.GROUP_ID).asLong();
+                    group = UserGroup.find.byId(groupId);
+                    System.out.println("setting group to gid=" + groupId + ", group=" + group);
+                }
+
                 u.setGroup(group);
 
             }
@@ -93,6 +98,7 @@ public class UserController extends Controller {
                             "Body did contain elements that are not allowed/expected. A user can contain: "+JsonKeys.USER_JSON_ELEMENTS));
         }
         catch (NullPointerException e){
+            e.printStackTrace();
             return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no user with id="+id+" exists."));
         }
 	}

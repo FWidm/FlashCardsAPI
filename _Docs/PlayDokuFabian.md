@@ -170,3 +170,13 @@ Die Gegenseite `Tag` muss jetzt nur angeben wie sie gemappt werden soll. Wird ei
 @JsonProperty(JsonKeys.TAG_CARDS)
 private List<FlashCard> cards;
 ```
+___
+##Postman als REST-API Tester
+Postman erlaubt es uns einfache HTTP Requests mit verschiedensten Methoden, Headern und Body an eine beliebige URL schicken.
+
+Zusätzlich erlaubt es ein abspeichern von Requests in Collections und das Anlegen von Umgebungsvariablen, die dann wiederum in den Requests genutzt werden können. **Collections** und  **Umgebungsvariablen** lassen sich als Json Datei exportieren. Das ermöglicht zusätzlich das teilen dieser Dateien im Team. Für die FlashCards API gibt es beide files zum download.
+
+ - Collection: [Link](FlashCardsApi.postman_collection.json)
+ - Environment: [Link](FlashCardsApi.postman_environment.json)
+### Tutorial für das Nutzen von Variablen:
+[Link](http://blog.getpostman.com/2014/02/20/using-variables-inside-postman-and-collection-runner/)

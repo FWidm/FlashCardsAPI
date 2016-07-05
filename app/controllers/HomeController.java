@@ -8,9 +8,7 @@ import views.html.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * This controller contains an action to handle HTTP requests
@@ -25,6 +23,7 @@ public class HomeController extends Controller {
      * <code>GET</code> request with a path of <code>/</code>.
      */
     public Result index() {
+//        return ok(JsonWrap.prepareJson(map));
         return ok(index.render("Your new application is ready."));
     }
 
