@@ -119,6 +119,7 @@ public class FlashCard extends Model {
         this.answers=requestObject.getAnswers();
         this.question=requestObject.getQuestion();
         this.multipleChoice =requestObject.isMultipleChoice();
+        this.tags=requestObject.getTags();
     }
 
     /**

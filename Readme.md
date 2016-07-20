@@ -1,43 +1,15 @@
 # FlashCards RESTful API
-## Current HTTP Methods that should be working:
-```
-#Flash Cards API
-#Flash Cards API
-GET     /testCards              controllers.HomeController.testCards
-GET     /testGroups             controllers.HomeController.testGroups
-GET     /test                   controllers.HomeController.test
+## Methods
+| Ressource | GET | PUT | POST | PATCH | DELETE|
+|-|-----|-----|------|-------|--------|
+|/users| retrieve a list of users. Can be filtered via url params ?name=x or ?email=y| - | creates a new User | - | - |
+|/users/5| retrieve the details of the specified user | update the complete ressource with this id | - | partial update of the resource | deletes the specified resource |
 
-#Users
-GET		/users				    controllers.UserController.getUserList
-GET		/users/:id              controllers.UserController.getUser(id:Long)
-GET		/users/e/:email         controllers.UserController.getUserByEmail(email:String)
-POST	/users				    controllers.UserController.addUser
-PUT		/users/:id			    controllers.UserController.updateUser(id:Long)
-PATCH	/users/:id			    controllers.UserController.updateUser(id:Long)
-DELETE 	/users/:id			    controllers.UserController.deleteUser(id:Long)
-
-#Groups
-GET 	/groups				    controllers.UserGroupController.getUserGroupList
-GET 	/groups/:id			    controllers.UserGroupController.getUserGroup(id:Long)
-PUT 	/groups/:id			    controllers.UserGroupController.updateUserGroup(id:Long)
-PATCH 	/groups/:id			    controllers.UserGroupController.updateUserGroup(id:Long)
-POST 	/groups				    controllers.UserGroupController.addUserGroup
-DELETE	/groups/:id			    controllers.UserGroupController.deleteUserGroup(id:Long)
-
-#Flashcards
-GET     /cards                  controllers.FlashCardController.getFlashCardList
-GET     /cards/:id              controllers.FlashCardController.getFlashCard(id:Long)
-GET     /cards/:id/questionText controllers.FlashCardController.getQuestion(id:Long)
-GET     /cards/:id/answers?size controllers.FlashCardController.getAnswers(id:Long)
-GET     /cards/:id/author       controllers.FlashCardController.getAuthor(id:Long)
-POST    /cards                  controllers.FlashCardController.addFlashCard
-DELETE  /cards/:id              controllers.FlashCardController.deleteFlashCard(id:Long)
-PATCH   /cards/:id              controllers.FlashCardController.updateFlashCard(id:Long)
-PUT     /cards/:id              controllers.FlashCardController.updateFlashCard(id:Long)
-```
-
-##
+for more working routing look at the [routes](conf/routes).
+## German Turoial/Insights
 If you're interested in reading about the things we use, there is a dev log file that describes problems and other topics we came across in german: [here]((https://github.com/FWidm/FlashCardsAPI/blob/master/_Docs/PlayDokuFabian.md)).
+
+
 ## Example Calls
 ### Users
 **Elements needed for REST calls:**
@@ -115,14 +87,11 @@ Currently creation works without specifying a group, which sets the group of the
   {
     "id": 4,
     "rating": 0,
-    "created": "2016-06-22 10:10:06 UTC",
-    "lastUpdated": "2016-06-22 10:10:06 UTC",
     "questionText": {},
     "answers": [{},{}],
     "author": { /*see user*/ },
     "multipleChoice": false,
-    "marked": false,
-    "selected": false
+    "tags":[{},{}]
   }
 ```
 #### Questions
@@ -149,3 +118,5 @@ Currently creation works without specifying a group, which sets the group of the
         "rating": 0
  }
 ```
+
+

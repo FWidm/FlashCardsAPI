@@ -198,6 +198,6 @@ Nutzen kann man die Variablen jetzt, nachdem man wie im ersten Bild gezeigt, die
 ### Nutzung der Variablen
 - In URLs: `{{url}}{{port}}/users/{{userId}}`
 - Im Json-Body: `"email": "{{userEmail}}"`
-
-
 Quelle: [Link](http://blog.getpostman.com/2014/02/20/using-variables-inside-postman-and-collection-runner/)
+### Nutzung von Responses
+Quelle: [Link](http://blog.getpostman.com/2014/01/27/extracting-data-from-responses-and-chaining-requests/)

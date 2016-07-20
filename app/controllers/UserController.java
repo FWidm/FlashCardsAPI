@@ -1,6 +1,7 @@
 package controllers;
 
 import java.util.List;
+import java.util.Map;
 
 import models.*;
 import play.api.mvc.Flash;
@@ -13,33 +14,57 @@ import play.mvc.Result;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import util.UrlParamKeys;
 
 public class UserController extends Controller {
-    public Result getUserIndex(){
-        return ok(JsonWrap.prepareJsonStatus(OK,"ok!"));
+    public Result getUserIndex() {
+        return ok(JsonWrap.prepareJsonStatus(OK, "ok!"));
     }
 
     /**
      * Return all users in the database.
+     *
      * @return HTTP Status OK with a list of all users.
      */
-	public Result getUserList() {
-        // TODO: 11/07/16  Suche nach Email über http://localhost:9000/users?email=hello1@world.com statt /users/e/email, das gleiche für name
-        List<User> u = User.find.all();
-		return ok(JsonWrap.getJson(u));
-	}
+    public Result getUserList() {
+        Map<String, String[]> urlParams = Controller.request().queryString();
+
+        if (urlParams.containsKey(UrlParamKeys.EMAIL)) {
+            String email = urlParams.get(UrlParamKeys.EMAIL)[0];
+            User u = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
+            if (u == null)
+                return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,
+                        "The user with the email=" + email + " could not be found."));
+            System.out.println(u);
+            return ok(JsonWrap.getJson(u));
+        }
+
+        if (urlParams.containsKey(UrlParamKeys.NAME)) {
+            String name = urlParams.get(UrlParamKeys.NAME)[0];
+            List<User> u = User.find.where().eq(JsonKeys.USER_NAME, name).findList();
+            if (u == null)
+                return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,
+                        "The user with the name=" + name + " could not be found."));
+            System.out.println(u);
+            return ok(JsonWrap.getJson(u));
+        } else {
+            System.out.println("Std. Userlist");
+            List<User> u = User.find.all();
+            return ok(JsonWrap.getJson(u));
+        }
+    }
 
 
-
-	/**
-	 * Either PATCHes single values or PUTs all values into the entity with the specified id.
-	 * @return HTTP Status ok when everything works out or badRequest if not.
-	 */
-	@BodyParser.Of(BodyParser.Json.class)
-	public Result updateUser(Long id) {
+    /**
+     * Either PATCHes single values or PUTs all values into the entity with the specified id.
+     *
+     * @return HTTP Status ok when everything works out or badRequest if not.
+     */
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result updateUser(Long id) {
         try {
             JsonNode json = request().body().asJson();
-            System.out.println("Update method="+request().method());
+            System.out.println("Update method=" + request().method());
             if (request().method().equals("PUT") && (!json.has(JsonKeys.USER_EMAIL) || !json.has(JsonKeys.RATING)
                     || !json.has(JsonKeys.USER_NAME) || !json.has(JsonKeys.USER_GROUP) || !json.has(JsonKeys.USER_PASSWORD)))
                 return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
@@ -76,10 +101,10 @@ public class UserController extends Controller {
             if (json.has(JsonKeys.USER_NAME) && minLengthValidator.isValid(json.get(JsonKeys.USER_NAME).asText()))
                 u.setName(json.get(JsonKeys.USER_NAME).asText());
             if (json.has(JsonKeys.USER_GROUP)) {
-                UserGroup group=null;
-                System.err.println("Json Value="+json.get(JsonKeys.USER_GROUP)+ " is empty?" + json.get(JsonKeys.USER_GROUP).size());
+                UserGroup group = null;
+                System.err.println("Json Value=" + json.get(JsonKeys.USER_GROUP) + " is empty?" + json.get(JsonKeys.USER_GROUP).size());
 
-                if(json.get(JsonKeys.USER_GROUP).size()>0 && json.get(JsonKeys.USER_GROUP).has(JsonKeys.GROUP_ID)){
+                if (json.get(JsonKeys.USER_GROUP).size() > 0 && json.get(JsonKeys.USER_GROUP).has(JsonKeys.GROUP_ID)) {
                     Long groupId = json.get(JsonKeys.USER_GROUP).get(JsonKeys.GROUP_ID).asLong();
                     group = UserGroup.find.byId(groupId);
                     System.out.println("setting group to gid=" + groupId + ", group=" + group);
@@ -91,57 +116,56 @@ public class UserController extends Controller {
             u.update();
             return ok(JsonWrap.prepareJsonStatus(OK, "User with id=" + id
                     + " has been succesfully changed."));
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             return badRequest(JsonWrap
                     .prepareJsonStatus(
                             BAD_REQUEST,
-                            "Body did contain elements that are not allowed/expected. A user can contain: "+JsonKeys.USER_JSON_ELEMENTS));
-        }
-        catch (NullPointerException e){
+                            "Body did contain elements that are not allowed/expected. A user can contain: " + JsonKeys.USER_JSON_ELEMENTS));
+        } catch (NullPointerException e) {
             e.printStackTrace();
-            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no user with id="+id+" exists."));
+            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND, "Error, no user with id=" + id + " exists."));
         }
-	}
+    }
 
     /**
      * Returns the user with a specific ID.
+     *
      * @param id
      * @return HTTP Status Result OK if found or NOT_FOUND if not found.
      */
-	public Result getUser(Long id) {
-		// Find a task by ID
-		User u = User.find.byId(id);
-		if (u == null)
-			return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,
-					"The user with the id=" + id + " could not be found."));
-		System.out.println(u+ "| USER_NAME Key="+JsonKeys.USER_NAME);
-		return ok(JsonWrap.getJson(u));
-	}
+    public Result getUser(Long id) {
+        User u = User.find.byId(id);
+        if (u == null)
+            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,
+                    "The user with the id=" + id + " could not be found."));
+        System.out.println(u + "| USER_NAME Key=" + JsonKeys.USER_NAME);
+        return ok(JsonWrap.getJson(u));
+    }
 
     /**
      * Returns the user with a specific (unique!) Email.
+     *
      * @param email
      * @return OK when found, NOT_FOUND if it doesnt exist.
      */
-	public Result getUserByEmail(String email) {
-		// Find a task by ID
-		User u = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
+    public Result getUserByEmail(String email) {
+        // Find a task by ID
+        User u = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         if (u == null)
             return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,
                     "The user with the email=" + email + " could not be found."));
-		System.out.println(u);
-		return ok(JsonWrap.getJson(u));
-	}
-
+        System.out.println(u);
+        return ok(JsonWrap.getJson(u));
+    }
 
 
     /**
      * Deletes a user with the given id.
+     *
      * @param id
      * @return OK
      */
-	public Result deleteUser(Long id) {
+    public Result deleteUser(Long id) {
         try {
             List<Answer> givenAnswers = Answer.find.where().eq("author_id", id).findList();
             System.out.println("Answers from the user has size=" + givenAnswers.size());
@@ -178,20 +202,19 @@ public class UserController extends Controller {
 
             return ok(JsonWrap.prepareJsonStatus(OK, "The user with the id=" + id
                     + " has been deleted. This includes questions, answers and cards mady by this user."));
+        } catch (NullPointerException e) {
+            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND, "Error, no user with id=" + id + " exists."));
         }
-        catch (NullPointerException e){
-            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no user with id="+id+" exists."));
-        }
-	}
+    }
 
-	/**
-	 * Adds a new user to the database, throws an error if the email, name or
-	 * password are missing.
-	 * 
-	 * @return
-	 */
-	@BodyParser.Of(BodyParser.Json.class)
-	public  Result addUser() {
+    /**
+     * Adds a new user to the database, throws an error if the email, name or
+     * password are missing.
+     *
+     * @return
+     */
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result addUser() {
         try {
             JsonNode json = request().body().asJson();
             ObjectMapper mapper = new ObjectMapper();
@@ -220,13 +243,12 @@ public class UserController extends Controller {
             return forbidden(JsonWrap.prepareJsonStatus(FORBIDDEN,
                     "The user could not be created, please specify email, name, password. " +
                             "Email has to be valid (e.g. a@b.com)"));
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             return badRequest(JsonWrap
                     .prepareJsonStatus(
                             BAD_REQUEST,
-                            "Body did contain elements that are not allowed/expected. A user can contain: "+JsonKeys.USER_JSON_ELEMENTS));
+                            "Body did contain elements that are not allowed/expected. A user can contain: " + JsonKeys.USER_JSON_ELEMENTS));
         }
-	}
+    }
 
 }
