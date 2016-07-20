@@ -24,6 +24,10 @@ public class UserGroupController extends Controller {
 	 */
 	public Result getUserGroupList() {
         Map<String, String[]> urlParams = Controller.request().queryString();
+        for (String s:urlParams.get("empty")
+             ) {
+            System.out.println(">>>"+s);
+        }
         if(urlParams.keySet().contains("empty")){
             System.out.println("only print empty or nonempty groups");
             //only print the first val we get for the key, this is possible as /groups?empty=true&empty=false could return

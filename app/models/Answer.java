@@ -2,6 +2,7 @@ package models;
 
 import com.avaje.ebean.Model;
 import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.avaje.ebean.annotation.UpdatedTimestamp;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -34,6 +35,7 @@ public class Answer extends Model {
     @JsonProperty(JsonKeys.URI)
     private URI mediaURI;
 
+    // TODO: 11/07/16  Ist die Antwort richtig oder falsch?
    @ManyToOne
    @JoinColumn(name="author_id", referencedColumnName=JsonKeys.USER_ID)
    @JsonProperty(JsonKeys.AUTHOR)
@@ -47,6 +49,11 @@ public class Answer extends Model {
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z") @CreatedTimestamp
     @JsonProperty(JsonKeys.DATE_CREATED)
     private Date created;
+
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
+    @UpdatedTimestamp
+    @JsonProperty(JsonKeys.DATE_UPDATED)
+    private Date lastUpdated;
     @JsonProperty(JsonKeys.RATING)
     private int rating;
 

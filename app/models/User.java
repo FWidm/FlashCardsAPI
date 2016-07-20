@@ -45,9 +45,11 @@ public class User extends Model {
 	private Date created;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "group_id")
+	@JoinColumn(name = JsonKeys.GROUP_ID)
     @JsonProperty(JsonKeys.USER_GROUP)
 	private UserGroup group;
+
+    // TODO: 11/07/16 Profilbild, last Login
 
 	public static Model.Finder<Long, User> find = new Model.Finder<Long, User>(User.class);
 

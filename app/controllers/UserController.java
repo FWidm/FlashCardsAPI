@@ -24,7 +24,8 @@ public class UserController extends Controller {
      * @return HTTP Status OK with a list of all users.
      */
 	public Result getUserList() {
-		List<User> u = User.find.all();
+        // TODO: 11/07/16  Suche nach Email über http://localhost:9000/users?email=hello1@world.com statt /users/e/email, das gleiche für name
+        List<User> u = User.find.all();
 		return ok(JsonWrap.getJson(u));
 	}
 
@@ -132,6 +133,8 @@ public class UserController extends Controller {
 		System.out.println(u);
 		return ok(JsonWrap.getJson(u));
 	}
+
+
 
     /**
      * Deletes a user with the given id.

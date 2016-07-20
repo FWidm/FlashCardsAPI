@@ -3,6 +3,7 @@ package controllers;
 import models.*;
 import play.mvc.*;
 
+import util.JsonKeys;
 import util.JsonWrap;
 import views.html.*;
 
@@ -99,7 +100,7 @@ public class HomeController extends Controller {
         System.out.println("Querying the groups");
         List<UserGroup> groups = UserGroup.find.all();
         for(UserGroup group:groups){
-            List<User> users= User.find.where().eq("group_id", group.getId()).findList();
+            List<User> users= User.find.where().eq(JsonKeys.GROUP_ID, group.getId()).findList();
             System.out.println("Finding users for group="+group+" users are: "+users);
         }
         UserGroup tmpGroup;

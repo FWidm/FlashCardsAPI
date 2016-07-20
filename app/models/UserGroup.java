@@ -29,9 +29,11 @@ public class UserGroup extends Model {
     @JsonProperty(JsonKeys.GROUP_NAME)
     private String name;
 
+    //TODO: Delete this attribute
     @Constraints.Required
     @JsonProperty(JsonKeys.GROUP_DESCRIPTION)
     private String description;
+
 	@OneToMany(mappedBy = "group")
     @JsonIgnore	// to prevent endless recursion.
 	private List<User> users;

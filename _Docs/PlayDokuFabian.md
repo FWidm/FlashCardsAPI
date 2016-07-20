@@ -3,6 +3,7 @@ ___
 ![FlashCards Logo](img/flash_icon_250.png)
 ___
 [Play Framework Website](https://www.playframework.com/)
+
 ___
 ## Allgemeines für Play v2.2
 ### Projekt anlegen
@@ -10,6 +11,7 @@ ___
 $ cd /PathToProbject/
 $ play new Project // activator new Project
 ```
+
 ### Projekt starten
 ```bash
 $ cd /PathToProbject/Project
@@ -72,7 +74,7 @@ Um auf diese Daten zuzugreifen, kann jetzt der Body in der Funktion zugegriffen 
     {
     "name":"anon",
     "email":"email@example.com",
-    "password":"asdfgh",
+    "password":"asdfgh"
     }
 ```
 Um daraufhin in der folgenden Methode einen Nutzer anhand der genannten Daten anzulegen.
