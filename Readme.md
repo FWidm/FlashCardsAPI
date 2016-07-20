@@ -9,6 +9,13 @@ for more working routing look at the [routes](conf/routes).
 ## German Turoial/Insights
 If you're interested in reading about the things we use, there is a dev log file that describes problems and other topics we came across in german: [here]((https://github.com/FWidm/FlashCardsAPI/blob/master/_Docs/PlayDokuFabian.md)).
 
+## TODO
+- [ ] Rewrite all PUT/PATCH to completely replace the ressources instead of appending
+- [ ] Add append via url paramter to all PUT/PATCH methods
+- [ ] Session Management/Authentication/Token base system
+- [ ] Rewrite Group System
+- [ ] Implement CardDeck and Categories
+- [ ] Write proper Unit-Tests in Postman
 
 ## Example Calls
 ### Users
@@ -56,67 +63,5 @@ see the Postman Collection for more detailled information: [here](https://github
 
 Also refer to the [JsonKeys.java](https://github.com/FWidm/FlashCardsAPI/blob/master/app/util/JsonKeys.java) for more inforations about naming conventions.
 ## Expected/Possible JSON for the different Objects
-#### User
-Currently creation works without specifying a group, which sets the group of the user to null. The group can then be set via `PATCH` or `PUT` if it is specified like this:
-```Json
-{
-    "name": "hello",
-    "password": "passwörd",
-    "email": "hello1@world.com",
-    "rating": 1,
-    "group":{
-                "groupId": 3,
-                "name": "y",
-                "description": "y"
-            }
-}
-```
-#### Group
-```json
-{
-      "groupId": 3,
-      "name": "y",
-      "description": "y",
-      "users":[{"userID":1}, {}]
-    }
-```
-
-
-#### Card
-```json
-  {
-    "id": 4,
-    "rating": 0,
-    "questionText": {},
-    "answers": [{},{}],
-    "author": { /*see user*/ },
-    "multipleChoice": false,
-    "tags":[{},{}]
-  }
-```
-#### Questions
-```json
-{
-      "id": 4,
-      "questionText": "Question",
-      "mediaURI": null,
-      "author": {
-        /*see user*/
-      }
-}
-```
-
-#### Answers
-```json
- {
-        "id": 4,
-        "answerText": "Answer",
-        "hintText": "No hintText available - 404",
-        "mediaURI": null,
-        "author": { /*see user*/ },
-        "created": "2016-06-22 10:10:06 UTC",
-        "rating": 0
- }
-```
-
+Refer to the [JsonKeys.java](/app/util/JsonKeys.java) File, it containis all named JsonProperties for each Class/Model.
 
