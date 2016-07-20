@@ -374,7 +374,8 @@ public class FlashCardController {
             // TODO: 27/06/16 Allow sorting by date, rating o.A., handle multichoice etc.
             ret=FlashCard.find.byId(id).getAnswers();
             //Return a sublist from 0 to either the size of answers OR the cap we get via parameter.
-            ret=ret.subList(0,Math.min(answersSize,ret.size()));
+            if(answersSize>0)
+                ret=ret.subList(0,Math.min(answersSize,ret.size()));
 
 
         }catch (Exception e){
@@ -383,6 +384,36 @@ public class FlashCardController {
         return ok(JsonWrap.getJson(ret));
     }
 
+    /**
+     * Retreive all Tags or the first n Elements from the Sublist when adding ?size=x to the url, where x must be an integer.
+     * @param id of a card
+     * @return list of Tags as json to the caller
+     */
+    public Result getTags(long id) {
+        Map<String, String[]> urlParams = Controller.request().queryString();
+        int answersSize=-1;
+        if(urlParams.containsKey(JsonKeys.FLASHCARD_PARAM_SIZE)){
+            try {
+                answersSize = Integer.parseInt(urlParams.get("size")[0]);
+            }catch(NumberFormatException e){
+                return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
+                        "Parameter size="+urlParams.get("size")[0]+" has to be a valid integer."));
+            }
+        }
+        System.out.println("tags size="+answersSize);
+        List<Tag> ret;
+        try{
+            // TODO: 27/06/16 Allow sorting by date, rating o.A., handle multichoice etc.
+            ret=FlashCard.find.byId(id).getTags();
+            //Return a sublist from 0 to either the size of answers OR the cap we get via parameter.
+            if(answersSize>0)
+                ret=ret.subList(0,Math.min(answersSize,ret.size()));
+
+        }catch (Exception e){
+            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no card with id="+id+" exists."));
+        }
+        return ok(JsonWrap.getJson(ret));
+    }
 
 
 }

@@ -49,8 +49,7 @@ public class JsonWrap {
      * @param description
      * @return
      */
-    public static ObjectNode prepareJsonStatus(int statuscode,
-                                               String description, int id) {
+    public static ObjectNode prepareJsonStatus(int statuscode, String description, int id) {
         ObjectNode result = Json.newObject();
         result.put("statuscode", statuscode);
         result.put("description", description);
@@ -72,4 +71,4 @@ public class JsonWrap {
         return result;
     }
 
-    }
+}

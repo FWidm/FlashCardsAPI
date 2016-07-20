@@ -41,6 +41,7 @@ GET     /cards/:id          controllers.FlashCardController.getFlashCard(id:Long
 GET     /cards/:id/question controllers.FlashCardController.getQuestion(id:Long)
 GET     /cards/:id/answers  controllers.FlashCardController.getAnswers(id:Long)
 GET     /cards/:id/author   controllers.FlashCardController.getAuthor(id:Long)
+GET     /cards/:id/tags     controllers.FlashCardController.getTags(id:Long)
 POST    /cards              controllers.FlashCardController.addFlashCard
 DELETE  /cards/:id          controllers.FlashCardController.deleteFlashCard(id:Long)
 PATCH   /cards/:id          controllers.FlashCardController.updateFlashCard(id:Long)

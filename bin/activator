@@ -40,7 +40,6 @@ is_cygwin() {
   esac
 }
 
-# TODO - Use nicer bash-isms here.
 CYGWIN_FLAG=$(if is_cygwin; then echo true; else echo false; fi)
 
 
@@ -261,7 +260,6 @@ run() {
   set -- "${residual_args[@]}"
   argumentCount=$#
 
-  # TODO - java check should be configurable...
   checkJava "1.6"
 
   #If we're in cygwin, we should use the windows config, and terminal hacks
@@ -376,7 +374,6 @@ loadConfigFile() {
   done
 }
 
-# TODO - Pull in config based on operating system... (MSYS + cygwin should pull in txt file).
 # Here we pull in the global settings configuration.
 [[ -f "$etc_sbt_opts_file" ]] && set -- $(loadConfigFile "$etc_sbt_opts_file") "$@"
 # -- Windows behavior stub'd

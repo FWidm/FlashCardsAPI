@@ -71,10 +71,6 @@ public class HomeController extends Controller {
 
         System.out.println("Card tags: "+fc.getTags());
         List<Tag> fc_tags = FlashCard.find.byId(fc.getId()).getTags();
-        for (Tag tmptag:fc_tags){
-            tmptag.removeFlashCard(fc);
-            System.out.println("Tag="+tmptag);
-        }
 
         return ok(index.render("Card test done!"));
     }

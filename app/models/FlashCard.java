@@ -43,8 +43,7 @@ public class FlashCard extends Model {
     @UpdatedTimestamp
     @JsonProperty(JsonKeys.DATE_UPDATED)
     private Date lastUpdated;
-    // TODO: 11/07/16 Catalogue(CardDeck) anlegegen 
-    //todo: maybe remove the cascade and handle the rest, up until no this removes all tags and the join table enries.
+    // TODO: 11/07/16 add Catalogue(CardDeck)
     @ManyToMany/*(cascade = CascadeType.ALL)*/
     @JoinTable(name="card_tag",
             joinColumns = @JoinColumn(name="card_id", referencedColumnName=JsonKeys.FLASHCARD_ID),
@@ -242,6 +241,10 @@ public class FlashCard extends Model {
     }
 
     public List<Tag> getTags() {
+        for (Tag t: tags) {
+            System.out.print(t.getName());
+        }
+        
         return tags;
     }
 

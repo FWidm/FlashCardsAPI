@@ -18,44 +18,40 @@ public class UserGroupController extends Controller {
 
 	/**
 	 * Returns all groups in the JSON format. Optional URL Paramerer is "?empty" which can either be true or false and
-     * only returns groups that contain or do not contain users.
-	 * 
+	 * only returns groups that contain or do not contain users.
+	 *
 	 * @return
 	 */
 	public Result getUserGroupList() {
-        Map<String, String[]> urlParams = Controller.request().queryString();
-        for (String s:urlParams.get("empty")
-             ) {
-            System.out.println(">>>"+s);
-        }
-        if(urlParams.keySet().contains("empty")){
-            System.out.println("only print empty or nonempty groups");
-            //only print the first val we get for the key, this is possible as /groups?empty=true&empty=false could return
-            //multiple values.
-            if(urlParams.get("empty")[0].equals("true")){
-                // TODO: 27/06/16 check why the opposite of UserGroup.find.where().isNotNull(JsonKeys.GROUP_USERS).findList() does not work for this. Always returns 0.
-                List<UserGroup> nonemptyGroups=UserGroup.find.where().isNotNull(JsonKeys.GROUP_USERS).findList();
-                List<UserGroup> emptyGroups=UserGroup.find.all();
-                emptyGroups.removeAll(nonemptyGroups);
-                return ok(JsonWrap.getJson(emptyGroups));
-            }
-            else{
-                return ok(JsonWrap.getJson(UserGroup.find.where().isNotNull(JsonKeys.GROUP_USERS).findList()));
-            }
-        }
-        for(UserGroup ug:UserGroup.find.all()){
-            System.out.print("id="+ug.getId()+" | users size="+ug.getUsers().size()+" | users is null? "+(ug.getUsers()==null)+" | users=");
-            for(User u: ug.getUsers()){
-                System.out.print("["+u+"];");
-            }
-            System.out.println();
-        }
+		Map<String, String[]> urlParams = Controller.request().queryString();
+		if(urlParams.keySet().contains("empty")){
+			System.out.println("only print empty or nonempty groups");
+			//only print the first val we get for the key, this is possible as /groups?empty=true&empty=false could return
+			//multiple values.
+			if(urlParams.get("empty")[0].equals("true")){
+				// TODO: 27/06/16 check why the opposite of UserGroup.find.where().isNotNull(JsonKeys.GROUP_USERS).findList() does not work for this. Always returns 0.
+				List<UserGroup> nonEmptyGroups=UserGroup.find.where().isNotNull(JsonKeys.GROUP_USERS).findList();
+				List<UserGroup> emptyGroups=UserGroup.find.all();
+				emptyGroups.removeAll(nonEmptyGroups);
+				return ok(JsonWrap.getJson(emptyGroups));
+			}
+			else{
+				return ok(JsonWrap.getJson(UserGroup.find.where().isNotNull(JsonKeys.GROUP_USERS).findList()));
+			}
+		}
+		for(UserGroup ug:UserGroup.find.all()){
+			System.out.print("id="+ug.getId()+" | users size="+ug.getUsers().size()+" | users is null? "+(ug.getUsers()==null)+" | users=");
+			for(User u: ug.getUsers()){
+				System.out.print("["+u+"];");
+			}
+			System.out.println();
+		}
 		return ok(JsonWrap.getJson(UserGroup.find.all()));
 	}
 
 	/**
 	 * Returns a specific UserGroup in the JSON format.
-	 * 
+	 *
 	 * @param id
 	 *            - GroupID of the group we want to get.
 	 * @return
@@ -74,24 +70,24 @@ public class UserGroupController extends Controller {
 	 * JsonKeys.GROUP_DESCRIPTION as Strings or JsonKeys.GROUP_USERS as array of UserIds. If anything else
 	 * is sent no update will be made. Example Body: { "name": "345",
 	 * JsonKeys.GROUP_DESCRIPTION: "345", JsonKeys.GROUP_USERS: [{"JsonKeys.USER_ID": 4}, {"JsonKeys.USER_ID": 5}, ...] }
-	 * 
+	 *
 	 * @param id GroupID of the group we want to update
 	 * @return either ok or bad_request with an explanation
 	 */
 	@BodyParser.Of(BodyParser.Json.class)
 	public Result updateUserGroup(Long id) {
-        System.out.println(request().method());
+		System.out.println(request().method());
 		String information = "";
 		JsonNode json = request().body().asJson();
 		ObjectMapper mapper = new ObjectMapper();
 
-        //Check whether the request was a put and if it was check if a param is missing, if that is the case --> bad req.
-        if(request().method().equals("PUT") && (!json.has(JsonKeys.GROUP_NAME) || !json.has(JsonKeys.GROUP_DESCRIPTION) || !json.has(JsonKeys.GROUP_USERS))){
-            return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
-                    "The Update method needs all details of the group, such as name, " +
-                            "description and a user group (array of users or null). An attribute was missing for id="
-                            + id + "."));
-        }
+		//Check whether the request was a put and if it was check if a param is missing, if that is the case --> bad req.
+		if(request().method().equals("PUT") && (!json.has(JsonKeys.GROUP_NAME) || !json.has(JsonKeys.GROUP_DESCRIPTION) || !json.has(JsonKeys.GROUP_USERS))){
+			return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
+					"The Update method needs all details of the group, such as name, " +
+							"description and a user group (array of users or null). An attribute was missing for id="
+							+ id + "."));
+		}
 
 		try {
 			UserGroup requestGroup = mapper.convertValue(json, UserGroup.class);
@@ -132,17 +128,18 @@ public class UserGroupController extends Controller {
 
 				}
 			}
+
 			toUpdate.update();
 			return ok(JsonWrap.prepareJsonStatus(200, "Group with id=" + id
-					+ " has been succesfully changed. " + information));
+					+ " has been successfully changed. " + information));
 		} catch (IllegalArgumentException e) {
-            return badRequest(JsonWrap
-                    .prepareJsonStatus(
-                            BAD_REQUEST, "Body did contain elements that are not allowed/expected. A group can contain: " + JsonKeys.GROUP_JSON_ELEMENTS));
-        }
-        catch (NullPointerException e){
-            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no group with id="+id+" exists."));
-        }
+			return badRequest(JsonWrap
+					.prepareJsonStatus(
+							BAD_REQUEST, "Body did contain elements that are not allowed/expected. A group can contain: " + JsonKeys.GROUP_JSON_ELEMENTS));
+		}
+		catch (NullPointerException e){
+			return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no group with id="+id+" exists."));
+		}
 	}
 
 	/**
@@ -169,20 +166,20 @@ public class UserGroupController extends Controller {
 				// JsonKeys.GROUP_USERS key.
 				for (JsonNode n : users) {
 					// when a user id is found we will get the object and add them to the userList.
-                    Long l=n.get(JsonKeys.USER_ID).asLong();
-                    System.out.println("User id="+l+" found for node="+n);
+					Long l=n.get(JsonKeys.USER_ID).asLong();
+					System.out.println("User id="+l+" found for node="+n);
 					if (n.has(JsonKeys.USER_ID)) {
 						User u = User.find.byId(l);
 						userList.add(u);
-					} 
+					}
 				}
-                //set the list for the group created from the content of the json body
-                System.out.println("Adding users to the group: "+userList);
+				//set the list for the group created from the content of the json body
+				System.out.println("Adding users to the group: "+userList);
 			}
 
-            UserGroup group = new UserGroup(requestGroup);
-            group.save();
-            group.setUsers(userList);
+			UserGroup group = new UserGroup(requestGroup);
+			group.save();
+			group.setUsers(userList);
 			System.out.println(group);
 
 			return ok(JsonWrap.prepareJsonStatus(OK, "Usergroup with the id="
@@ -190,10 +187,10 @@ public class UserGroupController extends Controller {
 		} catch (IllegalArgumentException e) {
 			return badRequest(JsonWrap
 					.prepareJsonStatus(
-                            BAD_REQUEST, "Body did contain elements that are not allowed/expected. A group can contain: " + JsonKeys.GROUP_JSON_ELEMENTS));
+							BAD_REQUEST, "Body did contain elements that are not allowed/expected. A group can contain: " + JsonKeys.GROUP_JSON_ELEMENTS));
 		}
 	}
-	
+
 	/**
 	 * Grabs the group by its id, deletes the reference to this group from all members and updates them and then deletes the group.
 	 * @param id
