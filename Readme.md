@@ -1,9 +1,9 @@
 # FlashCards RESTful API
 ## Methods
-| Ressource | GET | PUT | POST | PATCH | DELETE|
-|-|-----|-----|------|-------|--------|
-|/users| retrieve a list of users. Can be filtered via url params ?name=x or ?email=y| - | creates a new User | - | - |
-|/users/5| retrieve the details of the specified user | update the complete ressource with this id | - | partial update of the resource | deletes the specified resource |
+| Resource | GET | PUT | POST | PATCH | DELETE|
+| -------- | --- | --- | ---- | ----- | ----- |
+| /users | retrieve a list of users. Can be filtered via url params ?name=x or ?email=y| - | creates a new User | - | - |
+| /users/5 | retrieve the details of the specified user | update the complete ressource with this id | - | partial update of the resource | deletes the specified resource |
 
 for more working routing look at the [routes](conf/routes).
 ## German Turoial/Insights
