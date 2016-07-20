@@ -244,7 +244,6 @@ public class FlashCard extends Model {
         for (Tag t: tags) {
             System.out.print(t.getName());
         }
-        
         return tags;
     }
 

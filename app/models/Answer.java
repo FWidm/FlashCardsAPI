@@ -7,11 +7,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.JsonNode;
 import play.data.validation.Constraints;
 import util.JsonKeys;
 
 import javax.persistence.*;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 
 /**
@@ -65,6 +67,36 @@ public class Answer extends Model {
         this.author = author;
     }
 
+    /**
+     * Parses answers from the given JsonNode node.
+     * @param node the json node to parse
+     * @return list of answers
+     * @throws URISyntaxException
+     */
+    public static Answer parseAnswer(JsonNode node) throws URISyntaxException {
+        User author=null;
+        String answerText=null;
+        String hintText=null;
+        if(node.has(JsonKeys.ANSWER_HINT)){
+            hintText=node.get(JsonKeys.ANSWER_HINT).asText();
+        }
+        if(node.has(JsonKeys.AUTHOR)){
+            if(node.get(JsonKeys.AUTHOR).has(JsonKeys.USER_ID)){
+                long uid=node.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong();
+                author=User.find.byId(uid);
+                System.out.println("Search for user with id="+uid+" details="+author);
+            }
+        }
+        if(node.has(JsonKeys.ANSWER_TEXT)){
+            answerText=node.get(JsonKeys.ANSWER_TEXT).asText();
+        }
+        Answer answer=new Answer(answerText,hintText,author);
+
+        if(node.has(JsonKeys.URI)){
+            answer.setMediaURI(new URI(node.get(JsonKeys.URI).asText()));
+        }
+        return answer;
+    }
 
     @Override
     public String toString() {

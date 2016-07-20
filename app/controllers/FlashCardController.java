@@ -100,7 +100,7 @@ public class FlashCardController {
             FlashCard requestObject = mapper.convertValue(json, FlashCard.class);
 
             List<Answer> answers;
-
+            List<Tag> tags;
             //We expect just id's to set answers/questions/authors - we then check the db for the id's and retrieve all values
             // we nee ourselves.
             if (json.has(JsonKeys.FLASHCARD_ANSWERS)) {
@@ -120,7 +120,7 @@ public class FlashCardController {
                     }
                     else{
                         try {
-                            Answer tmpA = parseAnswer(node);
+                            Answer tmpA = Answer.parseAnswer(node);
                             System.out.println(">> answer: "+tmpA);
                             answers.add(tmpA);
                         } catch (URISyntaxException e) {
@@ -132,14 +132,14 @@ public class FlashCardController {
             }
 
 
-            if(json.has("question")){
-                if(json.get("question").has(JsonKeys.QUESTION_ID)){
-                    Question question= Question.find.byId(json.findValue("question").findValue(JsonKeys.QUESTION_ID).asLong());
+            if(json.has(JsonKeys.FLASHCARD_QUESTION)){
+                if(json.get(JsonKeys.FLASHCARD_QUESTION).has(JsonKeys.QUESTION_ID)){
+                    Question question= Question.find.byId(json.findValue(JsonKeys.FLASHCARD_QUESTION).findValue(JsonKeys.QUESTION_ID).asLong());
                     requestObject.setQuestion(question);
                 }
                 else{
                     try {
-                        Question q=parseQuestion(json.get("question"));
+                        Question q=Question.parseQuestion(json.get(JsonKeys.FLASHCARD_QUESTION));
                         q.save();
                         requestObject.setQuestion(q);
                     } catch (URISyntaxException e) {
@@ -148,14 +148,14 @@ public class FlashCardController {
                 }
             }
 
-            if(json.has("author")){
-                User author = User.find.byId(json.get("author").get(JsonKeys.USER_ID).asLong());
+            if(json.has(JsonKeys.AUTHOR)){
+                User author = User.find.byId(json.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong());
                 requestObject.setAuthor(author);
             }
 
-        /*if(json.has("tags")){
-            //todo: implement tags as json array.
-        }*/
+        if(json.has(JsonKeys.FLASHCARD_TAGS)){
+                requestObject.setTags(retrieveTags(json));
+        }
 
             if(json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)){
                 requestObject.setMultipleChoice(json.findValue(JsonKeys.FLASHCARD_MULTIPLE_CHOICE).asBoolean());
@@ -171,63 +171,39 @@ public class FlashCardController {
                             BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
         }
     }
-    /**
-     * Parses answers from the given JsonNode node.
-     * @param node the json node to parse
-     * @return list of answers
-     * @throws URISyntaxException
-     */
-    private Answer parseAnswer(JsonNode node) throws URISyntaxException {
-        User author=null;
-        String answerText=null;
-        String hintText=null;
-        if(node.has(JsonKeys.ANSWER_HINT)){
-            hintText=node.get(JsonKeys.ANSWER_HINT).asText();
-        }
-        if(node.has(JsonKeys.AUTHOR)){
-            if(node.get(JsonKeys.AUTHOR).has(JsonKeys.USER_ID)){
-                long uid=node.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong();
-                author=User.find.byId(uid);
-                System.out.println("Search for user with id="+uid+" details="+author);
-            }
-        }
-        if(node.has(JsonKeys.ANSWER_TEXT)){
-            answerText=node.get(JsonKeys.ANSWER_TEXT).asText();
-        }
-        Answer answer=new Answer(answerText,hintText,author);
-
-        if(node.has(JsonKeys.URI)){
-            answer.setMediaURI(new URI(node.get(JsonKeys.URI).asText()));
-        }
-        return answer;
-    }
 
     /**
-     * Parses a question from the given JsonNode node.
-     * @param node the json node to parse
-     * @return a question object containing the information
-     * @throws URISyntaxException
+     * Reads all Tags either via their id, or creates a new Tag when it does not exist at the moment.
+     * @param json the root json Object
+     * @return a list of Tags
      */
-    private Question parseQuestion(JsonNode node) throws URISyntaxException {
-        User author=null;
-        String questionText=null;
-        if(node.has(JsonKeys.AUTHOR)){
-            if(node.get(JsonKeys.AUTHOR).has(JsonKeys.USER_ID)){
-                long uid=node.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong();
-                author=User.find.byId(uid);
-                System.out.println("Search for user with id="+uid+" details="+author);
+    private List<Tag> retrieveTags(JsonNode json){
+        List<Tag> tags=new ArrayList<>();
+        //get the specific nods in the json
+        JsonNode tagNode = json.findValue(JsonKeys.FLASHCARD_TAGS);
+        // Loop through all objects in the values associated with the
+        // "users" key.
+        for (JsonNode node : tagNode) {
+            // when a user id is found we will get the object and add them to the userList.
+            System.out.println("Node="+node);
+            if (node.has(JsonKeys.TAG_ID)) {
+                Tag found = Tag.find.byId(node.get(JsonKeys.TAG_ID).asLong());
+                System.out.println(">> answer: "+found);
+                tags.add(found);
+            }
+            else{
+                try {
+                    Tag tmpT = Tag.parseTag(node);
+                    System.out.println(">> tag: "+tmpT);
+                    tags.add(tmpT);
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
             }
         }
-        if(node.has(JsonKeys.QUESTION_TEXT)){
-            questionText=node.get(JsonKeys.QUESTION_TEXT).asText();
-        }
-        Question question=new Question(questionText, author);
-
-        if(node.has(JsonKeys.URI)){
-            question.setMediaURI(new URI(node.get(JsonKeys.URI).asText()));
-        }
-        return question;
+    return tags;
     }
+
     /**
      * Update a  Flashcard either completely via put or partially via patch.
      * @return httpResult
@@ -267,7 +243,7 @@ public class FlashCardController {
                     }
                     else{
                         try {
-                            Answer tmpA = parseAnswer(node);
+                            Answer tmpA = Answer.parseAnswer(node);
                             System.out.println(">> answer: "+tmpA);
                             answers.add(tmpA);
                         } catch (URISyntaxException e) {
@@ -285,7 +261,7 @@ public class FlashCardController {
                 }
                 else{
                     try {
-                        Question q=parseQuestion(json.get(JsonKeys.FLASHCARD_QUESTION));
+                        Question q=Question.parseQuestion(json.get(JsonKeys.FLASHCARD_QUESTION));
                         q.save();
                         toUpdate.setQuestion(q);
                     } catch (URISyntaxException e) {
@@ -300,8 +276,7 @@ public class FlashCardController {
                 toUpdate.setAuthor(author);
             }
 
-        /*if(json.has("tags")){
-            //todo: implement tags as json array.
+        /*if(json.has(JsonKeys.FLASHCARD_TAGS)){
         }*/
 
             if(json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)){
@@ -403,7 +378,6 @@ public class FlashCardController {
         System.out.println("tags size="+answersSize);
         List<Tag> ret;
         try{
-            // TODO: 27/06/16 Allow sorting by date, rating o.A., handle multichoice etc.
             ret=FlashCard.find.byId(id).getTags();
             //Return a sublist from 0 to either the size of answers OR the cap we get via parameter.
             if(answersSize>0)

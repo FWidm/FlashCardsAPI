@@ -3,10 +3,13 @@ package models;
 import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import play.data.validation.Constraints;
 import util.JsonKeys;
 
 import javax.persistence.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 /**
@@ -30,8 +33,29 @@ public class Tag extends Model {
     @JsonIgnore
     private List<FlashCard> cards;
 
+    public static Model.Finder<Long, Tag> find = new Model.Finder<Long, Tag>(Tag.class);
+
+
     public Tag(String name) {
         this.name = name;
+    }
+
+    /**
+     * Parses a question from the given JsonNode node.
+     * @param node the json node to parse
+     * @return a question object containing the information
+     * @throws URISyntaxException
+     */
+    public static Tag parseTag(JsonNode node) throws URISyntaxException {
+        User author=null;
+        String tagText=null;
+
+        if(node.has(JsonKeys.TAG_NAME)){
+            tagText=node.get(JsonKeys.QUESTION_TEXT).asText();
+        }
+        Tag tag=new Tag(tagText);
+
+        return tag;
     }
 
     public Tag(String name, List<FlashCard> cards) {
