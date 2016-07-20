@@ -14,7 +14,7 @@
 				{
 					"name": "get all cards",
 					"request": {
-						"url": "localhost:9000/cards",
+						"url": "{{url}}{{port}}/cards",
 						"method": "GET",
 						"header": [
 							{
@@ -34,7 +34,7 @@
 				{
 					"name": "deletes card with the given id",
 					"request": {
-						"url": "localhost:9000/cards/1",
+						"url": "{{url}}{{port}}/cards/1",
 						"method": "DELETE",
 						"header": [
 							{
@@ -54,7 +54,7 @@
 				{
 					"name": "create new card with a custom question.",
 					"request": {
-						"url": "localhost:9000/cards",
+						"url": "{{url}}{{port}}/cards",
 						"method": "POST",
 						"header": [
 							{
@@ -65,36 +65,16 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"rating\": 0,\n    \"question\": {\n      \"question\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false\n  }"
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":23\n    }]\n  }"
 						},
 						"description": "Inserts a question to the db instead of using one already created."
 					},
 					"response": []
 				},
 				{
-					"name": "create new card with a custom question and custom answers.",
-					"request": {
-						"url": "localhost:9000/cards",
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\"rating\": 0,\n    \"question\": {\n      \"questionText\": \"sadvsdavsadvfasf efqf vwvqwvwqfewewrvwqwqvvsdakwsödkcm   wpikvnowqidnvowqsndvoij!\",\n      \"mediaURI\": \"www.sadcsadqwv.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"ewinowvwvnowevonwevonj\",\n        \"answerHint\": \"casasasccsaacs\",\n        \"mediaURI\": \"www.csacssacsca.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false\n  }"
-						},
-						"description": "Inserts question and answers to the db instead of using their id."
-					},
-					"response": []
-				},
-				{
 					"name": "retrieve a specific card",
 					"request": {
-						"url": "localhost:9000/cards/3",
+						"url": "{{url}}{{port}}/cards/3",
 						"method": "GET",
 						"header": [
 							{
@@ -114,7 +94,7 @@
 				{
 					"name": "retrieve a specific cards question",
 					"request": {
-						"url": "localhost:9000/cards/3/question",
+						"url": "{{url}}{{port}}/cards/3/question",
 						"method": "GET",
 						"header": [
 							{
@@ -134,7 +114,7 @@
 				{
 					"name": "retrieve a specific cards answers (with param)",
 					"request": {
-						"url": "localhost:9000/cards/3/answers?size=1",
+						"url": "{{url}}{{port}}/cards/3/answers?size=1",
 						"method": "GET",
 						"header": [
 							{
@@ -154,7 +134,7 @@
 				{
 					"name": "get the author of a specific card.",
 					"request": {
-						"url": "localhost:9000/cards/3/author",
+						"url": "{{url}}{{port}}/cards/3/author",
 						"method": "GET",
 						"header": [
 							{
@@ -174,7 +154,7 @@
 				{
 					"name": "Patch card with id3 to be multichoice and have a new answer.",
 					"request": {
-						"url": "localhost:9000/cards/3",
+						"url": "{{url}}{{port}}/cards/3",
 						"method": "PATCH",
 						"header": [
 							{
@@ -194,7 +174,7 @@
 				{
 					"name": "Update card with id 3 completely with relevant data.",
 					"request": {
-						"url": "localhost:9000/cards/3",
+						"url": "{{url}}{{port}}/cards/3",
 						"method": "PUT",
 						"header": [
 							{
@@ -480,6 +460,20 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"rating\": \"{{userRating}}\",\n    \"email\": \"{{userEmail}}\",\n    \"group\": null\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Filter userlist by email.",
+					"request": {
+						"url": "{{url}}{{port}}/users?email=hello1@world.com",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
 						},
 						"description": ""
 					},
