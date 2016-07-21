@@ -31,7 +31,7 @@ public class HomeController extends Controller {
 
     public Result testTokens() {
         String output="";
-        User u = new User("Test", "test4@example.com", "habla", 0);
+        User u = new User("Test", "test5@example.com", "habla", 0);
         output+=u+"<br/>";
         u.save();
         AuthToken authToken=new AuthToken(u);

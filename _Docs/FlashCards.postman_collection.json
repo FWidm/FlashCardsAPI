@@ -480,6 +480,26 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "test token auth",
+			"request": {
+				"url": "{{url}}{{port}}/auth",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 1QWVcOV_pr5CIS-9xku2mBjzdMwZbO2HnX78NKXKtnU=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"description": ""
+			},
+			"response": []
 		}
 	]
 }

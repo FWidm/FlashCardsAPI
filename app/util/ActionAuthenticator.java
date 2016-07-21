@@ -12,16 +12,12 @@ import play.mvc.Security;
  */
 
 public class ActionAuthenticator extends Security.Authenticator {
+
     @Override
     public String getUsername(Http.Context ctx) {
         String token = getTokenFromHeader(ctx);
         System.out.println("Token=" + token);
-/*        if (token != null) {
-            User user = User.find.where().eq("authToken", token).findUnique();
-            if (user != null) {
-                return user.getName();
-            }
-        }*/
+
         if (token != null) {
             AuthToken authToken = AuthToken.find.where().eq(JsonKeys.TOKEN, token).findUnique();
             if (authToken != null) {
@@ -39,9 +35,14 @@ public class ActionAuthenticator extends Security.Authenticator {
     }
 
     private String getTokenFromHeader(Http.Context ctx) {
-        String[] authTokenHeaderValues = ctx.request().headers().get("X-AUTH-TOKEN");
+        //see rfc for oauth for info about the format: https://tools.ietf.org/html/rfc6750#section-2.1
+        String[] authTokenHeaderValues = ctx.request().headers().get(UrlParamKeys.TOKEN_HEADER);
         if ((authTokenHeaderValues != null) && (authTokenHeaderValues.length == 1) && (authTokenHeaderValues[0] != null)) {
-            return authTokenHeaderValues[0];
+            String[] tokenHeader = authTokenHeaderValues[0].split(" ");
+            if(tokenHeader.length==2){
+                return tokenHeader[1];
+            }
+
         }
         return null;
     }

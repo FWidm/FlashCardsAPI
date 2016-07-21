@@ -9,6 +9,8 @@ import javax.persistence.*;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.UUID;
 
 /**
@@ -38,8 +40,23 @@ public class AuthToken extends Model {
         this.user = user;
         //create new tokens while we find that it is already in use. Should not happen theoretically.
         do{
-            token = UUID.randomUUID().toString();
+//            token = UUID.randomUUID().toString();
+            try {
+                token=nextBase64String(32);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
         }while(AuthToken.find.where().eq(JsonKeys.TOKEN,token).findUnique()!=null);
+    }
+
+    private String nextBase64String(int n) throws UnsupportedEncodingException {
+        SecureRandom csprng = new SecureRandom();
+        // NIST SP800-90A recommends a seed length of 440 bits (i.e. 55 bytes)
+        csprng.setSeed(csprng.generateSeed(55));
+        byte[] bytes =new byte[n];
+        csprng.nextBytes(bytes);
+        byte[] encoded=Base64.getUrlEncoder().encode(bytes);
+        return new String(encoded,"UTF-8");
     }
 
     public Long getId() {
