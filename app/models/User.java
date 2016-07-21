@@ -1,6 +1,7 @@
 package models;
 
 import java.util.Date;
+import java.util.List;
 
 import com.avaje.ebean.Model;
 import com.avaje.ebean.annotation.CreatedTimestamp;
@@ -20,8 +21,6 @@ import javax.persistence.*;
 @Entity
 @JsonPropertyOrder({ JsonKeys.USER_ID})
 public class User extends Model {
-	private static final long serialVersionUID = -6538683107994877014L;
-
 	@Id
 	@GeneratedValue
     @Column(name = JsonKeys.USER_ID)
@@ -30,16 +29,19 @@ public class User extends Model {
 	@Required @MinLength(3)
     @JsonProperty(JsonKeys.USER_NAME)
     private String name;
+
     @Required @MinLength(3)
     @JsonProperty(JsonKeys.USER_PASSWORD)
     @JsonIgnore
     private String password;
+
 	@Required @Column(unique = true) @Email
     @JsonProperty(JsonKeys.USER_EMAIL)
 	private String email;
 
     @JsonProperty(JsonKeys.RATING)
 	private int rating;
+
 	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z") @CreatedTimestamp
     @JsonProperty(JsonKeys.DATE_CREATED)
 	private Date created;
@@ -48,6 +50,10 @@ public class User extends Model {
 	@JoinColumn(name = JsonKeys.GROUP_ID)
     @JsonProperty(JsonKeys.USER_GROUP)
 	private UserGroup group;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore	// to prevent endless recursion.
+	private List<AuthToken> authTokenList;
 
     // TODO: 11/07/16 Profilbild, last Login
 
@@ -143,4 +149,18 @@ public class User extends Model {
         this.update();
 	}
 
+    public List<AuthToken> getAuthTokenList() {
+        return authTokenList;
+    }
+
+    public void setAuthTokenList(List<AuthToken> authTokenList) {
+        this.authTokenList = authTokenList;
+    }
+
+    public void addAuthToken(AuthToken token){
+        if(!authTokenList.contains(token)){
+            authTokenList.add(token);
+            this.update();
+        }
+    }
 }
