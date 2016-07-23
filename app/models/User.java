@@ -1,5 +1,6 @@
 package models;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -66,6 +67,7 @@ public class User extends Model {
 		this.email = email;
 		this.password = password;
 		this.rating = rating;
+		authTokenList=new ArrayList<>();
 //		created = new Date();
 	}
 	
@@ -75,6 +77,7 @@ public class User extends Model {
 		this.email=u.getEmail();
 		this.password=u.getPassword();
 		this.rating=u.getRating();
+		authTokenList=new ArrayList<>();
 //		created=new Date();
 	}
 
@@ -157,10 +160,30 @@ public class User extends Model {
         this.authTokenList = authTokenList;
     }
 
+    /**
+     * Adds one token to the tokenlist, updates this entity.
+     * @param token
+     */
     public void addAuthToken(AuthToken token){
         if(!authTokenList.contains(token)){
             authTokenList.add(token);
             this.update();
         }
     }
+
+    /**
+     * Deletes all Tokens associated with this entity.
+     */
+    public void deleteTokens(){
+        for (int i=0; i<authTokenList.size(); i++){
+            authTokenList.get(i).delete();
+        }
+        authTokenList=new ArrayList<>();
+        this.update();
+	}
+
+	public void deleteToken(AuthToken authToken){
+		if(authTokenList.remove(authToken))
+            authToken.delete();
+	}
 }

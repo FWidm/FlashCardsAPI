@@ -16,6 +16,8 @@ public class JsonKeys {
     public static final String AUTHOR = "author";
     public static final String URI = "mediaURI";
     public static final String TOKEN = "token";
+    public static final String STATUS_CODE = "statuscode";
+    public static final String DESCRIPTION = "description";
 
     //Flashcard
     public static final String FLASHCARD_ID = "flashcardId";

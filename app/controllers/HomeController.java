@@ -1,6 +1,9 @@
 package controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.*;
+import play.libs.Json;
 import play.mvc.*;
 
 import util.ActionAuthenticator;
@@ -11,6 +14,8 @@ import views.html.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+
+import static com.avaje.ebean.Expr.like;
 
 /**
  * This controller contains an action to handle HTTP requests
@@ -29,19 +34,26 @@ public class HomeController extends Controller {
         return ok(index.render("Your new application is ready."));
     }
 
+    /**
+     * Creates one user with two tokens, attempts to delete both tokens.
+     * @return
+     */
     public Result testTokens() {
         String output="";
-        User u = new User("Test", "test5@example.com", "habla", 0);
-        output+=u+"<br/>";
+        User u = new User("Test", "test"+Math.random()+"@example.com", "habla", 0);
+        output+=u+System.lineSeparator();
         u.save();
         AuthToken authToken=new AuthToken(u);
-        output+="Token="+authToken+"<br/>";
+        output+="Token="+authToken+System.lineSeparator();
         authToken.save();
         u.addAuthToken(authToken);
         authToken=new AuthToken(u);
         output+="Token="+authToken+System.lineSeparator();
         authToken.save();
         u.addAuthToken(authToken);
+        u.deleteTokens();
+        u.delete();
+        System.out.println(output);
         return ok(index.render(output));
     }
 
@@ -116,6 +128,27 @@ public class HomeController extends Controller {
         }
         UserGroup tmpGroup;
         return ok(index.render("Group test done!"));
+    }
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result login(){
+        JsonNode json = request().body().asJson();
+        if(json.has(JsonKeys.USER_PASSWORD) && json.has(JsonKeys.USER_EMAIL)){
+            String pass=json.get(JsonKeys.USER_PASSWORD).asText();
+            String email=json.get(JsonKeys.USER_EMAIL).asText();
+            User logInTo = User.find.where().and(like(JsonKeys.USER_EMAIL,email),like(JsonKeys.USER_PASSWORD,pass)).findUnique();
+            System.out.println("Login attempt with email="+email+" User found="+logInTo);
+            if(logInTo!=null) {
+                ObjectNode result = Json.newObject();
+                result.put(JsonKeys.STATUS_CODE,OK);
+                result.put(JsonKeys.DESCRIPTION,"Login succeeded.");
+                AuthToken token = new AuthToken(logInTo);
+                token.save();
+                logInTo.addAuthToken(token);
+                result.put(JsonKeys.TOKEN, token.getToken());
+                return ok(result);
+            }
+        }
+        return forbidden(JsonWrap.prepareJsonStatus(FORBIDDEN,"Login failed, check email and password for errors."));
     }
 
     @Security.Authenticated(ActionAuthenticator.class)
