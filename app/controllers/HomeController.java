@@ -8,11 +8,9 @@ import play.mvc.*;
 
 import util.ActionAuthenticator;
 import util.JsonKeys;
-import util.JsonWrap;
+import util.JsonUtil;
 import views.html.*;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.*;
 
 import static com.avaje.ebean.Expr.like;
@@ -30,26 +28,31 @@ public class HomeController extends Controller {
      * <code>GET</code> request with a path of <code>/</code>.
      */
     public Result index() {
-//        return ok(JsonWrap.prepareJson(map));
+//        return ok(JsonUtil.prepareJson(map));
         return ok(index.render("Your new application is ready."));
     }
 
     /**
      * Creates one user with two tokens, attempts to delete both tokens.
+     *
      * @return
      */
     public Result testTokens() {
-        String output="";
-        User u = new User("Test", "test"+Math.random()+"@example.com", "habla", 0);
-        output+=u+System.lineSeparator();
+        String output = "";
+        User u = new User("Test", "test" + Math.random() + "@example.com", "habla", 0);
+
         u.save();
-        AuthToken authToken=new AuthToken(u);
-        output+="Token="+authToken+System.lineSeparator();
+        output += u + System.lineSeparator();
+
+        AuthToken authToken = new AuthToken(u);
         authToken.save();
+        output += "Token=" + authToken + System.lineSeparator();
+
         u.addAuthToken(authToken);
-        authToken=new AuthToken(u);
-        output+="Token="+authToken+System.lineSeparator();
+        authToken = new AuthToken(u);
         authToken.save();
+        output += "Token=" + authToken + System.lineSeparator();
+
         u.addAuthToken(authToken);
         u.deleteTokens();
         u.delete();
@@ -129,18 +132,23 @@ public class HomeController extends Controller {
         UserGroup tmpGroup;
         return ok(index.render("Group test done!"));
     }
+
+    /**
+     * Checks the credentials in the body - users password and email and returns a token if valid or forbidden if invalid.
+     * @return
+     */
     @BodyParser.Of(BodyParser.Json.class)
-    public Result login(){
+    public Result login() {
         JsonNode json = request().body().asJson();
-        if(json.has(JsonKeys.USER_PASSWORD) && json.has(JsonKeys.USER_EMAIL)){
-            String pass=json.get(JsonKeys.USER_PASSWORD).asText();
-            String email=json.get(JsonKeys.USER_EMAIL).asText();
-            User logInTo = User.find.where().and(like(JsonKeys.USER_EMAIL,email),like(JsonKeys.USER_PASSWORD,pass)).findUnique();
-            System.out.println("Login attempt with email="+email+" User found="+logInTo);
-            if(logInTo!=null) {
+        if (json.has(JsonKeys.USER_PASSWORD) && json.has(JsonKeys.USER_EMAIL)) {
+            String pass = json.get(JsonKeys.USER_PASSWORD).asText();
+            String email = json.get(JsonKeys.USER_EMAIL).asText();
+            User logInTo = User.find.where().and(like(JsonKeys.USER_EMAIL, email), like(JsonKeys.USER_PASSWORD, pass)).findUnique();
+            System.out.println("Login attempt with email=" + email + " User found=" + logInTo);
+            if (logInTo != null) {
                 ObjectNode result = Json.newObject();
-                result.put(JsonKeys.STATUS_CODE,OK);
-                result.put(JsonKeys.DESCRIPTION,"Login succeeded.");
+                result.put(JsonKeys.STATUS_CODE, OK);
+                result.put(JsonKeys.DESCRIPTION, "Login succeeded.");
                 AuthToken token = new AuthToken(logInTo);
                 token.save();
                 logInTo.addAuthToken(token);
@@ -148,7 +156,7 @@ public class HomeController extends Controller {
                 return ok(result);
             }
         }
-        return forbidden(JsonWrap.prepareJsonStatus(FORBIDDEN,"Login failed, check email and password for errors."));
+        return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN, "Login failed, check email and password for errors."));
     }
 
     @Security.Authenticated(ActionAuthenticator.class)
@@ -157,6 +165,6 @@ public class HomeController extends Controller {
     }
 
     public Result test() {
-        return ok(JsonWrap.prepareJsonStatus(OK, "hello world"));
+        return ok(JsonUtil.prepareJsonStatus(OK, "hello world"));
     }
 }

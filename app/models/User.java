@@ -134,10 +134,6 @@ public class User extends Model {
 		return created;
 	}
 
-	public void setCreated(Date created) {
-		this.created = created;
-	}
-
 	public UserGroup getGroup() {
 		return group;
 	}

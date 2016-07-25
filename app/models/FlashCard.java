@@ -33,16 +33,20 @@ public class FlashCard extends Model {
     @Column(name = JsonKeys.FLASHCARD_ID)
     @JsonProperty(JsonKeys.FLASHCARD_ID)
     private long id;
+
     @JsonProperty(JsonKeys.RATING)
     private int rating;
+
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
     @CreatedTimestamp
     @JsonProperty(JsonKeys.DATE_CREATED)
     private Date created;
+
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
     @UpdatedTimestamp
     @JsonProperty(JsonKeys.DATE_UPDATED)
     private Date lastUpdated;
+
     // TODO: 11/07/16 add Catalogue(CardDeck)
     @ManyToMany/*(cascade = CascadeType.ALL)*/
     @JoinTable(name="card_tag",

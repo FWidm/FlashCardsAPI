@@ -10,6 +10,7 @@ import util.JsonKeys;
 import javax.persistence.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,28 +41,11 @@ public class Tag extends Model {
         this.name = name;
     }
 
-    /**
-     * Parses a question from the given JsonNode node.
-     * @param node the json node to parse
-     * @return a question object containing the information
-     * @throws URISyntaxException
-     */
-    public static Tag parseTag(JsonNode node) throws URISyntaxException {
-        User author=null;
-        String tagText=null;
-
-        if(node.has(JsonKeys.TAG_NAME)){
-            tagText=node.get(JsonKeys.QUESTION_TEXT).asText();
-        }
-        Tag tag=new Tag(tagText);
-
-        return tag;
-    }
-
     public Tag(String name, List<FlashCard> cards) {
         this.name = name;
         this.cards = cards;
     }
+
 
     public long getId() {
         return id;

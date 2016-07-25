@@ -13,6 +13,11 @@ import play.mvc.Security;
 
 public class ActionAuthenticator extends Security.Authenticator {
 
+    /**
+     * Returns the email (unique) of the user despite it's name to identify the user.
+     * @param ctx
+     * @return
+     */
     @Override
     public String getUsername(Http.Context ctx) {
         String token = getTokenFromHeader(ctx);
@@ -34,6 +39,11 @@ public class ActionAuthenticator extends Security.Authenticator {
         return super.onUnauthorized(context);
     }
 
+    /**
+     * Performs operations to get the tokenHeader from the context.
+     * @param ctx
+     * @return
+     */
     private String getTokenFromHeader(Http.Context ctx) {
         //see rfc for oauth for info about the format: https://tools.ietf.org/html/rfc6750#section-2.1
         String[] authTokenHeaderValues = ctx.request().headers().get(UrlParamKeys.TOKEN_HEADER);

@@ -20,6 +20,7 @@ create table auth_token (
   tokenId                   bigint auto_increment not null,
   userId                    bigint,
   token                     varchar(255),
+  created                   datetime(6) not null,
   constraint uq_auth_token_token unique (token),
   constraint pk_auth_token primary key (tokenId))
 ;

@@ -2,17 +2,14 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.typesafe.config.ConfigException;
 import models.*;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import util.JsonKeys;
-import util.JsonWrap;
+import util.JsonUtil;
 
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +40,7 @@ public class FlashCardController {
      */
     public Result getFlashCardList() {
         List<FlashCard> flashCardList = FlashCard.find.all();
-        return ok(JsonWrap.getJson(flashCardList));
+        return ok(JsonUtil.getJson(flashCardList));
     }
 
     /**
@@ -55,9 +52,9 @@ public class FlashCardController {
     public Result getFlashCard(long id) {
         try {
             FlashCard card = FlashCard.find.byId(id);
-            return ok(JsonWrap.getJson(card));
+            return ok(JsonUtil.getJson(card));
         } catch (NullPointerException e) {
-            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         }
     }
 
@@ -82,11 +79,11 @@ public class FlashCardController {
 
             FlashCard.find.byId(id).delete();
 
-            return ok(JsonWrap.prepareJsonStatus(OK, "The card with the id=" + id
+            return ok(JsonUtil.prepareJsonStatus(OK, "The card with the id=" + id
                     + " has been deleted. This includes questions and answers. All Tags for this card were disconnected and persist."));
         } catch (NullPointerException e) {
             System.err.println(e.getMessage());
-            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         }
     }
 
@@ -106,7 +103,7 @@ public class FlashCardController {
             //We expect just id's to set answers/questions/authors - we then check the db for the id's and retrieve all values
             // we nee ourselves.
             if (json.has(JsonKeys.FLASHCARD_ANSWERS)) {
-                requestObject.setAnswers(retrieveAnswers(json));
+                requestObject.setAnswers(JsonUtil.retrieveAnswers(json));
             }
 
             if (json.has(JsonKeys.FLASHCARD_QUESTION)) {
@@ -130,7 +127,7 @@ public class FlashCardController {
             }
 
             if (json.has(JsonKeys.FLASHCARD_TAGS)) {
-                requestObject.setTags(retrieveTags(json));
+                requestObject.setTags(JsonUtil.retrieveTags(json));
             }
 
             if (json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)) {
@@ -140,79 +137,15 @@ public class FlashCardController {
             System.out.println("Tags="+card.getTags().size());
             card.save();
 
-            return ok(JsonWrap.prepareJsonStatus(OK, "FlashCard with id=" + card.getId() + " has been created!"));
+            return ok(JsonUtil.prepareJsonStatus(OK, "FlashCard with id=" + card.getId() + " has been created!"));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
-            return badRequest(JsonWrap
+            return badRequest(JsonUtil
                     .prepareJsonStatus(
                             BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
         }
     }
 
-    /**
-     * Reads all tags either via their id, or creates a new tag when it does not exist at the moment.
-     *
-     * @param json the root json object
-     * @return a list of tags
-     */
-    private List<Tag> retrieveTags(JsonNode json) {
-        List<Tag> tags = new ArrayList<>();
-        //get the specific nods in the json
-        JsonNode tagNode = json.findValue(JsonKeys.FLASHCARD_TAGS);
-        // Loop through all objects in the values associated with the
-        // "users" key.
-        for (JsonNode node : tagNode) {
-            // when a user id is found we will get the object and add them to the userList.
-            System.out.println("Node=" + node);
-            if (node.has(JsonKeys.TAG_ID)) {
-                Tag found = Tag.find.byId(node.get(JsonKeys.TAG_ID).asLong());
-                System.out.println(">> tag: " + found);
-                tags.add(found);
-            } else {
-                try {
-                    Tag tmpT = Tag.parseTag(node);
-                    System.out.println(">> tag: " + tmpT);
-                    tags.add(tmpT);
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return tags;
-    }
-
-    /**
-     * Reads all answers either via their id, or creates a new answer when it does not exist at the moment.
-     *
-     * @param json the root json object
-     * @return a list of answers
-     */
-    private List<Answer> retrieveAnswers(JsonNode json) {
-        List<Answer> answers = new ArrayList<>();
-
-        //get the specific nods in the json
-        JsonNode answersNode = json.findValue(JsonKeys.FLASHCARD_ANSWERS);
-        // Loop through all objects in the values associated with the
-        // "users" key.
-        for (JsonNode node : answersNode) {
-            // when a user id is found we will get the object and add them to the userList.
-            System.out.println("Node=" + node);
-            if (node.has(JsonKeys.ANSWER_ID)) {
-                Answer found = Answer.find.byId(node.get(JsonKeys.ANSWER_ID).asLong());
-                System.out.println(">> answer: " + found);
-                answers.add(found);
-            } else {
-                try {
-                    Answer tmpA = Answer.parseAnswer(node);
-                    System.out.println(">> answer: " + tmpA);
-                    answers.add(tmpA);
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return answers;
-    }
 
     /**
      * Update a  Flashcard either completely via put or partially via patch.
@@ -230,7 +163,7 @@ public class FlashCardController {
                     || !json.has(JsonKeys.AUTHOR) || !json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE) || !json.has(JsonKeys.FLASHCARD_TAGS))) {
                 System.out.println(!json.has(JsonKeys.FLASHCARD_ANSWERS) + " " + !json.has(JsonKeys.FLASHCARD_QUESTION)
                         + " " + !json.has(JsonKeys.AUTHOR) + " " + !json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE) + " " + json.has(JsonKeys.FLASHCARD_TAGS));
-                return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
+                return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
                         "The Update method needs all details of the card, such as name, " +
                                 "description and a user group (array of users or null). An attribute was missing for id="
                                 + id + "."));
@@ -238,7 +171,7 @@ public class FlashCardController {
 
 
             if (json.has(JsonKeys.FLASHCARD_ANSWERS)) {
-                toUpdate.setAnswers(retrieveAnswers(json));
+                toUpdate.setAnswers(JsonUtil.retrieveAnswers(json));
             }
 
             if (json.has(JsonKeys.FLASHCARD_QUESTION)) {
@@ -263,7 +196,7 @@ public class FlashCardController {
             }
 
             if (json.has(JsonKeys.FLASHCARD_TAGS)) {
-                toUpdate.setTags(retrieveTags(json));
+                toUpdate.setTags(JsonUtil.retrieveTags(json));
             }
 
             if (json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)) {
@@ -272,12 +205,12 @@ public class FlashCardController {
 
             toUpdate.update();
 
-            return ok(JsonWrap.prepareJsonStatus(OK, "FlashCard with id=" + id + " has been updated!"));
+            return ok(JsonUtil.prepareJsonStatus(OK, "FlashCard with id=" + id + " has been updated!"));
         } catch (NullPointerException e) {
-            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         } catch (IllegalArgumentException e) {
             System.err.println(e);
-            return badRequest(JsonWrap
+            return badRequest(JsonUtil
                     .prepareJsonStatus(
                             BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
         }
@@ -296,9 +229,9 @@ public class FlashCardController {
             ret = FlashCard.find.byId(id).getQuestion();
         } catch (Exception e) {
             System.err.println(e);
-            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         }
-        return ok(JsonWrap.getJson(ret));
+        return ok(JsonUtil.getJson(ret));
     }
 
     /**
@@ -312,9 +245,9 @@ public class FlashCardController {
         try {
             ret = FlashCard.find.byId(id).getAuthor();
         } catch (Exception e) {
-            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         }
-        return ok(JsonWrap.getJson(ret));
+        return ok(JsonUtil.getJson(ret));
     }
 
     /**
@@ -330,7 +263,7 @@ public class FlashCardController {
             try {
                 answersSize = Integer.parseInt(urlParams.get("size")[0]);
             } catch (NumberFormatException e) {
-                return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
+                return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
                         "Parameter size=" + urlParams.get("size")[0] + " could not be parsed to integer."));
             }
         }
@@ -346,9 +279,9 @@ public class FlashCardController {
 
         } catch (Exception e) {
             System.err.println(e);
-            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         }
-        return ok(JsonWrap.getJson(ret));
+        return ok(JsonUtil.getJson(ret));
     }
 
     /**
@@ -365,7 +298,7 @@ public class FlashCardController {
                 answersSize = Integer.parseInt(urlParams.get("size")[0]);
             } catch (NumberFormatException e) {
                 System.err.println(e);
-                return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
+                return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
                         "Parameter size=" + urlParams.get("size")[0] + " has to be a valid integer."));
             }
         }
@@ -379,9 +312,9 @@ public class FlashCardController {
 
         } catch (Exception e) {
             System.err.println(e);
-            return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         }
-        return ok(JsonWrap.getJson(ret));
+        return ok(JsonUtil.getJson(ret));
     }
 
 

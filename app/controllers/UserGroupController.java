@@ -9,10 +9,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import models.User;
 import models.UserGroup;
-import play.data.Form;
 import play.mvc.*;
 import util.JsonKeys;
-import util.JsonWrap;
+import util.JsonUtil;
 
 public class UserGroupController extends Controller {
 
@@ -33,10 +32,10 @@ public class UserGroupController extends Controller {
 				List<UserGroup> nonEmptyGroups=UserGroup.find.where().isNotNull(JsonKeys.GROUP_USERS).findList();
 				List<UserGroup> emptyGroups=UserGroup.find.all();
 				emptyGroups.removeAll(nonEmptyGroups);
-				return ok(JsonWrap.getJson(emptyGroups));
+				return ok(JsonUtil.getJson(emptyGroups));
 			}
 			else{
-				return ok(JsonWrap.getJson(UserGroup.find.where().isNotNull(JsonKeys.GROUP_USERS).findList()));
+				return ok(JsonUtil.getJson(UserGroup.find.where().isNotNull(JsonKeys.GROUP_USERS).findList()));
 			}
 		}
 		for(UserGroup ug:UserGroup.find.all()){
@@ -46,7 +45,7 @@ public class UserGroupController extends Controller {
 			}
 			System.out.println();
 		}
-		return ok(JsonWrap.getJson(UserGroup.find.all()));
+		return ok(JsonUtil.getJson(UserGroup.find.all()));
 	}
 
 	/**
@@ -59,10 +58,10 @@ public class UserGroupController extends Controller {
 	public Result getUserGroup(long id) {
 		UserGroup group = UserGroup.find.byId(id);
 		if (group == null)
-			return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,
+			return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
 					"The group with the id=" + id + " could not be found."));
 
-		return ok(JsonWrap.getJson(group));
+		return ok(JsonUtil.getJson(group));
 	}
 
 	/**
@@ -83,7 +82,7 @@ public class UserGroupController extends Controller {
 
 		//Check whether the request was a put and if it was check if a param is missing, if that is the case --> bad req.
 		if(request().method().equals("PUT") && (!json.has(JsonKeys.GROUP_NAME) || !json.has(JsonKeys.GROUP_DESCRIPTION) || !json.has(JsonKeys.GROUP_USERS))){
-			return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
+			return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
 					"The Update method needs all details of the group, such as name, " +
 							"description and a user group (array of users or null). An attribute was missing for id="
 							+ id + "."));
@@ -97,7 +96,7 @@ public class UserGroupController extends Controller {
 					+ "\n JSON Size=" + json.size());
 
 			if (json.size() == 0)
-				return badRequest(JsonWrap.prepareJsonStatus(BAD_REQUEST,
+				return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
 						"No Json body was found. This is required to update the group with id="
 								+ id + "."));
 			// check for new values
@@ -130,15 +129,15 @@ public class UserGroupController extends Controller {
 			}
 
 			toUpdate.update();
-			return ok(JsonWrap.prepareJsonStatus(200, "Group with id=" + id
+			return ok(JsonUtil.prepareJsonStatus(200, "Group with id=" + id
 					+ " has been successfully changed. " + information));
 		} catch (IllegalArgumentException e) {
-			return badRequest(JsonWrap
+			return badRequest(JsonUtil
 					.prepareJsonStatus(
 							BAD_REQUEST, "Body did contain elements that are not allowed/expected. A group can contain: " + JsonKeys.GROUP_JSON_ELEMENTS));
 		}
 		catch (NullPointerException e){
-			return notFound(JsonWrap.prepareJsonStatus(NOT_FOUND,"Error, no group with id="+id+" exists."));
+			return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,"Error, no group with id="+id+" exists."));
 		}
 	}
 
@@ -182,10 +181,10 @@ public class UserGroupController extends Controller {
 			group.setUsers(userList);
 			System.out.println(group);
 
-			return ok(JsonWrap.prepareJsonStatus(OK, "Usergroup with the id="
+			return ok(JsonUtil.prepareJsonStatus(OK, "Usergroup with the id="
 					+ group.getId() + " has been created!"));
 		} catch (IllegalArgumentException e) {
-			return badRequest(JsonWrap
+			return badRequest(JsonUtil
 					.prepareJsonStatus(
 							BAD_REQUEST, "Body did contain elements that are not allowed/expected. A group can contain: " + JsonKeys.GROUP_JSON_ELEMENTS));
 		}
@@ -207,7 +206,7 @@ public class UserGroupController extends Controller {
 			information+=" userID="+u.getId()+"; ";
 		}
 		group.delete();
-		return ok(JsonWrap.prepareJsonStatus(OK, "The group with the id=" + id
+		return ok(JsonUtil.prepareJsonStatus(OK, "The group with the id=" + id
 				+ " has been deleted. Additionally members with the following ids are now without groups: "+information));
 	}
 }
