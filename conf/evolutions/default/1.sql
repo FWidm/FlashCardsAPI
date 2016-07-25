@@ -47,8 +47,8 @@ create table question (
 
 create table tag (
   tagId                     bigint auto_increment not null,
-  name                      varchar(255),
-  constraint uq_tag_name unique (name),
+  tagName                   varchar(255),
+  constraint uq_tag_tagName unique (tagName),
   constraint pk_tag primary key (tagId))
 ;
 

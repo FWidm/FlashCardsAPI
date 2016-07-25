@@ -25,7 +25,7 @@ public class Tag extends Model {
     @JsonProperty(JsonKeys.TAG_ID)
     private long id;
     @Constraints.Required
-    @Column(unique = true) @Constraints.MinLength(3) @Constraints.MaxLength(16)
+    @Column(unique = true, name=JsonKeys.TAG_NAME) @Constraints.MinLength(3) @Constraints.MaxLength(16)
     @JsonProperty(JsonKeys.TAG_NAME)
     private String name;
     //this cascade from the "tag" to "join_cards_tag" - e.g. tag.delete -> delete evey entry with tag.id

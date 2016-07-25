@@ -10,9 +10,9 @@ for more working routing look at the [routes](conf/routes).
 If you're interested in reading about the things we use, there is a dev log file that describes problems and other topics we came across in german: [here]((https://github.com/FWidm/FlashCardsAPI/blob/master/_Docs/PlayDokuFabian.md)).
 
 ## TODO
-- [ ] Rewrite all PUT/PATCH to completely replace the ressources instead of appending
-- [ ] Add append via url paramter to all PUT/PATCH methods
-- [ ] Session Management/Authentication/Token base system
+- [ ] Decide where appending is useful in the future
+- [x] Add append via url paramter to card PUT/PATCH methods
+- [x] Session Management/Authentication/Token based system
 - [ ] Rewrite Group System
 - [ ] Implement CardDeck and Categories
 - [ ] Write proper Unit-Tests in Postman

@@ -100,8 +100,19 @@ public class JsonUtil {
             } else {
                 try {
                     Tag tmpT = parseTag(node);
-                    System.out.println(">> tag: " + tmpT);
-                    tags.add(tmpT);
+                    Tag lookupTag=Tag.find.where().eq(JsonKeys.TAG_NAME,tmpT.getName()).findUnique();
+                    //check if the tag is unique
+                    if(lookupTag==null){
+                        tmpT.save();
+                        System.out.println(">> tag: " + tmpT);
+                        //save our new tag so that no foreign constraint fails
+                        //((`flashcards`.`card_tag`, CONSTRAINT `fk_card_tag_tag_02` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tagId`))]]
+                        tags.add(tmpT);
+                    }
+                    else{
+                        tags.add(lookupTag);
+                    }
+
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
@@ -121,7 +132,7 @@ public class JsonUtil {
         String tagText=null;
 
         if(node.has(JsonKeys.TAG_NAME)){
-            tagText=node.get(JsonKeys.QUESTION_TEXT).asText();
+            tagText=node.get(JsonKeys.TAG_NAME).asText();
         }
         Tag tag=new Tag(tagText);
 

@@ -8,8 +8,10 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import util.JsonKeys;
 import util.JsonUtil;
+import util.UrlParamKeys;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -149,13 +151,26 @@ public class FlashCardController {
 
     /**
      * Update a  Flashcard either completely via put or partially via patch.
-     *
+     * Allows the user to append instead of replace by adding the URL Parameter "?append=(true|false)" which is false by default.
+     * with append only two update operations for attributes change:
+     *  - Tags that would be duplicates are merged by hand, before adding we check if the element is contained and don't
+     *    add in that case. This is to remove duplicate tags completely. Tags have unique names, which allows checking for
+     *    duplicates before creating new tags.
+     *  - Answers can be complete duplicates
      * @return httpResult
      */
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateFlashCard(long id) {
         JsonNode json = request().body().asJson();
         ObjectMapper mapper = new ObjectMapper();
+        boolean appendMode=false;
+
+        Map<String, String[]> urlParams = Controller.request().queryString();
+        int answersSize = -1;
+        if (urlParams.containsKey(UrlParamKeys.APPEND)) {
+                appendMode = Boolean.parseBoolean(urlParams.get(UrlParamKeys.APPEND)[0]);
+        }
+        System.out.println("Appending mode enabled? "+appendMode);
         try {
             FlashCard toUpdate = FlashCard.find.byId(id);
 
@@ -170,8 +185,16 @@ public class FlashCardController {
             }
 
 
-            if (json.has(JsonKeys.FLASHCARD_ANSWERS)) {
-                toUpdate.setAnswers(JsonUtil.retrieveAnswers(json));
+            if (json.has(JsonKeys.FLASHCARD_ANSWERS)){
+                if(appendMode) {
+                    List<Answer> mergedAnswers = new ArrayList<>();
+                    mergedAnswers.addAll(toUpdate.getAnswers());
+                    mergedAnswers.addAll(JsonUtil.retrieveAnswers(json));
+                    toUpdate.setAnswers(mergedAnswers);
+                }
+                else {
+                    toUpdate.setAnswers(JsonUtil.retrieveAnswers(json));
+                }
             }
 
             if (json.has(JsonKeys.FLASHCARD_QUESTION)) {
@@ -196,7 +219,21 @@ public class FlashCardController {
             }
 
             if (json.has(JsonKeys.FLASHCARD_TAGS)) {
-                toUpdate.setTags(JsonUtil.retrieveTags(json));
+                if(appendMode) {
+                    List<Tag> mergedTags = new ArrayList<>();
+                    mergedTags.addAll(toUpdate.getTags());
+                    for(Tag t: JsonUtil.retrieveTags(json)){
+                        if(!mergedTags.contains(t)){
+                            mergedTags.add(t);
+                        }
+                    }
+//                    mergedTags.addAll(JsonUtil.retrieveTags(json));
+                    toUpdate.setTags(mergedTags);
+                    System.out.println("append: "+mergedTags);
+                }
+                else {
+                    toUpdate.setTags(JsonUtil.retrieveTags(json));
+                }
             }
 
             if (json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)) {
@@ -204,12 +241,14 @@ public class FlashCardController {
             }
 
             toUpdate.update();
+            System.out.println("updated");
 
             return ok(JsonUtil.prepareJsonStatus(OK, "FlashCard with id=" + id + " has been updated!"));
         } catch (NullPointerException e) {
+            e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         } catch (IllegalArgumentException e) {
-            System.err.println(e);
+            e.printStackTrace();
             return badRequest(JsonUtil
                     .prepareJsonStatus(
                             BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
@@ -259,9 +298,9 @@ public class FlashCardController {
     public Result getAnswers(long id) {
         Map<String, String[]> urlParams = Controller.request().queryString();
         int answersSize = -1;
-        if (urlParams.containsKey(JsonKeys.FLASHCARD_PARAM_SIZE)) {
+        if (urlParams.containsKey(UrlParamKeys.SIZE)) {
             try {
-                answersSize = Integer.parseInt(urlParams.get("size")[0]);
+                answersSize = Integer.parseInt(urlParams.get(UrlParamKeys.SIZE)[0]);
             } catch (NumberFormatException e) {
                 return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
                         "Parameter size=" + urlParams.get("size")[0] + " could not be parsed to integer."));
@@ -293,9 +332,9 @@ public class FlashCardController {
     public Result getTags(long id) {
         Map<String, String[]> urlParams = Controller.request().queryString();
         int answersSize = -1;
-        if (urlParams.containsKey(JsonKeys.FLASHCARD_PARAM_SIZE)) {
+        if (urlParams.containsKey(UrlParamKeys.SIZE)) {
             try {
-                answersSize = Integer.parseInt(urlParams.get("size")[0]);
+                answersSize = Integer.parseInt(urlParams.get(UrlParamKeys.SIZE)[0]);
             } catch (NumberFormatException e) {
                 System.err.println(e);
                 return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
@@ -316,6 +355,7 @@ public class FlashCardController {
         }
         return ok(JsonUtil.getJson(ret));
     }
+
 
 
 }
