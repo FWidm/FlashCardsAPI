@@ -56,6 +56,8 @@ public class User extends Model {
     @JsonIgnore	// to prevent endless recursion.
 	private List<AuthToken> authTokenList;
 
+	private List<Rating> ratings;
+
     // TODO: 11/07/16 Profilbild, last Login
 
 	public static Model.Finder<Long, User> find = new Model.Finder<Long, User>(User.class);

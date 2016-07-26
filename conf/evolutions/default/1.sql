@@ -11,6 +11,7 @@ create table answer (
   author_id                 bigint,
   parent_card_id            bigint,
   rating                    integer,
+  is_correct                tinyint(1) default 0,
   created                   datetime(6) not null,
   last_updated              datetime(6) not null,
   constraint pk_answer primary key (answerId))
@@ -43,6 +44,17 @@ create table question (
   media_uri                 varchar(255),
   author_id                 bigint,
   constraint pk_question primary key (questionId))
+;
+
+create table rating (
+  rating_type               varchar(31) not null,
+  ratingId                  bigint auto_increment not null,
+  userId                    bigint,
+  rating_modifier           integer,
+  answerId                  bigint,
+  flashcardId               bigint,
+  constraint uq_rating_1 unique (userId,answerId,flashcardId),
+  constraint pk_rating primary key (ratingId))
 ;
 
 create table tag (
@@ -89,8 +101,14 @@ alter table flash_card add constraint fk_flash_card_author_5 foreign key (author
 create index ix_flash_card_author_5 on flash_card (author_id);
 alter table question add constraint fk_question_author_6 foreign key (author_id) references user (userId) on delete restrict on update restrict;
 create index ix_question_author_6 on question (author_id);
-alter table user add constraint fk_user_group_7 foreign key (groupId) references user_group (groupId) on delete restrict on update restrict;
-create index ix_user_group_7 on user (groupId);
+alter table rating add constraint fk_rating_author_7 foreign key (userId) references user (userId) on delete restrict on update restrict;
+create index ix_rating_author_7 on rating (userId);
+alter table rating add constraint fk_rating_ratedAnswer_8 foreign key (answerId) references answer (answerId) on delete restrict on update restrict;
+create index ix_rating_ratedAnswer_8 on rating (answerId);
+alter table rating add constraint fk_rating_ratedFlashCard_9 foreign key (flashcardId) references flash_card (flashcardId) on delete restrict on update restrict;
+create index ix_rating_ratedFlashCard_9 on rating (flashcardId);
+alter table user add constraint fk_user_group_10 foreign key (groupId) references user_group (groupId) on delete restrict on update restrict;
+create index ix_user_group_10 on user (groupId);
 
 
 
@@ -111,6 +129,8 @@ drop table flash_card;
 drop table card_tag;
 
 drop table question;
+
+drop table rating;
 
 drop table tag;
 

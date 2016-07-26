@@ -2,6 +2,7 @@ package models;
 
 import com.avaje.ebean.Model;
 import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.avaje.ebean.annotation.PrivateOwned;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -60,6 +61,11 @@ public class Answer extends Model {
     private Date lastUpdated;
     @JsonProperty(JsonKeys.RATING)
     private int rating;
+    @ManyToMany
+
+
+    @JsonProperty(JsonKeys.ANSWER_CORRECT)
+    private boolean isCorrect;
 
     public static Model.Finder<Long, Answer> find = new Model.Finder<Long, Answer>(Answer.class);
 
@@ -137,6 +143,15 @@ public class Answer extends Model {
 
     public Date getCreated() {
         return created;
+    }
+
+
+    public boolean isCorrect() {
+        return isCorrect;
+    }
+
+    public void setCorrect(boolean correct) {
+        isCorrect = correct;
     }
 
     public void setCard(FlashCard card) {

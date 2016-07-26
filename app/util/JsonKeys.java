@@ -52,7 +52,9 @@ public class JsonKeys {
     public static final String ANSWER_ID = "answerId";
     public static final String ANSWER_TEXT = "answerText";
     public static final String ANSWER_HINT = "answerHint";
-    public static final String ANSWER_JSON_ELEMENTS = ANSWER_TEXT + ", " + ANSWER_HINT + ", " + URI + ", " + AUTHOR;
+    public static final String ANSWER_RATERS = "answerRaters";
+    public static final String ANSWER_CORRECT = "answerCorrect";
+    public static final String ANSWER_JSON_ELEMENTS = ANSWER_TEXT + ", " + ANSWER_HINT + ", " + URI + ", " + AUTHOR+", "+ANSWER_CORRECT;
 
     //Question
     public static final String QUESTION_ID = "questionId";
@@ -62,5 +64,9 @@ public class JsonKeys {
     //Token
     public static final String TOKEN_ID = "tokenId";
     public static final String TOKEN_USER = "tokenUser";
+
+    //Rating
+    public static final String RATING_MODIFIER="ratingModifier";
+    public static final String RATING_ID="ratingId";
 
 }

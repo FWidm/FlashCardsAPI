@@ -13,6 +13,7 @@ import views.html.*;
 
 import java.util.*;
 
+import static com.avaje.ebean.Expr.eq;
 import static com.avaje.ebean.Expr.like;
 
 /**
@@ -29,6 +30,40 @@ public class HomeController extends Controller {
      */
     public Result index() {
 //        return ok(JsonUtil.prepareJson(map));
+        User u = new User("Test", "test" + Math.random() + "@example.com", "habla", 0);
+        u.save();
+        Answer a = new Answer("hello", "world", u);
+        a.save();
+        FlashCard f = new FlashCard(u, false, null);
+        f.save();
+        AnswerRating r = new AnswerRating(u, a, -1);
+        CardRating r2 = new CardRating(u, f, -1);
+
+        if (!AnswerRating.exists(u, a)) {
+            r.save();
+        } else
+            System.out.println("nope answer ");
+
+        if (!CardRating.exists(u, f)) {
+            r2.save();
+        } else
+            System.out.println("nope card ");
+
+
+        System.out.println(AnswerRating.find.where().eq(JsonKeys.USER_ID, u.getId()).findList());
+//        Rating.find.all().forEach((t)->System.out.println(t+" class="+t.getClass().getName()));
+        User.find.all().forEach((user) -> System.out.println(user.getId() + ": Ratings from this user: " + Rating.find.where().eq(JsonKeys.USER_ID, user.getId()).findList().size()));
+        //clean up.
+        if (AnswerRating.exists(u, a)) {
+            r.delete();
+        }
+        if (CardRating.exists(u, f)) {
+            r2.delete();
+        }
+        f.delete();
+        a.delete();
+        u.delete();
+
         return ok(index.render("Your new application is ready."));
     }
 
@@ -135,6 +170,7 @@ public class HomeController extends Controller {
 
     /**
      * Checks the credentials in the body - users password and email and returns a token if valid or forbidden if invalid.
+     *
      * @return
      */
     @BodyParser.Of(BodyParser.Json.class)
