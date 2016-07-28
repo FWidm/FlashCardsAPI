@@ -1,14 +1,18 @@
-package models;
+package models.rating;
 
 import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import models.Answer;
+import models.User;
 import util.JsonKeys;
+import util.RequestKeys;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import java.util.List;
+
+import java.util.Date;
 
 import static com.avaje.ebean.Expr.eq;
 
@@ -17,7 +21,7 @@ import static com.avaje.ebean.Expr.eq;
  * @author Fabian Widmann
  */
 @Entity
-@DiscriminatorValue("AnswerRating")
+@DiscriminatorValue(RequestKeys.ANSWER_RATING)
 public class AnswerRating extends Rating{
     @ManyToOne
     @JoinColumn(name= JsonKeys.ANSWER_ID, referencedColumnName = JsonKeys.ANSWER_ID)
@@ -44,18 +48,19 @@ public class AnswerRating extends Rating{
     /**
      * Changes the rating to either add or substract the ratingmodifier. Updates the answer object to save those changes.
      */
-    public void changeRating(){
-        System.out.println("Modifying rating of answer="+ ratedAnswer.getId()+": "+ratedAnswer.getRating()+" to: "+(ratedAnswer.getRating()+ratingModifier));
-        ratedAnswer.setRating(ratedAnswer.getRating()+ratingModifier);
+    public void apply(){
+        System.out.println(new Date().getTime()+"calling updateRating");
+        //System.out.println("Modifying rating of answer="+ ratedAnswer.getId()+": "+ratedAnswer.getRating()+" to: "+(ratedAnswer.getRating()+ratingModifier));
+        ratedAnswer.updateRating(ratingModifier);
         ratedAnswer.update();
     }
 
     /**
      * Changes the rating to either add or substract the ratingmodifier. Updates the answer object to save those changes.
      */
-    public void compensate(){
-        System.out.println("Compensating rating of answer="+ ratedAnswer.getId()+": "+ratedAnswer.getRating()+" to: "+(ratedAnswer.getRating()-ratingModifier));
-        ratedAnswer.setRating(ratedAnswer.getRating()-ratingModifier);
+    private void compensate(){
+//        System.out.println("Compensating rating of answer="+ ratedAnswer.getId()+": "+ratedAnswer.getRating()+" to: "+(ratedAnswer.getRating()-ratingModifier));
+        ratedAnswer.updateRating(-1*ratingModifier);
         ratedAnswer.update();
     }
 
@@ -67,7 +72,7 @@ public class AnswerRating extends Rating{
     @Override
     public void save() {
         super.save();
-        changeRating();
+        apply();
     }
 
     @Override

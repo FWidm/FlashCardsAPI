@@ -3,6 +3,9 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.*;
+import models.rating.AnswerRating;
+import models.rating.CardRating;
+import models.rating.Rating;
 import play.libs.Json;
 import play.mvc.*;
 
@@ -13,7 +16,6 @@ import views.html.*;
 
 import java.util.*;
 
-import static com.avaje.ebean.Expr.eq;
 import static com.avaje.ebean.Expr.like;
 
 /**
@@ -29,12 +31,15 @@ public class HomeController extends Controller {
      * <code>GET</code> request with a path of <code>/</code>.
      */
     public Result index() {
-//        return ok(JsonUtil.prepareJson(map));
+        return ok(index.render("Your new application is ready."));
+    }
+
+    public  Result testRating(){
         User u = new User("Test", "test" + Math.random() + "@example.com", "habla", 0);
         u.save();
-        Answer a = new Answer("hello", "world", u);
+        Answer a = new Answer("hello", "world", User.find.byId(1l));
         a.save();
-        FlashCard f = new FlashCard(u, false, null);
+        FlashCard f = new FlashCard(User.find.byId(1l), false, null);
         f.save();
         AnswerRating r = new AnswerRating(u, a, -1);
         CardRating r2 = new CardRating(u, f, -1);
@@ -52,9 +57,10 @@ public class HomeController extends Controller {
 
         System.out.println(AnswerRating.find.where().eq(JsonKeys.USER_ID, u.getId()).findList());
 //        Rating.find.all().forEach((t)->System.out.println(t+" class="+t.getClass().getName()));
-        User.find.all().forEach((user) -> System.out.println(user.getId() + ": Ratings from this user: " + Rating.find.where().eq(JsonKeys.USER_ID, user.getId()).findList().size()));
+        User.find.all().forEach((user) -> System.out.println("\t uid="+user.getId() + " rating of this user="+user.getRating()+": Ratings from this user: " + Rating.find.where().eq(JsonKeys.USER_ID, user.getId()).findList().size()));
+        System.out.println();
         //clean up.
-        if (AnswerRating.exists(u, a)) {
+/*        if (AnswerRating.exists(u, a)) {
             r.delete();
         }
         if (CardRating.exists(u, f)) {
@@ -62,11 +68,9 @@ public class HomeController extends Controller {
         }
         f.delete();
         a.delete();
-        u.delete();
-
-        return ok(index.render("Your new application is ready."));
+        u.delete();*/
+        return ok(index.render("Test done."));
     }
-
     /**
      * Creates one user with two tokens, attempts to delete both tokens.
      *

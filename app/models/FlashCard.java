@@ -255,4 +255,15 @@ public class FlashCard extends Model {
     public void setTags(List<Tag> tags) {
         this.tags = tags;
     }
+
+    /**
+     * Adds the given rating to the current rating, updates this instance and calls the function on the corresponding user.
+     * @param ratingModifier
+     */
+    public void updateRating(int ratingModifier){
+        this.rating+=ratingModifier;
+        this.update();
+        //update user as well, work on the newest data from the db, not our local reference.
+        User.find.byId(author.getId()).updateRating(ratingModifier);
+    }
 }

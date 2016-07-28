@@ -1,11 +1,13 @@
 package models;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import com.avaje.ebean.Model;
 import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.avaje.ebean.config.JsonConfig;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,6 +29,10 @@ public class User extends Model {
     @Column(name = JsonKeys.USER_ID)
     @JsonProperty(JsonKeys.USER_ID)
 	private Long id;
+
+	@JsonProperty(JsonKeys.USER_AVATAR)
+	private File avatar;
+
 	@Required @MinLength(3)
     @JsonProperty(JsonKeys.USER_NAME)
     private String name;
@@ -47,6 +53,10 @@ public class User extends Model {
     @JsonProperty(JsonKeys.DATE_CREATED)
 	private Date created;
 
+	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z") @CreatedTimestamp
+	@JsonProperty(JsonKeys.DATE_LAST_LOGIN)
+	private Date lastLogin;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = JsonKeys.GROUP_ID)
     @JsonProperty(JsonKeys.USER_GROUP)
@@ -56,9 +66,6 @@ public class User extends Model {
     @JsonIgnore	// to prevent endless recursion.
 	private List<AuthToken> authTokenList;
 
-	private List<Rating> ratings;
-
-    // TODO: 11/07/16 Profilbild, last Login
 
 	public static Model.Finder<Long, User> find = new Model.Finder<Long, User>(User.class);
 
@@ -70,7 +77,6 @@ public class User extends Model {
 		this.password = password;
 		this.rating = rating;
 		authTokenList=new ArrayList<>();
-//		created = new Date();
 	}
 	
 	public User(User u){
@@ -80,7 +86,6 @@ public class User extends Model {
 		this.password=u.getPassword();
 		this.rating=u.getRating();
 		authTokenList=new ArrayList<>();
-//		created=new Date();
 	}
 
 	public Long getId() {
@@ -183,5 +188,30 @@ public class User extends Model {
 	public void deleteToken(AuthToken authToken){
 		if(authTokenList.remove(authToken))
             authToken.delete();
+	}
+
+	public File getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(File avatar) {
+		this.avatar = avatar;
+	}
+
+	public Date getLastLogin() {
+		return lastLogin;
+	}
+
+	public void setLastLogin(Date lastLogin) {
+		this.lastLogin = lastLogin;
+	}
+	/**
+	 * Adds the given rating to the current rating, updates this instance.
+	 * @param ratingModifier
+	 */
+	public void updateRating(int ratingModifier){
+		System.out.println(new Date().getTime()+ " Modifying rating from="+rating+" by modifier="+ratingModifier+" to="+(rating+ratingModifier));
+		this.rating+=ratingModifier;
+		this.update();
 	}
 }

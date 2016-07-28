@@ -13,6 +13,7 @@ public class JsonKeys {
     public static final String RATING = "rating";
     public static final String DATE_CREATED = "created";
     public static final String DATE_UPDATED = "lastUpdated";
+    public static final String DATE_LAST_LOGIN="lastLogin";
     public static final String AUTHOR = "author";
     public static final String URI = "mediaURI";
     public static final String TOKEN = "token";
@@ -27,9 +28,9 @@ public class JsonKeys {
     public static final String FLASHCARD_MULTIPLE_CHOICE = "multipleChoice";
     public static final String FLASHCARD_JSON_ELEMENTS = RATING + ", " + FLASHCARD_ANSWERS + ", " + FLASHCARD_QUESTION + ", " + AUTHOR + ", " + FLASHCARD_MULTIPLE_CHOICE + ", " + FLASHCARD_TAGS;
 
-
     //User
     public static final String USER_ID = "userId";
+    public static final String USER_AVATAR = "avatarURI";
     public static final String USER_NAME = "name";
     public static final String USER_PASSWORD = "password";
     public static final String USER_EMAIL = "email";
@@ -68,5 +69,6 @@ public class JsonKeys {
     //Rating
     public static final String RATING_MODIFIER="ratingModifier";
     public static final String RATING_ID="ratingId";
+    public static final String RATING_TYPE="ratingType";
 
 }

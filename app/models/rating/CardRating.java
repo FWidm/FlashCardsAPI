@@ -1,14 +1,18 @@
-package models;
+package models.rating;
 
 import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import play.api.mvc.Flash;
+import models.FlashCard;
+import models.User;
 import util.JsonKeys;
+import util.RequestKeys;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+
+import java.util.Date;
 
 import static com.avaje.ebean.Expr.eq;
 
@@ -17,8 +21,9 @@ import static com.avaje.ebean.Expr.eq;
  * @author Fabian Widmann
  */
 @Entity
-@DiscriminatorValue("CardRating")
+@DiscriminatorValue(RequestKeys.CARD_RATING)
 public class CardRating extends Rating{
+
     @ManyToOne
     @JoinColumn(name= JsonKeys.FLASHCARD_ID, referencedColumnName = JsonKeys.FLASHCARD_ID)
     @JsonProperty(JsonKeys.ANSWER_ID)
@@ -35,18 +40,20 @@ public class CardRating extends Rating{
     /**
      * Changes the rating to either add or substract the ratingmodifier. Updates the answer object to save those changes.
      */
-    public void changeRating(){
-        System.out.println("Modifying rating of ratedFlashCard="+ ratedFlashCard.getId()+": "+ratedFlashCard.getRating()+" to: "+(ratedFlashCard.getRating()+ratingModifier));
-        ratedFlashCard.setRating(ratedFlashCard.getRating()+ratingModifier);
+    public void apply(){
+//        System.out.println("Modifying rating of ratedFlashCard="+ ratedFlashCard.getId()+": "+ratedFlashCard.getRating()+" to: "+(ratedFlashCard.getRating()+ratingModifier));
+        System.out.println(new Date().getTime()+"calling updateRating");
+        ratedFlashCard.updateRating(ratingModifier);
         ratedFlashCard.update();
     }
 
     /**
      * Changes the rating to either add or substract the ratingmodifier. Updates the answer object to save those changes.
      */
-    public void compensate(){
-        System.out.println("Compensating rating of answer="+ ratedFlashCard.getId()+": "+ratedFlashCard.getRating()+" to: "+(ratedFlashCard.getRating()-ratingModifier));
-        ratedFlashCard.setRating(ratedFlashCard.getRating()-ratingModifier);
+    private void compensate(){
+//        System.out.println("Compensating rating of answer="+ ratedFlashCard.getId()+": "+ratedFlashCard.getRating()+" to: "+(ratedFlashCard.getRating()-ratingModifier));
+        System.out.println(new Date().getTime()+"calling updateRating");
+        ratedFlashCard.updateRating(-1*ratingModifier);
         ratedFlashCard.update();
     }
     /**
@@ -65,7 +72,7 @@ public class CardRating extends Rating{
     @Override
     public void save() {
         super.save();
-        changeRating();
+        apply();
     }
 
     @Override

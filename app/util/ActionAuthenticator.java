@@ -46,7 +46,7 @@ public class ActionAuthenticator extends Security.Authenticator {
      */
     private String getTokenFromHeader(Http.Context ctx) {
         //see rfc for oauth for info about the format: https://tools.ietf.org/html/rfc6750#section-2.1
-        String[] authTokenHeaderValues = ctx.request().headers().get(UrlParamKeys.TOKEN_HEADER);
+        String[] authTokenHeaderValues = ctx.request().headers().get(RequestKeys.TOKEN_HEADER);
         if ((authTokenHeaderValues != null) && (authTokenHeaderValues.length == 1) && (authTokenHeaderValues[0] != null)) {
             String[] tokenHeader = authTokenHeaderValues[0].split(" ");
             if(tokenHeader.length==2){

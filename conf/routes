@@ -14,6 +14,8 @@ GET     /assets/*file       controllers.Assets.versioned(path="/public", file: A
 GET     /testCards          controllers.HomeController.testCards
 GET     /testGroups         controllers.HomeController.testGroups
 GET     /testTokens         controllers.HomeController.testTokens
+GET     /testRating         controllers.HomeController.testRating
+
 GET     /test               controllers.HomeController.test
 POST    /auth               controllers.HomeController.auth
 POST    /login              controllers.HomeController.login
@@ -46,3 +48,7 @@ POST    /cards              controllers.FlashCardController.addFlashCard
 DELETE  /cards/:id          controllers.FlashCardController.deleteFlashCard(id:Long)
 PATCH   /cards/:id          controllers.FlashCardController.updateFlashCard(id:Long)
 PUT     /cards/:id          controllers.FlashCardController.updateFlashCard(id:Long)
+
+#Ratings
+GET     /ratings            controllers.RatingController.getRatingList
+GET     /ratings/:id          controllers.RatingController.getRating(id:Long)

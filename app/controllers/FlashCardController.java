@@ -8,7 +8,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import util.JsonKeys;
 import util.JsonUtil;
-import util.UrlParamKeys;
+import util.RequestKeys;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -167,8 +167,8 @@ public class FlashCardController {
 
         Map<String, String[]> urlParams = Controller.request().queryString();
         int answersSize = -1;
-        if (urlParams.containsKey(UrlParamKeys.APPEND)) {
-                appendMode = Boolean.parseBoolean(urlParams.get(UrlParamKeys.APPEND)[0]);
+        if (urlParams.containsKey(RequestKeys.APPEND)) {
+                appendMode = Boolean.parseBoolean(urlParams.get(RequestKeys.APPEND)[0]);
         }
         System.out.println("Appending mode enabled? "+appendMode);
         try {
@@ -298,9 +298,9 @@ public class FlashCardController {
     public Result getAnswers(long id) {
         Map<String, String[]> urlParams = Controller.request().queryString();
         int answersSize = -1;
-        if (urlParams.containsKey(UrlParamKeys.SIZE)) {
+        if (urlParams.containsKey(RequestKeys.SIZE)) {
             try {
-                answersSize = Integer.parseInt(urlParams.get(UrlParamKeys.SIZE)[0]);
+                answersSize = Integer.parseInt(urlParams.get(RequestKeys.SIZE)[0]);
             } catch (NumberFormatException e) {
                 return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
                         "Parameter size=" + urlParams.get("size")[0] + " could not be parsed to integer."));
@@ -332,9 +332,9 @@ public class FlashCardController {
     public Result getTags(long id) {
         Map<String, String[]> urlParams = Controller.request().queryString();
         int answersSize = -1;
-        if (urlParams.containsKey(UrlParamKeys.SIZE)) {
+        if (urlParams.containsKey(RequestKeys.SIZE)) {
             try {
-                answersSize = Integer.parseInt(urlParams.get(UrlParamKeys.SIZE)[0]);
+                answersSize = Integer.parseInt(urlParams.get(RequestKeys.SIZE)[0]);
             } catch (NumberFormatException e) {
                 System.err.println(e);
                 return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,

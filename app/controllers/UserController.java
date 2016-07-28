@@ -13,7 +13,7 @@ import play.mvc.Result;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import util.UrlParamKeys;
+import util.RequestKeys;
 
 public class UserController extends Controller {
     public Result getUserIndex() {
@@ -28,8 +28,8 @@ public class UserController extends Controller {
     public Result getUserList() {
         Map<String, String[]> urlParams = Controller.request().queryString();
 
-        if (urlParams.containsKey(UrlParamKeys.EMAIL)) {
-            String email = urlParams.get(UrlParamKeys.EMAIL)[0];
+        if (urlParams.containsKey(RequestKeys.EMAIL)) {
+            String email = urlParams.get(RequestKeys.EMAIL)[0];
             User u = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
             if (u == null)
                 return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
@@ -38,8 +38,8 @@ public class UserController extends Controller {
             return ok(JsonUtil.getJson(u));
         }
 
-        if (urlParams.containsKey(UrlParamKeys.NAME)) {
-            String name = urlParams.get(UrlParamKeys.NAME)[0];
+        if (urlParams.containsKey(RequestKeys.NAME)) {
+            String name = urlParams.get(RequestKeys.NAME)[0];
             List<User> u = User.find.where().eq(JsonKeys.USER_NAME, name).findList();
             if (u == null)
                 return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,

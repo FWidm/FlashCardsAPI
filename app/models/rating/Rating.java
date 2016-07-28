@@ -1,7 +1,8 @@
-package models;
+package models.rating;
 
 import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import models.User;
 import util.JsonKeys;
 
 import javax.persistence.*;
@@ -16,7 +17,7 @@ import javax.persistence.*;
         uniqueConstraints=
         @UniqueConstraint(columnNames={JsonKeys.USER_ID, JsonKeys.ANSWER_ID, JsonKeys.FLASHCARD_ID})
 )
-@DiscriminatorColumn(name="rating_type", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name=util.JsonKeys.RATING_TYPE, discriminatorType = DiscriminatorType.STRING)
 public abstract class Rating extends Model {
     @Id @GeneratedValue
     @Column(name = JsonKeys.RATING_ID)
