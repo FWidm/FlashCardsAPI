@@ -20,7 +20,9 @@ public class JsonKeys {
     public static final String STATUS_CODE = "statuscode";
     public static final String DESCRIPTION = "description";
 
+
     //Flashcard
+    public static final String FLASHCARD = "flashcard";
     public static final String FLASHCARD_ID = "flashcardId";
     public static final String FLASHCARD_QUESTION = "question";
     public static final String FLASHCARD_ANSWERS = "answers";
@@ -50,6 +52,7 @@ public class JsonKeys {
     public static final String GROUP_JSON_ELEMENTS = GROUP_NAME + ", " + GROUP_DESCRIPTION + ", " + GROUP_USERS;
 
     //Answer
+    public static final String ANSWER = "answer" ;
     public static final String ANSWER_ID = "answerId";
     public static final String ANSWER_TEXT = "answerText";
     public static final String ANSWER_HINT = "answerHint";
@@ -70,5 +73,7 @@ public class JsonKeys {
     public static final String RATING_MODIFIER="ratingModifier";
     public static final String RATING_ID="ratingId";
     public static final String RATING_TYPE="ratingType";
+    public static final String RATING_JSON_ELEMENTS = AUTHOR+" (userID), "+FLASHCARD+" (flashcardID) OR "+ANSWER+" (answerId), "+RATING_MODIFIER;
+
 
 }

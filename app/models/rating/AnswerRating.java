@@ -25,8 +25,9 @@ import static com.avaje.ebean.Expr.eq;
 public class AnswerRating extends Rating{
     @ManyToOne
     @JoinColumn(name= JsonKeys.ANSWER_ID, referencedColumnName = JsonKeys.ANSWER_ID)
-    @JsonProperty(JsonKeys.ANSWER_ID)
+    @JsonProperty(JsonKeys.ANSWER)
     protected Answer ratedAnswer;
+    public static Model.Finder<Long, AnswerRating> find = new Model.Finder<Long, AnswerRating>(AnswerRating.class);
 
     public AnswerRating(User author, Answer ratedAnswer, int ratingModifier ) {
             this.ratedAnswer=ratedAnswer;
@@ -34,7 +35,10 @@ public class AnswerRating extends Rating{
             this.ratingModifier=ratingModifier;
     }
 
-    public static Model.Finder<Long, AnswerRating> find = new Model.Finder<Long, AnswerRating>(AnswerRating.class);
+
+    public Answer getRatedAnswer() {
+        return ratedAnswer;
+    }
 
     /**
      * Checks if a combination of user and answer is already in the database.
@@ -49,7 +53,6 @@ public class AnswerRating extends Rating{
      * Changes the rating to either add or substract the ratingmodifier. Updates the answer object to save those changes.
      */
     public void apply(){
-        System.out.println(new Date().getTime()+"calling updateRating");
         //System.out.println("Modifying rating of answer="+ ratedAnswer.getId()+": "+ratedAnswer.getRating()+" to: "+(ratedAnswer.getRating()+ratingModifier));
         ratedAnswer.updateRating(ratingModifier);
         ratedAnswer.update();
@@ -80,4 +83,5 @@ public class AnswerRating extends Rating{
         compensate();
         super.delete();
     }
+
 }

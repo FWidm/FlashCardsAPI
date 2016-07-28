@@ -7,13 +7,21 @@ import java.util.List;
 import java.util.Map;
 
 import models.Answer;
+import models.FlashCard;
 import models.Tag;
 import models.User;
+import models.rating.AnswerRating;
+import models.rating.CardRating;
+import models.rating.Rating;
 import play.libs.Json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import javax.smartcardio.Card;
+
+import static com.avaje.ebean.Expr.eq;
 
 public class JsonUtil {
 //	public final static String dateformat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
@@ -56,7 +64,7 @@ public class JsonUtil {
      * @param description
      * @return
      */
-    public static ObjectNode prepareJsonStatus(int statuscode, String description, int id) {
+    public static ObjectNode prepareJsonStatus(int statuscode, String description, Long id) {
         ObjectNode result = Json.newObject();
         result.put("statuscode", statuscode);
         result.put("description", description);
@@ -173,9 +181,9 @@ public class JsonUtil {
     }
 
     /**
-     * Parses answers from the given JsonNode node.
+     * Parses an answer from the given JsonNode node.
      * @param node the json node to parse
-     * @return list of answers
+     * @return answer
      * @throws URISyntaxException
      */
     public static Answer parseAnswer(JsonNode node) throws URISyntaxException {
@@ -203,4 +211,63 @@ public class JsonUtil {
         return answer;
     }
 
+    /**
+     * Parses a answerrating object from the given jsonnode.
+     * @param json
+     * @return answerrating
+     */
+    public static AnswerRating parseAnswerRating(JsonNode json) {
+        User author=null;
+        Answer answer=null;
+        int modifier=0;
+
+        if(json.has(JsonKeys.AUTHOR)){
+            author=User.find.byId(json.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong());
+            System.out.println("Rating user="+author);
+
+        }
+        if(json.has(JsonKeys.ANSWER)){
+            answer=Answer.find.byId(json.get(JsonKeys.ANSWER).get(JsonKeys.ANSWER_ID).asLong());
+            System.out.println("Rating answer="+answer);
+
+        }
+        if(json.has(JsonKeys.RATING_MODIFIER)){
+            modifier=json.get(JsonKeys.RATING_MODIFIER).asInt();
+        }
+
+        AnswerRating rating=new AnswerRating(author,answer,modifier);
+        System.out.println("Rating object="+rating);
+
+        return rating;
+    }
+
+    /**
+     * Parses a cardrating object from the given jsonnode.
+     * @param json
+     * @return cardrating
+     */
+    public static CardRating parseCardRating(JsonNode json) {
+        User author=null;
+        FlashCard flashCard=null;
+        int modifier=0;
+
+        if(json.has(JsonKeys.AUTHOR)){
+            author=User.find.byId(json.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong());
+            System.out.println("Rating user="+author);
+
+        }
+        if(json.has(JsonKeys.FLASHCARD)){
+            flashCard=FlashCard.find.byId(json.get(JsonKeys.FLASHCARD).get(JsonKeys.FLASHCARD_ID).asLong());
+            System.out.println("Rating answer="+flashCard);
+
+        }
+        if(json.has(JsonKeys.RATING_MODIFIER)){
+            modifier=json.get(JsonKeys.RATING_MODIFIER).asInt();
+        }
+
+        CardRating rating=new CardRating(author,flashCard,modifier);
+        System.out.println("Rating object="+rating);
+
+        return rating;
+    }
 }

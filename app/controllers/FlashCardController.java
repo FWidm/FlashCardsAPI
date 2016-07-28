@@ -139,7 +139,7 @@ public class FlashCardController {
             System.out.println("Tags="+card.getTags().size());
             card.save();
 
-            return ok(JsonUtil.prepareJsonStatus(OK, "FlashCard with id=" + card.getId() + " has been created!"));
+            return ok(JsonUtil.prepareJsonStatus(OK, "FlashCard with id=" + card.getId() + " has been created!",card.getId()));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             return badRequest(JsonUtil

@@ -51,4 +51,7 @@ PUT     /cards/:id          controllers.FlashCardController.updateFlashCard(id:L
 
 #Ratings
 GET     /ratings            controllers.RatingController.getRatingList
-GET     /ratings/:id          controllers.RatingController.getRating(id:Long)
+GET     /ratings/:id        controllers.RatingController.getRating(id:Long)
+POST    /ratings            controllers.RatingController.addRating
+DELETE  /ratings/:id        controllers.RatingController.deleteRating(id:Long)
+

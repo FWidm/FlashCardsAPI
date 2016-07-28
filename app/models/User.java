@@ -210,7 +210,7 @@ public class User extends Model {
 	 * @param ratingModifier
 	 */
 	public void updateRating(int ratingModifier){
-		System.out.println(new Date().getTime()+ " Modifying rating from="+rating+" by modifier="+ratingModifier+" to="+(rating+ratingModifier));
+		System.out.println(new Date()+ " Modifying rating from="+rating+" by modifier="+ratingModifier+" to="+(rating+ratingModifier));
 		this.rating+=ratingModifier;
 		this.update();
 	}
