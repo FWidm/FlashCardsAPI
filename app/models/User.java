@@ -30,8 +30,9 @@ public class User extends Model {
     @JsonProperty(JsonKeys.USER_ID)
 	private Long id;
 
+	@Lob //blob
 	@JsonProperty(JsonKeys.USER_AVATAR)
-	private File avatar;
+	private String avatar;
 
 	@Required @MinLength(3)
     @JsonProperty(JsonKeys.USER_NAME)
@@ -55,6 +56,7 @@ public class User extends Model {
 
 	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z") @CreatedTimestamp
 	@JsonProperty(JsonKeys.DATE_LAST_LOGIN)
+	@Column(name = JsonKeys.DATE_LAST_LOGIN)
 	private Date lastLogin;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -190,11 +192,11 @@ public class User extends Model {
             authToken.delete();
 	}
 
-	public File getAvatar() {
+	public String getAvatar() {
 		return avatar;
 	}
 
-	public void setAvatar(File avatar) {
+	public void setAvatar(String avatar) {
 		this.avatar = avatar;
 	}
 

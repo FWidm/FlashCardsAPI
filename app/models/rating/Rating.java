@@ -29,6 +29,7 @@ public abstract class Rating extends Model {
     protected User author;
     //VoteType for 5* vs. +-1 style?
     @JsonProperty(JsonKeys.RATING_MODIFIER)
+    @Column(name = JsonKeys.RATING_MODIFIER)
     protected int ratingModifier;
 
     public static Model.Finder<Long, Rating> find = new Model.Finder<Long, Rating>(Rating.class);

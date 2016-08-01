@@ -5,15 +5,15 @@
 
 create table answer (
   answerId                  bigint auto_increment not null,
-  answer_text               varchar(255),
-  hint_text                 varchar(255),
-  media_uri                 varchar(255),
+  answerText                varchar(255),
+  answerHint                varchar(255),
+  mediaURI                  varchar(255),
   userId                    bigint,
   parent_card_id            bigint,
   rating                    integer,
-  is_correct                tinyint(1) default 0,
+  answerCorrect             tinyint(1) default 0,
   created                   datetime(6) not null,
-  last_updated              datetime(6) not null,
+  lastUpdated               datetime(6) not null,
   constraint pk_answer primary key (answerId))
 ;
 
@@ -29,19 +29,19 @@ create table auth_token (
 create table flash_card (
   flashcardId               bigint auto_increment not null,
   rating                    integer,
-  question_id               bigint,
+  questionId                bigint,
   userId                    bigint,
-  multiple_choice           tinyint(1) default 0,
+  multipleChoice            tinyint(1) default 0,
   created                   datetime(6) not null,
-  last_updated              datetime(6) not null,
-  constraint uq_flash_card_question_id unique (question_id),
+  lastUpdated               datetime(6) not null,
+  constraint uq_flash_card_questionId unique (questionId),
   constraint pk_flash_card primary key (flashcardId))
 ;
 
 create table question (
   questionId                bigint auto_increment not null,
-  question_text             varchar(255),
-  media_uri                 varchar(255),
+  questionText              varchar(255),
+  mediaURI                  varchar(255),
   userId                    bigint,
   constraint pk_question primary key (questionId))
 ;
@@ -50,7 +50,7 @@ create table rating (
   ratingtype                varchar(31) not null,
   ratingId                  bigint auto_increment not null,
   userId                    bigint,
-  rating_modifier           integer,
+  ratingModifier            integer,
   flashcardId               bigint,
   answerId                  bigint,
   constraint uq_rating_1 unique (userId,answerId,flashcardId),
@@ -66,14 +66,14 @@ create table tag (
 
 create table user (
   userId                    bigint auto_increment not null,
-  avatar                    longblob,
+  avatar                    longtext,
   name                      varchar(255),
   password                  varchar(255),
   email                     varchar(255),
   rating                    integer,
   groupId                   bigint,
   created                   datetime(6) not null,
-  last_login                datetime(6) not null,
+  lastLogin                 datetime(6) not null,
   constraint uq_user_email unique (email),
   constraint pk_user primary key (userId))
 ;
@@ -87,9 +87,9 @@ create table user_group (
 
 
 create table card_tag (
-  card_id                        bigint not null,
-  tag_id                         bigint not null,
-  constraint pk_card_tag primary key (card_id, tag_id))
+  flashcardId                    bigint not null,
+  tagId                          bigint not null,
+  constraint pk_card_tag primary key (flashcardId, tagId))
 ;
 alter table answer add constraint fk_answer_author_1 foreign key (userId) references user (userId) on delete restrict on update restrict;
 create index ix_answer_author_1 on answer (userId);
@@ -97,8 +97,8 @@ alter table answer add constraint fk_answer_card_2 foreign key (parent_card_id) 
 create index ix_answer_card_2 on answer (parent_card_id);
 alter table auth_token add constraint fk_auth_token_user_3 foreign key (userId) references user (userId) on delete restrict on update restrict;
 create index ix_auth_token_user_3 on auth_token (userId);
-alter table flash_card add constraint fk_flash_card_question_4 foreign key (question_id) references question (questionId) on delete restrict on update restrict;
-create index ix_flash_card_question_4 on flash_card (question_id);
+alter table flash_card add constraint fk_flash_card_question_4 foreign key (questionId) references question (questionId) on delete restrict on update restrict;
+create index ix_flash_card_question_4 on flash_card (questionId);
 alter table flash_card add constraint fk_flash_card_author_5 foreign key (userId) references user (userId) on delete restrict on update restrict;
 create index ix_flash_card_author_5 on flash_card (userId);
 alter table question add constraint fk_question_author_6 foreign key (userId) references user (userId) on delete restrict on update restrict;
@@ -114,9 +114,9 @@ create index ix_user_group_10 on user (groupId);
 
 
 
-alter table card_tag add constraint fk_card_tag_flash_card_01 foreign key (card_id) references flash_card (flashcardId) on delete restrict on update restrict;
+alter table card_tag add constraint fk_card_tag_flash_card_01 foreign key (flashcardId) references flash_card (flashcardId) on delete restrict on update restrict;
 
-alter table card_tag add constraint fk_card_tag_tag_02 foreign key (tag_id) references tag (tagId) on delete restrict on update restrict;
+alter table card_tag add constraint fk_card_tag_tag_02 foreign key (tagId) references tag (tagId) on delete restrict on update restrict;
 
 # --- !Downs
 

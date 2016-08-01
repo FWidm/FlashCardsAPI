@@ -2,22 +2,17 @@ package models;
 
 import com.avaje.ebean.Model;
 import com.avaje.ebean.annotation.CreatedTimestamp;
-import com.avaje.ebean.annotation.PrivateOwned;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.JsonNode;
 import play.data.validation.Constraints;
 import util.JsonKeys;
 
 import javax.persistence.*;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author Jonas Kraus
@@ -33,12 +28,17 @@ public class Answer extends Model {
     private long id;
 
     @Constraints.Required
+    @Column(name = JsonKeys.ANSWER_TEXT)
     @JsonProperty(JsonKeys.ANSWER_TEXT)
     private String answerText;
+
     @JsonProperty(JsonKeys.ANSWER_HINT)
+    @Column(name = JsonKeys.ANSWER_HINT)
     private String hintText;
+
     @JsonProperty(JsonKeys.URI)
-    private URI mediaURI;
+    @Column(name = JsonKeys.URI)
+    private URI uri;
 
     // TODO: 11/07/16  Ist die Antwort richtig oder falsch?
    @ManyToOne
@@ -52,11 +52,13 @@ public class Answer extends Model {
     private FlashCard card;
 
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z") @CreatedTimestamp
+    @Column(name = JsonKeys.DATE_CREATED)
     @JsonProperty(JsonKeys.DATE_CREATED)
     private Date created;
 
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
     @UpdatedTimestamp
+    @Column(name = JsonKeys.DATE_UPDATED)
     @JsonProperty(JsonKeys.DATE_UPDATED)
     private Date lastUpdated;
     @JsonProperty(JsonKeys.RATING)
@@ -65,6 +67,7 @@ public class Answer extends Model {
 
 
     @JsonProperty(JsonKeys.ANSWER_CORRECT)
+    @Column(name = JsonKeys.ANSWER_CORRECT)
     private boolean isCorrect;
 
     public static Model.Finder<Long, Answer> find = new Model.Finder<Long, Answer>(Answer.class);
@@ -81,7 +84,7 @@ public class Answer extends Model {
                 "id=" + id +
                 ", answerText='" + answerText + '\'' +
                 ", hintText='" + hintText + '\'' +
-                ", mediaURI=" + mediaURI +
+                ", uri=" + uri +
                 ", author=" + author +
                 ", card=" + card +
                 ", created=" + created +
@@ -121,12 +124,12 @@ public class Answer extends Model {
         this.hintText = hintText;
     }
 
-    public URI getMediaURI() {
-        return mediaURI;
+    public URI getUri() {
+        return uri;
     }
 
-    public void setMediaURI(URI mediaURI) {
-        this.mediaURI = mediaURI;
+    public void setUri(URI uri) {
+        this.uri = uri;
     }
 
     public User getAuthor() {

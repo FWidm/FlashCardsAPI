@@ -25,9 +25,12 @@ public class Question extends Model {
 
     @Constraints.Required
     @JsonProperty(JsonKeys.QUESTION_TEXT)
+    @Column(name = JsonKeys.QUESTION_TEXT)
     private String questionText;
+
     @JsonProperty(JsonKeys.URI)
-    private URI mediaURI;
+    @Column(name = JsonKeys.URI)
+    private URI uri;
 
     @ManyToOne
     @JoinColumn(name=JsonKeys.USER_ID, referencedColumnName=JsonKeys.USER_ID)
@@ -67,7 +70,7 @@ public class Question extends Model {
         Question question=new Question(questionText, author);
 
         if(node.has(JsonKeys.URI)){
-            question.setMediaURI(new URI(node.get(JsonKeys.URI).asText()));
+            question.setUri(new URI(node.get(JsonKeys.URI).asText()));
         }
         return question;
     }
@@ -77,7 +80,7 @@ public class Question extends Model {
         return "Question{" +
                 "id=" + id +
                 ", questionText='" + questionText + '\'' +
-                ", mediaURI=" + mediaURI +
+                ", uri=" + uri +
                 ", author=" + author +
                 '}';
     }
@@ -98,12 +101,12 @@ public class Question extends Model {
         this.questionText = questionText;
     }
 
-    public URI getMediaURI() {
-        return mediaURI;
+    public URI getUri() {
+        return uri;
     }
 
-    public void setMediaURI(URI mediaURI) {
-        this.mediaURI = mediaURI;
+    public void setUri(URI uri) {
+        this.uri = uri;
     }
 
     public User getAuthor() {

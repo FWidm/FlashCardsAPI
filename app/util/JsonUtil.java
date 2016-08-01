@@ -12,16 +12,11 @@ import models.Tag;
 import models.User;
 import models.rating.AnswerRating;
 import models.rating.CardRating;
-import models.rating.Rating;
 import play.libs.Json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import javax.smartcardio.Card;
-
-import static com.avaje.ebean.Expr.eq;
 
 public class JsonUtil {
 //	public final static String dateformat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
@@ -206,7 +201,7 @@ public class JsonUtil {
         Answer answer=new Answer(answerText,hintText,author);
 
         if(node.has(JsonKeys.URI)){
-            answer.setMediaURI(new URI(node.get(JsonKeys.URI).asText()));
+            answer.setUri(new URI(node.get(JsonKeys.URI).asText()));
         }
         return answer;
     }

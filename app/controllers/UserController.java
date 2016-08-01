@@ -47,7 +47,6 @@ public class UserController extends Controller {
             System.out.println(u);
             return ok(JsonUtil.getJson(u));
         } else {
-            System.out.println("Std. Userlist");
             List<User> u = User.find.all();
             return ok(JsonUtil.getJson(u));
         }
@@ -111,6 +110,10 @@ public class UserController extends Controller {
 
                 u.setGroup(group);
 
+            }
+            if(json.has(JsonKeys.USER_AVATAR)){
+                System.out.println(json.get(JsonKeys.USER_AVATAR));
+                u.setAvatar(json.get(JsonKeys.USER_AVATAR).asText());
             }
             u.update();
             return ok(JsonUtil.prepareJsonStatus(OK, "User with id=" + id
@@ -186,12 +189,15 @@ public class UserController extends Controller {
         try {
             JsonNode json = request().body().asJson();
             ObjectMapper mapper = new ObjectMapper();
+
             if (json.has(JsonKeys.USER_GROUP)) {
                 return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN,
                         "The user could not be created, a user group has to be set via PATCH or PUT. It may not be content of POST."));
             }
             User tmp = mapper.convertValue(json, User.class);
-
+            if(json.has(JsonKeys.USER_AVATAR)){
+                tmp.setAvatar(json.get(JsonKeys.USER_AVATAR).asText());
+            }
             //Checks if the constraints for @email are met via it's isValid method.
             Constraints.EmailValidator emailValidator = new Constraints.EmailValidator();
             Constraints.MinLengthValidator minLengthValidator = new Constraints.MinLengthValidator();

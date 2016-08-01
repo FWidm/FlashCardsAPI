@@ -32,7 +32,7 @@ public class JsonKeys {
 
     //User
     public static final String USER_ID = "userId";
-    public static final String USER_AVATAR = "avatarURI";
+    public static final String USER_AVATAR = "avatar";
     public static final String USER_NAME = "name";
     public static final String USER_PASSWORD = "password";
     public static final String USER_EMAIL = "email";

@@ -35,27 +35,30 @@ public class FlashCard extends Model {
     private long id;
 
     @JsonProperty(JsonKeys.RATING)
+    @Column(name = JsonKeys.RATING)
     private int rating;
 
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
     @CreatedTimestamp
     @JsonProperty(JsonKeys.DATE_CREATED)
+    @Column(name = JsonKeys.DATE_CREATED)
     private Date created;
 
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
     @UpdatedTimestamp
+    @Column(name = JsonKeys.DATE_UPDATED)
     @JsonProperty(JsonKeys.DATE_UPDATED)
     private Date lastUpdated;
 
     // TODO: 11/07/16 add Catalogue(CardDeck)
     @ManyToMany/*(cascade = CascadeType.ALL)*/
     @JoinTable(name="card_tag",
-            joinColumns = @JoinColumn(name="card_id", referencedColumnName=JsonKeys.FLASHCARD_ID),
-            inverseJoinColumns = @JoinColumn(name="tag_id", referencedColumnName = JsonKeys.TAG_ID))
+            joinColumns = @JoinColumn(name=JsonKeys.FLASHCARD_ID, referencedColumnName=JsonKeys.FLASHCARD_ID),
+            inverseJoinColumns = @JoinColumn(name=JsonKeys.TAG_ID, referencedColumnName = JsonKeys.TAG_ID))
     private List<Tag> tags;
 
     @OneToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name="question_id", referencedColumnName = JsonKeys.QUESTION_ID)
+    @JoinColumn(name=JsonKeys.QUESTION_ID, referencedColumnName = JsonKeys.QUESTION_ID)
     @PrivateOwned //this means, that if the element is deleted with its parent.
     @JsonProperty(JsonKeys.FLASHCARD_QUESTION)
     private Question question;
@@ -64,11 +67,14 @@ public class FlashCard extends Model {
     @PrivateOwned
     @JsonProperty(JsonKeys.FLASHCARD_ANSWERS)
     private List<Answer> answers;
+
     @ManyToOne //OneToMany??
     @JoinColumn(name=JsonKeys.USER_ID, referencedColumnName=JsonKeys.USER_ID)
     @JsonProperty(JsonKeys.AUTHOR)
     private User author;
+
     @JsonProperty(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)
+    @Column(name = JsonKeys.FLASHCARD_MULTIPLE_CHOICE)
     private boolean multipleChoice;
 
     @Transient //not persistent.

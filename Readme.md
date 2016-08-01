@@ -84,7 +84,7 @@ Use `DELETE` request to `localhost:9000/groups/<id>`.
     "rating": 0,
     "question": {
       "questionText": "hello world!",
-      "mediaURI": "www.google.de",
+      "uri": "www.google.de",
       "author": {
         "userId": 1
       }
@@ -93,7 +93,7 @@ Use `DELETE` request to `localhost:9000/groups/<id>`.
       {
         "answerText": "answer",
         "answerHint": "hint",
-        "mediaURI": "www.answer.com",
+        "uri": "www.answer.com",
         "author": {
             "userId":1
         }
