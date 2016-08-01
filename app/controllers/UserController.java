@@ -111,13 +111,12 @@ public class UserController extends Controller {
                 u.setGroup(group);
 
             }
-            if(json.has(JsonKeys.USER_AVATAR)){
+            if (json.has(JsonKeys.USER_AVATAR)) {
                 System.out.println(json.get(JsonKeys.USER_AVATAR));
                 u.setAvatar(json.get(JsonKeys.USER_AVATAR).asText());
             }
             u.update();
-            return ok(JsonUtil.prepareJsonStatus(OK, "User with id=" + id
-                    + " has been succesfully changed."));
+            return ok(JsonUtil.prepareJsonStatus(OK, "User has been changed.", id));
         } catch (IllegalArgumentException e) {
             return badRequest(JsonUtil
                     .prepareJsonStatus(
@@ -125,7 +124,7 @@ public class UserController extends Controller {
                             "Body did contain elements that are not allowed/expected. A user can contain: " + JsonKeys.USER_JSON_ELEMENTS));
         } catch (NullPointerException e) {
             e.printStackTrace();
-            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no user with id=" + id + " exists."));
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no user with the specified id exists.", id));
         }
     }
 
@@ -171,10 +170,9 @@ public class UserController extends Controller {
         try {
             User.find.ref(id).delete();
 
-            return ok(JsonUtil.prepareJsonStatus(OK, "The user with the id=" + id
-                    + " has been deleted. All produced content now will be unlinked from this account (author set to null)."));
+            return ok(JsonUtil.prepareJsonStatus(OK, "The user has been deleted. All produced content now will be unlinked from this account (author set to null).", id));
         } catch (NullPointerException e) {
-            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no user with id=" + id + " exists."));
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, user does not exist.", id));
         }
     }
 
@@ -195,7 +193,7 @@ public class UserController extends Controller {
                         "The user could not be created, a user group has to be set via PATCH or PUT. It may not be content of POST."));
             }
             User tmp = mapper.convertValue(json, User.class);
-            if(json.has(JsonKeys.USER_AVATAR)){
+            if (json.has(JsonKeys.USER_AVATAR)) {
                 tmp.setAvatar(json.get(JsonKeys.USER_AVATAR).asText());
             }
             //Checks if the constraints for @email are met via it's isValid method.
@@ -210,8 +208,7 @@ public class UserController extends Controller {
                     User u = new User(tmp);
 
                     u.save();
-                    return created(JsonUtil.prepareJsonStatus(CREATED, "User with id=" + u.getId()
-                            + " has been created."));
+                    return created(JsonUtil.prepareJsonStatus(CREATED, "User has been created.", u.getId()));
                 }
             }
             return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN,

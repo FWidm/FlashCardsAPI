@@ -19,6 +19,7 @@ public class JsonKeys {
     public static final String TOKEN = "token";
     public static final String STATUS_CODE = "statuscode";
     public static final String DESCRIPTION = "description";
+    public static final String CARD_TAG_JOIN_TABLE="cardTagJoinTable";
 
 
     //Flashcard
@@ -42,7 +43,6 @@ public class JsonKeys {
     public static final String TAG_ID = "tagId";
     public static final String TAG_NAME = "tagName";
     public static final String TAG_CARDS = "cads";
-
 
     //Group
     public static final String GROUP_ID = "groupId";

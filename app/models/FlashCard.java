@@ -52,7 +52,7 @@ public class FlashCard extends Model {
 
     // TODO: 11/07/16 add Catalogue(CardDeck)
     @ManyToMany/*(cascade = CascadeType.ALL)*/
-    @JoinTable(name="card_tag",
+    @JoinTable(name=JsonKeys.CARD_TAG_JOIN_TABLE,
             joinColumns = @JoinColumn(name=JsonKeys.FLASHCARD_ID, referencedColumnName=JsonKeys.FLASHCARD_ID),
             inverseJoinColumns = @JoinColumn(name=JsonKeys.TAG_ID, referencedColumnName = JsonKeys.TAG_ID))
     private List<Tag> tags;

@@ -86,10 +86,10 @@ create table user_group (
 ;
 
 
-create table card_tag (
+create table cardTagJoinTable (
   flashcardId                    bigint not null,
   tagId                          bigint not null,
-  constraint pk_card_tag primary key (flashcardId, tagId))
+  constraint pk_cardTagJoinTable primary key (flashcardId, tagId))
 ;
 alter table answer add constraint fk_answer_author_1 foreign key (userId) references user (userId) on delete restrict on update restrict;
 create index ix_answer_author_1 on answer (userId);
@@ -114,9 +114,9 @@ create index ix_user_group_10 on user (groupId);
 
 
 
-alter table card_tag add constraint fk_card_tag_flash_card_01 foreign key (flashcardId) references flash_card (flashcardId) on delete restrict on update restrict;
+alter table cardTagJoinTable add constraint fk_cardTagJoinTable_flash_card_01 foreign key (flashcardId) references flash_card (flashcardId) on delete restrict on update restrict;
 
-alter table card_tag add constraint fk_card_tag_tag_02 foreign key (tagId) references tag (tagId) on delete restrict on update restrict;
+alter table cardTagJoinTable add constraint fk_cardTagJoinTable_tag_02 foreign key (tagId) references tag (tagId) on delete restrict on update restrict;
 
 # --- !Downs
 
@@ -128,7 +128,7 @@ drop table auth_token;
 
 drop table flash_card;
 
-drop table card_tag;
+drop table cardTagJoinTable;
 
 drop table question;
 
