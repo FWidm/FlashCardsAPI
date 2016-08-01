@@ -8,7 +8,7 @@ create table answer (
   answer_text               varchar(255),
   hint_text                 varchar(255),
   media_uri                 varchar(255),
-  author_id                 bigint,
+  userId                    bigint,
   parent_card_id            bigint,
   rating                    integer,
   is_correct                tinyint(1) default 0,
@@ -30,7 +30,7 @@ create table flash_card (
   flashcardId               bigint auto_increment not null,
   rating                    integer,
   question_id               bigint,
-  author_id                 bigint,
+  userId                    bigint,
   multiple_choice           tinyint(1) default 0,
   created                   datetime(6) not null,
   last_updated              datetime(6) not null,
@@ -42,7 +42,7 @@ create table question (
   questionId                bigint auto_increment not null,
   question_text             varchar(255),
   media_uri                 varchar(255),
-  author_id                 bigint,
+  userId                    bigint,
   constraint pk_question primary key (questionId))
 ;
 
@@ -91,18 +91,18 @@ create table card_tag (
   tag_id                         bigint not null,
   constraint pk_card_tag primary key (card_id, tag_id))
 ;
-alter table answer add constraint fk_answer_author_1 foreign key (author_id) references user (userId) on delete restrict on update restrict;
-create index ix_answer_author_1 on answer (author_id);
+alter table answer add constraint fk_answer_author_1 foreign key (userId) references user (userId) on delete restrict on update restrict;
+create index ix_answer_author_1 on answer (userId);
 alter table answer add constraint fk_answer_card_2 foreign key (parent_card_id) references flash_card (flashcardId) on delete restrict on update restrict;
 create index ix_answer_card_2 on answer (parent_card_id);
 alter table auth_token add constraint fk_auth_token_user_3 foreign key (userId) references user (userId) on delete restrict on update restrict;
 create index ix_auth_token_user_3 on auth_token (userId);
 alter table flash_card add constraint fk_flash_card_question_4 foreign key (question_id) references question (questionId) on delete restrict on update restrict;
 create index ix_flash_card_question_4 on flash_card (question_id);
-alter table flash_card add constraint fk_flash_card_author_5 foreign key (author_id) references user (userId) on delete restrict on update restrict;
-create index ix_flash_card_author_5 on flash_card (author_id);
-alter table question add constraint fk_question_author_6 foreign key (author_id) references user (userId) on delete restrict on update restrict;
-create index ix_question_author_6 on question (author_id);
+alter table flash_card add constraint fk_flash_card_author_5 foreign key (userId) references user (userId) on delete restrict on update restrict;
+create index ix_flash_card_author_5 on flash_card (userId);
+alter table question add constraint fk_question_author_6 foreign key (userId) references user (userId) on delete restrict on update restrict;
+create index ix_question_author_6 on question (userId);
 alter table rating add constraint fk_rating_author_7 foreign key (userId) references user (userId) on delete restrict on update restrict;
 create index ix_rating_author_7 on rating (userId);
 alter table rating add constraint fk_rating_ratedFlashCard_8 foreign key (flashcardId) references flash_card (flashcardId) on delete restrict on update restrict;

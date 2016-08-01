@@ -6,15 +6,27 @@ import models.*;
 import models.rating.AnswerRating;
 import models.rating.CardRating;
 import models.rating.Rating;
+import org.h2.store.fs.FileUtils;
 import play.libs.Json;
 import play.mvc.*;
 
 import util.ActionAuthenticator;
+import util.FileTypeChecker;
 import util.JsonKeys;
 import util.JsonUtil;
 import views.html.*;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.*;
+import java.util.Base64;
+import java.util.Base64.Decoder;
+import java.util.Base64.Encoder;
 
 import static com.avaje.ebean.Expr.like;
 
@@ -25,16 +37,39 @@ import static com.avaje.ebean.Expr.like;
 public class HomeController extends Controller {
 
     /**
-     * An action that renders an HTML page with a welcome message.
-     * The configuration in the <code>routes</code> file means that
-     * this method will be called when the application receives a
-     * <code>GET</code> request with a path of <code>/</code>.
+     * displays the flashcardslogo.
      */
     public Result index() {
-        return ok(index.render("Your new application is ready."));
+        java.io.File file = new java.io.File("_Docs/img/flash_icon.png");
+        System.out.println(file.getAbsolutePath());
+        return ok(file);
     }
 
-    public  Result testRating(){
+    /**
+     * Decoes the given Image to a file and saves it to the _Docs/img/usr/ directory.
+     * @return
+     */
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result imageUpload() {
+        JsonNode json = request().body().asJson();
+        if (json.has("image")) {
+            String imageDataBytes = json.get("image").asText().substring(json.get("image").asText().indexOf(",") + 1);
+
+            System.out.println(imageDataBytes);
+            byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageDataBytes);
+            File f = new File("_Docs/img/usr/" + new Date().getTime()+ FileTypeChecker.getFileType(json.get("image").asText()));
+            try {
+                Files.write(f.toPath(), imageBytes);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+//            f.delete();
+            return ok(f);
+        }
+        return notFound();
+    }
+
+    public Result testRating() {
         User u = new User("Test", "test" + Math.random() + "@example.com", "habla", 0);
         u.save();
         Answer a = new Answer("hello", "world", User.find.byId(1l));
@@ -57,7 +92,7 @@ public class HomeController extends Controller {
 
         System.out.println(AnswerRating.find.where().eq(JsonKeys.USER_ID, u.getId()).findList());
 //        Rating.find.all().forEach((t)->System.out.println(t+" class="+t.getClass().getName()));
-        User.find.all().forEach((user) -> System.out.println("\t uid="+user.getId() + " rating of this user="+user.getRating()+": Ratings from this user: " + Rating.find.where().eq(JsonKeys.USER_ID, user.getId()).findList().size()));
+        User.find.all().forEach((user) -> System.out.println("\t uid=" + user.getId() + " rating of this user=" + user.getRating() + ": Ratings from this user: " + Rating.find.where().eq(JsonKeys.USER_ID, user.getId()).findList().size()));
         System.out.println();
         //clean up.
 /*        if (AnswerRating.exists(u, a)) {
@@ -71,6 +106,7 @@ public class HomeController extends Controller {
         u.delete();*/
         return ok(index.render("Test done."));
     }
+
     /**
      * Creates one user with two tokens, attempts to delete both tokens.
      *

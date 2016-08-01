@@ -30,7 +30,7 @@ public class Question extends Model {
     private URI mediaURI;
 
     @ManyToOne
-    @JoinColumn(name="author_id", referencedColumnName=JsonKeys.USER_ID)
+    @JoinColumn(name=JsonKeys.USER_ID, referencedColumnName=JsonKeys.USER_ID)
     @JsonProperty(JsonKeys.AUTHOR)
     private User author;
 //    @OneToOne(fetch= FetchType.LAZY)

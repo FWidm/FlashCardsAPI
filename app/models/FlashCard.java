@@ -65,7 +65,7 @@ public class FlashCard extends Model {
     @JsonProperty(JsonKeys.FLASHCARD_ANSWERS)
     private List<Answer> answers;
     @ManyToOne //OneToMany??
-    @JoinColumn(name="author_id", referencedColumnName=JsonKeys.USER_ID)
+    @JoinColumn(name=JsonKeys.USER_ID, referencedColumnName=JsonKeys.USER_ID)
     @JsonProperty(JsonKeys.AUTHOR)
     private User author;
     @JsonProperty(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)
@@ -265,5 +265,18 @@ public class FlashCard extends Model {
         this.update();
         //update user as well, work on the newest data from the db, not our local reference.
         User.find.byId(author.getId()).updateRating(ratingModifier);
+    }
+
+    @Override
+    public void delete(){
+        //Get all tags and unlink them from this card. Tag still exists to this point.
+        for (Tag tmptag : tags) {
+            tmptag.removeFlashCard(this);
+            if (tmptag.getCards().size() == 0) {
+                // TODO: 01/07/16 do we want to delete if no reference to the tag exists?
+            }
+            System.out.println("Removing link to tag=" + tmptag);
+        }
+        super.delete();
     }
 }

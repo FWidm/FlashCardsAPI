@@ -42,7 +42,7 @@ public class Answer extends Model {
 
     // TODO: 11/07/16  Ist die Antwort richtig oder falsch?
    @ManyToOne
-   @JoinColumn(name="author_id", referencedColumnName=JsonKeys.USER_ID)
+   @JoinColumn(name=JsonKeys.USER_ID, referencedColumnName=JsonKeys.USER_ID)
    @JsonProperty(JsonKeys.AUTHOR)
     private User author;
 

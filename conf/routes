@@ -19,6 +19,8 @@ GET     /testRating         controllers.HomeController.testRating
 GET     /test               controllers.HomeController.test
 POST    /auth               controllers.HomeController.auth
 POST    /login              controllers.HomeController.login
+POST    /upload              controllers.HomeController.imageUpload
+
 #Users
 GET		/users				controllers.UserController.getUserList
 GET		/users/:id          controllers.UserController.getUser(id:Long)

@@ -166,41 +166,10 @@ public class UserController extends Controller {
      */
     public Result deleteUser(Long id) {
         try {
-            List<Answer> givenAnswers = Answer.find.where().eq("author_id", id).findList();
-            System.out.println("Answers from the user has size=" + givenAnswers.size());
-
-            for (Answer a : givenAnswers) {
-                System.out.println(">> Trying to delete answer a=" + a + " where author was: " + a.getAuthor());
-                a.delete();
-            }
-
-
-            List<FlashCard> cards = FlashCard.find.where().eq("author_id", id).findList();
-            System.out.println("Created cards list has size=" + cards.size());
-
-            for (FlashCard c : cards) {
-                System.out.println(">> Trying to delete card c=" + c + " where author was: " + c.getAuthor());
-                c.delete();
-            }
-
-
-            List<Question> questions = Question.find.where().eq("author_id", id).findList();
-            System.out.println("Questions from the user has size=" + questions.size());
-            for (Question q : questions) {
-                System.out.println(">> Trying to delete question q=" + q + " where author was: " + q.getAuthor());
-                q.delete();
-            }
-
-//        User u= User.find.byId(id);
-//
-//        UserGroup group = u.getGroup();
-//        u.setGroup(null);
-//        u.update();
-//        group.removeUser(User.find.byId(id));
             User.find.ref(id).delete();
 
             return ok(JsonUtil.prepareJsonStatus(OK, "The user with the id=" + id
-                    + " has been deleted. This includes questions, answers and cards mady by this user."));
+                    + " has been deleted. All produced content now will be unlinked from this account (author set to null)."));
         } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no user with id=" + id + " exists."));
         }

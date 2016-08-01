@@ -214,4 +214,38 @@ public class User extends Model {
 		this.rating+=ratingModifier;
 		this.update();
 	}
+
+
+	@Override
+	public void delete(){
+		//Get all tags and unlink them from this card. Tag still exists to this point.
+		List<Answer> givenAnswers = Answer.find.where().eq(JsonKeys.USER_ID, id).findList();
+		System.out.println("Answers from the user has size=" + givenAnswers.size());
+
+		for (Answer a : givenAnswers) {
+			System.out.println(">> Trying to null author on answer a=" + a + " where author was: " + a.getAuthor());
+			a.setAuthor(null);
+			a.update();
+		}
+
+
+		List<FlashCard> cards = FlashCard.find.where().eq(JsonKeys.USER_ID, id).findList();
+		System.out.println("Created cards list has size=" + cards.size());
+
+		for (FlashCard c : cards) {
+			System.out.println(">> Trying to null author on card c=" + c + " where author was: " + c.getAuthor());
+			c.setAuthor(null);
+			c.update();
+		}
+
+
+		List<Question> questions = Question.find.where().eq(JsonKeys.USER_ID, id).findList();
+		System.out.println("Questions from the user has size=" + questions.size());
+		for (Question q : questions) {
+			System.out.println(">> Trying to null author on question q=" + q + " where author was: " + q.getAuthor());
+			q.setAuthor(null);
+			q.update();
+		}
+		super.delete();
+	}
 }

@@ -68,17 +68,6 @@ public class FlashCardController {
      */
     public Result deleteFlashCard(long id) {
         try {
-            FlashCard fc = FlashCard.find.byId(id);
-            List<Tag> tags = fc.getTags();
-            //Get all tags and unlink them from this card. Tag still exists to this point.
-            for (Tag tmptag : tags) {
-                tmptag.removeFlashCard(fc);
-                if (tmptag.getCards().size() == 0) {
-                    // TODO: 01/07/16 do we want to delete if no reference to the tag exists?
-                }
-                System.out.println("Removing link to tag=" + tmptag);
-            }
-
             FlashCard.find.byId(id).delete();
 
             return ok(JsonUtil.prepareJsonStatus(OK, "The card with the id=" + id
