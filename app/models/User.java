@@ -1,13 +1,11 @@
 package models;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import com.avaje.ebean.Model;
 import com.avaje.ebean.annotation.CreatedTimestamp;
-import com.avaje.ebean.config.JsonConfig;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -59,10 +57,12 @@ public class User extends Model {
 	@Column(name = JsonKeys.DATE_LAST_LOGIN)
 	private Date lastLogin;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = JsonKeys.GROUP_ID)
-    @JsonProperty(JsonKeys.USER_GROUP)
-	private UserGroup group;
+	@ManyToMany/*(cascade = CascadeType.ALL)*/
+	@JoinTable(name=JsonKeys.USER_GROUP_JOIN_TABLE,
+			joinColumns = @JoinColumn(name=JsonKeys.USER_ID, referencedColumnName=JsonKeys.USER_ID),
+			inverseJoinColumns = @JoinColumn(name=JsonKeys.GROUP_ID, referencedColumnName = JsonKeys.GROUP_ID))
+    @JsonProperty(JsonKeys.USER_GROUPS)
+	private List<UserGroup> userGroups;
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore	// to prevent endless recursion.
@@ -136,24 +136,24 @@ public class User extends Model {
 	public String toString() {
 		return "User [id=" + id + ", name=" + name + ", password=" + password
 				+ ", email=" + email + ", rating=" + rating + ", created="
-				+ created + ", group=" + group + "]";
+				+ created + ", userGroups=" + userGroups + "]";
 	}
 
 	public Date getCreated() {
 		return created;
 	}
 
-	public UserGroup getGroup() {
-		return group;
+	public List<UserGroup> getUserGroups() {
+		return userGroups;
 	}
 
-	public void setGroup(UserGroup group) {
-//        System.out.println(">> setting usergroup from "+this.getGroup()+" to "+group);
-		this.group = group;
-		//update group definition as well.
-		if (group!=null && !group.getUsers().contains(this)) {
-			group.addUser(this);
-		}
+	public void setUserGroups(List<UserGroup> userGroups) {
+//        System.out.println(">> setting usergroup from "+this.getUserGroups()+" to "+userGroups);
+		this.userGroups = userGroups;
+		//update userGroups definition as well.
+/*		if (userGroups !=null && !userGroups.getUsers().contains(this)) {
+			userGroups.addUser(this);
+		}*/
         this.update();
 	}
 
@@ -250,4 +250,11 @@ public class User extends Model {
 		}
 		super.delete();
 	}
+
+    public void removeGroup(UserGroup userGroup) {
+		if (userGroups.contains( userGroup)){
+			userGroups.remove(userGroup);
+			this.update();
+		}
+    }
 }

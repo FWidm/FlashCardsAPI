@@ -21,6 +21,7 @@ import java.util.UUID;
  * @author Fabian Widmann
  */
 @Entity
+@Table (name = JsonKeys.AUTH_TOKEN_TABLE_NAME)
 public class AuthToken extends Model {
     @Id
     @GeneratedValue
@@ -51,7 +52,6 @@ public class AuthToken extends Model {
         this.user = user;
         //create new tokens while we find that it is already in use. Should not happen theoretically.
         do{
-//            token = UUID.randomUUID().toString();
             try {
                 token=nextBase64String(32);
             } catch (UnsupportedEncodingException e) {

@@ -26,6 +26,7 @@ import static util.JsonKeys.FLASHCARD_ID;
  *
  */
 @Entity
+@Table (name = JsonKeys.FLASH_CARD_TABLE_NAME)
 @JsonPropertyOrder({ JsonKeys.FLASHCARD_ID})
 public class FlashCard extends Model {
     @Id

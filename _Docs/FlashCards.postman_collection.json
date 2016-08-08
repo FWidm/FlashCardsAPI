@@ -12,6 +12,35 @@
 			"description": "",
 			"item": [
 				{
+					"name": "Create a new User copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"userId\", jsonData.id);"
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPass}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
 					"name": "Retrieve token for current User",
 					"event": [
 						{
@@ -254,8 +283,17 @@
 			"item": [
 				{
 					"name": "localhost:9000/groups",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"groupId\", jsonData.id);"
+							}
+						}
+					],
 					"request": {
-						"url": "localhost:9000/groups",
+						"url": "{{url}}{{port}}/groups",
 						"method": "POST",
 						"header": [
 							{
@@ -266,16 +304,36 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\":\"mwahaha\",\n    \"oojo\": \"xyz\",\n    \"users\":[{\"userId\":1\n    }]\n}"
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":3\n    }]\n}"
 						},
 						"description": "Creates a new Group and adds two users."
 					},
 					"response": []
 				},
 				{
+					"name": "localhost:9000/groups - get all groups",
+					"request": {
+						"url": "{{url}}{{port}}/groups",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all groups"
+					},
+					"response": []
+				},
+				{
 					"name": "localhost:9000/groups - get non-empty groups",
 					"request": {
-						"url": "localhost:9000/groups?empty=false",
+						"url": "{{url}}{{port}}/groups",
 						"method": "GET",
 						"header": [
 							{
@@ -295,27 +353,7 @@
 				{
 					"name": "localhost:9000/groups - get empty groups",
 					"request": {
-						"url": "localhost:9000/groups?empty=true",
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
-						},
-						"description": "Retrieves all groups"
-					},
-					"response": []
-				},
-				{
-					"name": "localhost:9000/groups - get all groups",
-					"request": {
-						"url": "localhost:9000/groups",
+						"url": "{{url}}{{port}}/groups?empty=true",
 						"method": "GET",
 						"header": [
 							{
@@ -335,7 +373,7 @@
 				{
 					"name": "localhost:9000/groups/20",
 					"request": {
-						"url": "localhost:9000/groups/20",
+						"url": "{{url}}{{port}}/groups/{{groupId}}",
 						"method": "GET",
 						"header": [
 							{
@@ -353,29 +391,9 @@
 					"response": []
 				},
 				{
-					"name": "localhost:9000/groups/20",
-					"request": {
-						"url": "localhost:9000/groups/20",
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
-						},
-						"description": "Deletes the specific group 20. Also deletes memberships."
-					},
-					"response": []
-				},
-				{
 					"name": "put localhost:9000/groups/20",
 					"request": {
-						"url": "localhost:9000/groups/2",
+						"url": "{{url}}{{port}}/groups/{{groupId}}",
 						"method": "PUT",
 						"header": [
 							{
@@ -395,7 +413,7 @@
 				{
 					"name": "patch localhost:9000/groups/20",
 					"request": {
-						"url": "localhost:9000/groups/21",
+						"url": "{{url}}{{port}}/groups/{{groupId}}",
 						"method": "PATCH",
 						"header": [
 							{
@@ -409,6 +427,26 @@
 							"raw": "{\n    \"users\":null\n}"
 						},
 						"description": "updates group 20 with a new userlist."
+					},
+					"response": []
+				},
+				{
+					"name": "localhost:9000/groups/20",
+					"request": {
+						"url": "{{url}}{{port}}/groups/{{groupId}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Deletes the specific group 20. Also deletes memberships."
 					},
 					"response": []
 				}
@@ -669,7 +707,43 @@
 					"response": []
 				},
 				{
-					"name": "Partially update a user with the id {{userId}}",
+					"name": "Append Usergroup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "tests[\"Status code is 200\"] = responseCode.code === 200;"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": "postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r\npostman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r\n"
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users/{{userId}}?append=true",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"groups\":[{\n        \"name\":\"2\",\n        \"description\":\"2\"\n    },{\n        \"name\":\"1\",\n        \"description\":\"1\"\n    }],\n    \"name\":\"testaaaa\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Replace Usergroup",
 					"event": [
 						{
 							"listen": "test",
@@ -698,7 +772,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"group\":{\"groupId\":\"{{groupId}}\"}\n}"
+							"raw": "{\n    \"groups\":[],\n    \"name\":\"testaaaa\"\n}"
 						},
 						"description": ""
 					},

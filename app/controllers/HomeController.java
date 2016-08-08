@@ -6,7 +6,6 @@ import models.*;
 import models.rating.AnswerRating;
 import models.rating.CardRating;
 import models.rating.Rating;
-import org.h2.store.fs.FileUtils;
 import play.libs.Json;
 import play.mvc.*;
 
@@ -16,17 +15,10 @@ import util.JsonKeys;
 import util.JsonUtil;
 import views.html.*;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.Base64;
-import java.util.Base64.Decoder;
-import java.util.Base64.Encoder;
 
 import static com.avaje.ebean.Expr.like;
 
@@ -182,29 +174,35 @@ public class HomeController extends Controller {
 
     public Result testGroups() {
         List<User> l = new ArrayList<User>();
-        l.add(new User("aaa", "a@b.com", "abbbbb", -1));
-        l.add(new User("bbb", "b@a.com", "baaaaa", -2));
+        l.add(new User("aaa","b"+(int)(Math.random()*100)+"@test.com", "abbbbb", -1));
+        l.add(new User("bbb", "a"+(int)(Math.random()*100)+"@test.com", "baaaaa", -2));
 
         for (User u : l) {
             u.save();
         }
 
-        UserGroup g = new UserGroup("y", "y", l);
-        g.save();
+        UserGroup g1 = new UserGroup("x", "x", l);
+        UserGroup g2 = new UserGroup("y", "y", l);
+        g1.save();
+        g2.save();
+        List<UserGroup> ug=new ArrayList<UserGroup>();
+        ug.add(g1);
+        ug.add(g2);
 
         for (User u : l) {
-            u.setGroup(g);
+            u.setUserGroups(ug);
             u.update();
         }
-        System.out.println("Created group g=" + g + " with users" + l);
+
+
         System.out.println("__________________________________");
         System.out.println("Querying the groups");
-        List<UserGroup> groups = UserGroup.find.all();
-        for (UserGroup group : groups) {
-            List<User> users = User.find.where().eq(JsonKeys.GROUP_ID, group.getId()).findList();
-            System.out.println("Finding users for group=" + group + " users are: " + users);
+        List<User> users = User.find.all();
+        // set group
+        for (User u:users) {
+            u.getUserGroups().forEach((group)-> System.out.println(u.getId()+":"+group));
         }
-        UserGroup tmpGroup;
+
         return ok(index.render("Group test done!"));
     }
 

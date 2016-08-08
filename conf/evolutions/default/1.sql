@@ -17,16 +17,16 @@ create table answer (
   constraint pk_answer primary key (answerId))
 ;
 
-create table auth_token (
+create table authToken (
   tokenId                   bigint auto_increment not null,
   userId                    bigint,
   token                     varchar(255),
   created                   datetime(6) not null,
-  constraint uq_auth_token_token unique (token),
-  constraint pk_auth_token primary key (tokenId))
+  constraint uq_authToken_token unique (token),
+  constraint pk_authToken primary key (tokenId))
 ;
 
-create table flash_card (
+create table flashCard (
   flashcardId               bigint auto_increment not null,
   rating                    integer,
   questionId                bigint,
@@ -34,8 +34,8 @@ create table flash_card (
   multipleChoice            tinyint(1) default 0,
   created                   datetime(6) not null,
   lastUpdated               datetime(6) not null,
-  constraint uq_flash_card_questionId unique (questionId),
-  constraint pk_flash_card primary key (flashcardId))
+  constraint uq_flashCard_questionId unique (questionId),
+  constraint pk_flashCard primary key (flashcardId))
 ;
 
 create table question (
@@ -71,18 +71,17 @@ create table user (
   password                  varchar(255),
   email                     varchar(255),
   rating                    integer,
-  groupId                   bigint,
   created                   datetime(6) not null,
   lastLogin                 datetime(6) not null,
   constraint uq_user_email unique (email),
   constraint pk_user primary key (userId))
 ;
 
-create table user_group (
+create table userGroup (
   groupId                   bigint auto_increment not null,
   name                      varchar(255),
   description               varchar(255),
-  constraint pk_user_group primary key (groupId))
+  constraint pk_userGroup primary key (groupId))
 ;
 
 
@@ -91,32 +90,40 @@ create table cardTagJoinTable (
   tagId                          bigint not null,
   constraint pk_cardTagJoinTable primary key (flashcardId, tagId))
 ;
+
+create table userGroupJoinTable (
+  userId                         bigint not null,
+  groupId                        bigint not null,
+  constraint pk_userGroupJoinTable primary key (userId, groupId))
+;
 alter table answer add constraint fk_answer_author_1 foreign key (userId) references user (userId) on delete restrict on update restrict;
 create index ix_answer_author_1 on answer (userId);
-alter table answer add constraint fk_answer_card_2 foreign key (parent_card_id) references flash_card (flashcardId) on delete restrict on update restrict;
+alter table answer add constraint fk_answer_card_2 foreign key (parent_card_id) references flashCard (flashcardId) on delete restrict on update restrict;
 create index ix_answer_card_2 on answer (parent_card_id);
-alter table auth_token add constraint fk_auth_token_user_3 foreign key (userId) references user (userId) on delete restrict on update restrict;
-create index ix_auth_token_user_3 on auth_token (userId);
-alter table flash_card add constraint fk_flash_card_question_4 foreign key (questionId) references question (questionId) on delete restrict on update restrict;
-create index ix_flash_card_question_4 on flash_card (questionId);
-alter table flash_card add constraint fk_flash_card_author_5 foreign key (userId) references user (userId) on delete restrict on update restrict;
-create index ix_flash_card_author_5 on flash_card (userId);
+alter table authToken add constraint fk_authToken_user_3 foreign key (userId) references user (userId) on delete restrict on update restrict;
+create index ix_authToken_user_3 on authToken (userId);
+alter table flashCard add constraint fk_flashCard_question_4 foreign key (questionId) references question (questionId) on delete restrict on update restrict;
+create index ix_flashCard_question_4 on flashCard (questionId);
+alter table flashCard add constraint fk_flashCard_author_5 foreign key (userId) references user (userId) on delete restrict on update restrict;
+create index ix_flashCard_author_5 on flashCard (userId);
 alter table question add constraint fk_question_author_6 foreign key (userId) references user (userId) on delete restrict on update restrict;
 create index ix_question_author_6 on question (userId);
 alter table rating add constraint fk_rating_author_7 foreign key (userId) references user (userId) on delete restrict on update restrict;
 create index ix_rating_author_7 on rating (userId);
-alter table rating add constraint fk_rating_ratedFlashCard_8 foreign key (flashcardId) references flash_card (flashcardId) on delete restrict on update restrict;
+alter table rating add constraint fk_rating_ratedFlashCard_8 foreign key (flashcardId) references flashCard (flashcardId) on delete restrict on update restrict;
 create index ix_rating_ratedFlashCard_8 on rating (flashcardId);
 alter table rating add constraint fk_rating_ratedAnswer_9 foreign key (answerId) references answer (answerId) on delete restrict on update restrict;
 create index ix_rating_ratedAnswer_9 on rating (answerId);
-alter table user add constraint fk_user_group_10 foreign key (groupId) references user_group (groupId) on delete restrict on update restrict;
-create index ix_user_group_10 on user (groupId);
 
 
 
-alter table cardTagJoinTable add constraint fk_cardTagJoinTable_flash_card_01 foreign key (flashcardId) references flash_card (flashcardId) on delete restrict on update restrict;
+alter table cardTagJoinTable add constraint fk_cardTagJoinTable_flashCard_01 foreign key (flashcardId) references flashCard (flashcardId) on delete restrict on update restrict;
 
 alter table cardTagJoinTable add constraint fk_cardTagJoinTable_tag_02 foreign key (tagId) references tag (tagId) on delete restrict on update restrict;
+
+alter table userGroupJoinTable add constraint fk_userGroupJoinTable_user_01 foreign key (userId) references user (userId) on delete restrict on update restrict;
+
+alter table userGroupJoinTable add constraint fk_userGroupJoinTable_userGroup_02 foreign key (groupId) references userGroup (groupId) on delete restrict on update restrict;
 
 # --- !Downs
 
@@ -124,9 +131,9 @@ SET FOREIGN_KEY_CHECKS=0;
 
 drop table answer;
 
-drop table auth_token;
+drop table authToken;
 
-drop table flash_card;
+drop table flashCard;
 
 drop table cardTagJoinTable;
 
@@ -138,7 +145,9 @@ drop table tag;
 
 drop table user;
 
-drop table user_group;
+drop table userGroupJoinTable;
+
+drop table userGroup;
 
 SET FOREIGN_KEY_CHECKS=1;
 

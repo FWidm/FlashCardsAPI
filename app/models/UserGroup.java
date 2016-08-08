@@ -4,7 +4,6 @@ import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import controllers.UserController;
 import play.data.validation.Constraints;
 import util.JsonKeys;
 
@@ -17,6 +16,7 @@ import java.util.List;
  *         on 13/06/16.
  */
 @Entity
+@Table (name = JsonKeys.USER_GROUP_TABLE_NAME)
 @JsonPropertyOrder({ JsonKeys.GROUP_ID}) //ensure that groupID is the first element in json.
 public class UserGroup extends Model {
 
@@ -25,6 +25,7 @@ public class UserGroup extends Model {
 	@Column(name = JsonKeys.GROUP_ID)
 	@JsonProperty(JsonKeys.GROUP_ID)
 	private Long id;
+
 	@Constraints.Required
     @JsonProperty(JsonKeys.GROUP_NAME)
     private String name;
@@ -34,7 +35,7 @@ public class UserGroup extends Model {
     @JsonProperty(JsonKeys.GROUP_DESCRIPTION)
     private String description;
 
-	@OneToMany(mappedBy = "group")
+	@ManyToMany(mappedBy = "userGroups"/*, cascade = CascadeType.ALL*/)
     @JsonIgnore	// to prevent endless recursion.
 	private List<User> users;
 
@@ -45,6 +46,7 @@ public class UserGroup extends Model {
 		this.name = name;
 		this.description = description;
 		this.users = users;
+
 	}
 
 	public UserGroup(UserGroup requestGroup) {
@@ -52,10 +54,10 @@ public class UserGroup extends Model {
 		this.name=requestGroup.getName();
 		this.description=requestGroup.getDescription();
 		this.users=requestGroup.getUsers();
-		for(User u:users){
+/*		for(User u:users){
 //            System.out.println(">> updating user: "+u);
-			u.setGroup(this);
-		}
+			u.setUserGroups(this);
+		}*/
 	}
 
 	public Long getId() {
@@ -92,9 +94,6 @@ public class UserGroup extends Model {
      */
 	public void setUsers(List<User> users) {
 		this.users = users;
-		for(User u: users){
-			u.setGroup(this);
-		}
 	}
 
 	/**
@@ -104,7 +103,7 @@ public class UserGroup extends Model {
 	public void addUser(User user) {
 		if (!users.contains(user)) {
 			users.add(user);
-			user.setGroup(this);
+//			user.setUserGroups(this);
 			this.save();
 		}
 	}
@@ -125,4 +124,18 @@ public class UserGroup extends Model {
             this.update();
         }
     }
+
+
+	@Override
+	public void delete(){
+		//Get all tags and unlink them from this card. Tag still exists to this point.
+		for (User user : users) {
+			user.removeGroup(this);
+			if (getUsers().size() == 0) {
+				// TODO: 08/08/16 do we want to delete if no reference to the user exists?
+			}
+			System.out.println("Removing link to tag=" + user);
+		}
+		super.delete();
+	}
 }

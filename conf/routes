@@ -24,6 +24,7 @@ POST    /upload              controllers.HomeController.imageUpload
 #Users
 GET		/users				controllers.UserController.getUserList
 GET		/users/:id          controllers.UserController.getUser(id:Long)
+GET		/users/:id/groups   controllers.UserController.getUserGroups(id:Long)
 GET		/users/e/:email     controllers.UserController.getUserByEmail(email:String)
 POST	/users				controllers.UserController.addUser
 PUT		/users/:id			controllers.UserController.updateUser(id:Long)

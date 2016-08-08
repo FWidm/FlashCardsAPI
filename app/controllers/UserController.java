@@ -1,5 +1,6 @@
 package controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +54,16 @@ public class UserController extends Controller {
     }
 
 
+    public Result getUserGroups(Long id) {
+        try {
+            List<UserGroup> group = User.find.byId(id).getUserGroups();
+            return ok(JsonUtil.getJson(group));
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, ""));
+    }
+
     /**
      * Either PATCHes single values or PUTs all values into the entity with the specified id.
      *
@@ -62,9 +73,17 @@ public class UserController extends Controller {
     public Result updateUser(Long id) {
         try {
             JsonNode json = request().body().asJson();
+            Map<String, String[]> urlParams = Controller.request().queryString();
+            boolean appendMode = false;
+
+            if (urlParams.containsKey(RequestKeys.APPEND)) {
+                appendMode = Boolean.parseBoolean(urlParams.get(RequestKeys.APPEND)[0]);
+            }
+            System.out.println("Appending mode enabled? " + appendMode);
+
             System.out.println("Update method=" + request().method());
             if (request().method().equals("PUT") && (!json.has(JsonKeys.USER_EMAIL) || !json.has(JsonKeys.RATING)
-                    || !json.has(JsonKeys.USER_NAME) || !json.has(JsonKeys.USER_GROUP) || !json.has(JsonKeys.USER_PASSWORD)))
+                    || !json.has(JsonKeys.USER_NAME) || !json.has(JsonKeys.USER_GROUPS) || !json.has(JsonKeys.USER_PASSWORD)))
                 return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
                         "The Update method needs all details of the user, such as email, " +
                                 "rating, name, group and password! An attribute was missing for id="
@@ -98,18 +117,25 @@ public class UserController extends Controller {
                 u.setRating(json.get(JsonKeys.RATING).asInt());
             if (json.has(JsonKeys.USER_NAME) && minLengthValidator.isValid(json.get(JsonKeys.USER_NAME).asText()))
                 u.setName(json.get(JsonKeys.USER_NAME).asText());
-            if (json.has(JsonKeys.USER_GROUP)) {
-                UserGroup group = null;
-                System.err.println("Json Value=" + json.get(JsonKeys.USER_GROUP) + " is empty?" + json.get(JsonKeys.USER_GROUP).size());
+            if (json.has(JsonKeys.USER_GROUPS)) {
+                if (appendMode) {
+                    System.out.println("Found group");
+                    List<UserGroup> mergedGroups = new ArrayList<UserGroup>();
 
-                if (json.get(JsonKeys.USER_GROUP).size() > 0 && json.get(JsonKeys.USER_GROUP).has(JsonKeys.GROUP_ID)) {
-                    Long groupId = json.get(JsonKeys.USER_GROUP).get(JsonKeys.GROUP_ID).asLong();
-                    group = UserGroup.find.byId(groupId);
-                    System.out.println("setting group to gid=" + groupId + ", group=" + group);
+                    //add all old valid information
+                    mergedGroups.addAll(u.getUserGroups());
+                    //retrieve new, check if not in list already
+                    for (UserGroup ug :
+                            JsonUtil.retrieveGroups(json)) {
+                        if (!mergedGroups.contains(ug)) {
+                            mergedGroups.add(ug);
+                        }
+                    }
+                    System.out.println("New groups: " + mergedGroups);
+                    u.setUserGroups(mergedGroups);
+                } else {
+                    u.setUserGroups(JsonUtil.retrieveGroups(json));
                 }
-
-                u.setGroup(group);
-
             }
             if (json.has(JsonKeys.USER_AVATAR)) {
                 System.out.println(json.get(JsonKeys.USER_AVATAR));
@@ -118,6 +144,7 @@ public class UserController extends Controller {
             u.update();
             return ok(JsonUtil.prepareJsonStatus(OK, "User has been changed.", id));
         } catch (IllegalArgumentException e) {
+            e.printStackTrace();
             return badRequest(JsonUtil
                     .prepareJsonStatus(
                             BAD_REQUEST,
@@ -188,7 +215,7 @@ public class UserController extends Controller {
             JsonNode json = request().body().asJson();
             ObjectMapper mapper = new ObjectMapper();
 
-            if (json.has(JsonKeys.USER_GROUP)) {
+            if (json.has(JsonKeys.USER_GROUPS)) {
                 return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN,
                         "The user could not be created, a user group has to be set via PATCH or PUT. It may not be content of POST."));
             }

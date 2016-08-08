@@ -28,7 +28,7 @@ public class Tag extends Model {
     @Column(unique = true, name=JsonKeys.TAG_NAME) @Constraints.MinLength(3) @Constraints.MaxLength(16)
     @JsonProperty(JsonKeys.TAG_NAME)
     private String name;
-    //this cascade from the "tag" to "join_cards_tag" - e.g. tag.delete -> delete evey entry with tag.id
+    //this cascades from the "tag" to "join_cards_tag" - e.g. tag.delete -> delete evey entry with tag.id
     @ManyToMany(mappedBy = "tags"/*, cascade = CascadeType.ALL*/)
     @JsonProperty(JsonKeys.TAG_CARDS)
     @JsonIgnore

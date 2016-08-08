@@ -4,32 +4,41 @@
 | Resource | GET | PUT | POST | PATCH | DELETE|
 | -------- | --- | --- | ---- | ----- | ----- |
 | `/users` | Retrieve a list of users. Can be filtered via url params `?name=x` or `?email=y`.| - | Creates a new User. | - | - |
-| `/users/x` | Retrieve the details of the specified user. can filter by email with `?email=x@y.com` | Update the complete ressource with this id. | - | Partial update of the resource. | Deletes the specified resource. |
-
+| `/users/x` | Retrieve the details of the specified user. can filter by email with `?email=x@y.com` | Update the complete resource with this id. | - | Partial update of the resource. | Deletes the specified resource. |
+| `/users/x/groups` | Retrieve all groups for a specific user. | | | | | |
+### UserGroups
+| Resource | GET | PUT | POST | PATCH | DELETE|
+| -------- | --- | --- | ---- | ----- | ----- |
+| `/groups`| A list of all groups, can be filtered with `?empty=y` where y={true,false}. | |Create a new resource with a name, description and a list of user ids. | | |
+| ´/groups´| Retrieve one group |  Update a resource completely with name, description, users. | | Update a resource partially with name, description, users. | Delete a group. |
 ### Flashcards
 | Resource | GET | PUT | POST | PATCH | DELETE|
 | -------- | --- | --- | ---- | ----- | ----- |
-| `/cards` | Retrieve a list of all cards that are available. | - | Create a new Flashcard. The Body can contain either Quetion/Answer ids or the completely ressource that in turn will be displayed. | - | - |
-| `/cards/x` | Retrieves a specific card by it's id. | Updates one specific card completely, answers ans question can be passed via id or as a new resource. Can be switched to append the list instead of replacing it via `?append=true`. | - | Updates one specific card partially, answers ans question can be passed via id or as a new resource. Can be switched to append the list instead of replacing it via `?append=true`. | - |
+| `/cards` | Retrieve a list of all cards that are available. | - | Create a new Flashcard. The Body can contain either Question/Answer ids or the completely resource that in turn will be displayed. | - | - |
+| `/cards/x` | Retrieves a specific card by it's id. | Updates one specific card completely, answers and question can be passed via id or as a new resource. Can be switched to append the list instead of replacing it via `?append=true`. | - | Updates one specific card partially, answers ans question can be passed via id or as a new resource. Can be switched to append the list instead of replacing it via `?append=true`. | - |
+| `/cards/x/question` | Retrieves a specific cards question by id. | | | | |
+| `/cards/x/answers` | Retrieves a specific cards answers by id, `size=y` can be used as optional parameter to get a number of answers to display. | | | | | |
 ### Ratings
 | Resource | GET | PUT | POST | PATCH | DELETE|
 | -------- | --- | --- | ---- | ----- | ----- |
 | `/ratings` | Retrieves a list of ratings can be filtered via `?cardId=x`, `?answerId=x`, `?userId=x`, `?cardRating`, `?answerRating`. | - | Creates a new Rating object. Automatically update the rating of the associated ansers/cards and users. | - | - |
-| `/ratings/x` | Retrieves one specific rating by it's id. | - | - | - | - |
+| `/ratings/x` | Retrieves one specific rating by  id. | - | - | - | - |
 
 
 for more working routing look at the [routes](conf/routes).
-## German Turoial/Insights
-If you're interested in reading about the things we use, there is a dev log file that describes problems and other topics we came across in german: [here]((https://github.com/FWidm/FlashCardsAPI/blob/master/_Docs/PlayDokuFabian.md)).
+
+## German Tutorial/Insights
+If you're interested in reading about the things we use, there is a dev log file that describes problems and other topics we came across in German: [here]((https://github.com/FWidm/FlashCardsAPI/blob/master/_Docs/PlayDokuFabian.md)).
 
 ## TODO
 - [ ] Decide where appending is useful in the future
 - [x] Add append via url paramter to card PUT/PATCH methods
 - [x] Session Management/Authentication/Token based system
 - [x] Write Ratingsystem
-- [ ] Rewrite Group System
+- [x] Rewrite Group System
 - [ ] Implement CardDeck and Categories
 - [ ] Write proper Unit-Tests in Postman
+    - [x] started this process with the `/users` category
 
 ## Example Calls
 ### Users

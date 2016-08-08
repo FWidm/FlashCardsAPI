@@ -7,6 +7,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.typesafe.config.ConfigException;
 import models.User;
 import models.UserGroup;
 import play.mvc.*;
@@ -118,7 +119,7 @@ public class UserGroupController extends Controller {
 					// update the usergroup.
 					if (n.has(JsonKeys.USER_ID)) {
 						User u = User.find.byId(n.get(JsonKeys.USER_ID).asLong());
-						u.setGroup(toUpdate);
+						//u.setUserGroups(toUpdate);
 						u.update();
 					} else {
 						information += "No ID found in the json node=" + n
@@ -129,15 +130,14 @@ public class UserGroupController extends Controller {
 			}
 
 			toUpdate.update();
-			return ok(JsonUtil.prepareJsonStatus(200, "Group with id=" + id
-					+ " has been successfully changed. " + information));
+			return ok(JsonUtil.prepareJsonStatus(200, "Group has been successfully changed. " + information,id));
 		} catch (IllegalArgumentException e) {
 			return badRequest(JsonUtil
 					.prepareJsonStatus(
 							BAD_REQUEST, "Body did contain elements that are not allowed/expected. A group can contain: " + JsonKeys.GROUP_JSON_ELEMENTS));
 		}
 		catch (NullPointerException e){
-			return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,"Error, no group with id="+id+" exists."));
+			return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,"Error, group does not exist",id));
 		}
 	}
 
@@ -155,35 +155,40 @@ public class UserGroupController extends Controller {
 			UserGroup requestGroup = mapper.convertValue(json, UserGroup.class);
 			//we do not want the app to send complete users, thus the mapper cant create the list from itself.
 			List<User> userList = null;
+            UserGroup group = new UserGroup(requestGroup);
 			if (json.has(JsonKeys.GROUP_USERS)) {
 				//create a new list of users
 				userList = new ArrayList<User>();
 				//get the specific nods in the json
 				JsonNode users = json.findValue(JsonKeys.GROUP_USERS);
-				System.out.println("Users=" + users);
+				if(users!=null){
+				    System.out.println("Users=" + users);
+
 				// Loop through all objects in the values associated with the
 				// JsonKeys.GROUP_USERS key.
 				for (JsonNode n : users) {
-					// when a user id is found we will get the object and add them to the userList.
-					Long l=n.get(JsonKeys.USER_ID).asLong();
-					System.out.println("User id="+l+" found for node="+n);
 					if (n.has(JsonKeys.USER_ID)) {
-						User u = User.find.byId(l);
-						userList.add(u);
+						User u = User.find.byId(n.get(JsonKeys.USER_ID).asLong());
+						if(u!=null)
+						    userList.add(u);
+                        else
+                            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "One user could not be found.",n.get(JsonKeys.USER_ID).asLong()));
 					}
+                    else
+                        return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "One user that was specified did not contain an id."));
 				}
 				//set the list for the group created from the content of the json body
 				System.out.println("Adding users to the group: "+userList);
-			}
+                    group.setUsers(userList);
 
-			UserGroup group = new UserGroup(requestGroup);
+                }
+			}
 			group.save();
-			group.setUsers(userList);
 			System.out.println(group);
 
-			return ok(JsonUtil.prepareJsonStatus(OK, "Usergroup with the id="
-					+ group.getId() + " has been created!"));
+			return ok(JsonUtil.prepareJsonStatus(OK, "Usergroup has been created!",group.getId()));
 		} catch (IllegalArgumentException e) {
+		    e.printStackTrace();
 			return badRequest(JsonUtil
 					.prepareJsonStatus(
 							BAD_REQUEST, "Body did contain elements that are not allowed/expected. A group can contain: " + JsonKeys.GROUP_JSON_ELEMENTS));
@@ -196,17 +201,15 @@ public class UserGroupController extends Controller {
 	 * @return
 	 */
 	public Result deleteUserGroup(long id){
-		UserGroup group = UserGroup.find.byId(id);
-		String information="";
-		//check if any conflicts may exist if the group is deleted and reset the user's association with the group before deleting.
-		for(User u : group.getUsers()){
-			System.out.println("Detaching user u="+u+" from the group!");
-			u.setGroup(null);
-			u.update();
-			information+=" userID="+u.getId()+"; ";
-		}
-		group.delete();
-		return ok(JsonUtil.prepareJsonStatus(OK, "The group with the id=" + id
-				+ " has been deleted. Additionally members with the following ids are now without groups: "+information));
+	    try {
+            UserGroup group = UserGroup.find.byId(id);
+            group.update();
+            group.delete();
+            return ok(JsonUtil.prepareJsonStatus(OK, "The group has been deleted."));
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,"Group with the id could not be found",id));
+        }
 	}
 }

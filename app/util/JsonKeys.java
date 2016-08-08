@@ -17,9 +17,17 @@ public class JsonKeys {
     public static final String AUTHOR = "author";
     public static final String URI = "mediaURI";
     public static final String TOKEN = "token";
-    public static final String STATUS_CODE = "statuscode";
+    public static final String STATUS_CODE = "statusCode";
     public static final String DESCRIPTION = "description";
+
+    //table names, for camelcase Classes
+    public static final String USER_GROUP_TABLE_NAME="userGroup";
+    public static final String FLASH_CARD_TABLE_NAME="flashCard";
+    public static final String AUTH_TOKEN_TABLE_NAME="authToken";
+
+    //Jointable names
     public static final String CARD_TAG_JOIN_TABLE="cardTagJoinTable";
+    public static final String USER_GROUP_JOIN_TABLE="userGroupJoinTable";
 
 
     //Flashcard
@@ -37,8 +45,8 @@ public class JsonKeys {
     public static final String USER_NAME = "name";
     public static final String USER_PASSWORD = "password";
     public static final String USER_EMAIL = "email";
-    public static final String USER_GROUP = "group";
-    public static final String USER_JSON_ELEMENTS = USER_NAME + ", " + USER_EMAIL + ", " + USER_PASSWORD + ", " + USER_GROUP;
+    public static final String USER_GROUPS = "groups";
+    public static final String USER_JSON_ELEMENTS = USER_NAME + ", " + USER_EMAIL + ", " + USER_PASSWORD + ", " + USER_GROUPS;
     //Tag
     public static final String TAG_ID = "tagId";
     public static final String TAG_NAME = "tagName";

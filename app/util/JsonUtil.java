@@ -6,10 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import models.Answer;
-import models.FlashCard;
-import models.Tag;
-import models.User;
+import models.*;
 import models.rating.AnswerRating;
 import models.rating.CardRating;
 import play.libs.Json;
@@ -207,6 +204,35 @@ public class JsonUtil {
     }
 
     /**
+     * Parses the given json to gain access to the given Usergroups.
+     * @param json
+     * @return
+     */
+    public static List<UserGroup> retrieveGroups(JsonNode json) {
+        List<UserGroup> userGroups = new ArrayList<>();
+
+        //get the specific nods in the json
+        JsonNode answersNode = json.findValue(JsonKeys.USER_GROUPS);
+        // Loop through all objects in the values associated with the
+        // "users" key.
+        for (JsonNode node : answersNode) {
+            // when a user id is found we will get the object and add them to the userList.
+            System.out.println("Node=" + node);
+            if (node.has(JsonKeys.GROUP_ID)) {
+                UserGroup found = UserGroup.find.byId(node.get(JsonKeys.GROUP_ID).asLong());
+                System.out.println(">> answer: " + found);
+                userGroups.add(found);
+            } else {
+                UserGroup tmpG = JsonUtil.parseGroup(node);
+                System.out.println(">> group: " + tmpG);
+                userGroups.add(tmpG);
+                tmpG.save();
+            }
+        }
+        return userGroups;
+    }
+
+    /**
      * Parses a answerrating object from the given jsonnode.
      * @param json
      * @return answerrating
@@ -264,5 +290,25 @@ public class JsonUtil {
         System.out.println("Rating object="+rating);
 
         return rating;
+    }
+
+
+    /**
+     * Create a new UserGroup with the given name and description.
+     * @param json
+     * @return
+     */
+    private static UserGroup parseGroup(JsonNode json) {
+        System.out.println("json="+json);
+        String name=null, description=null;
+
+        if(json.has(JsonKeys.GROUP_NAME)){
+            name=json.get(JsonKeys.GROUP_NAME).asText();
+        }
+        if(json.has(JsonKeys.GROUP_DESCRIPTION)){
+            description=json.get(JsonKeys.GROUP_DESCRIPTION).asText();
+        }
+        UserGroup group = new UserGroup(name,description,null);
+        return group;
     }
 }
