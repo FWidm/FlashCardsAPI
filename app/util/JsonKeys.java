@@ -37,6 +37,7 @@ public class JsonKeys {
     public static final String FLASHCARD_ANSWERS = "answers";
     public static final String FLASHCARD_TAGS = "tags";
     public static final String FLASHCARD_MULTIPLE_CHOICE = "multipleChoice";
+    public static final String FLASHCARD_PARENT_ID="parentId";
     public static final String FLASHCARD_JSON_ELEMENTS = RATING + ", " + FLASHCARD_ANSWERS + ", " + FLASHCARD_QUESTION + ", " + AUTHOR + ", " + FLASHCARD_MULTIPLE_CHOICE + ", " + FLASHCARD_TAGS;
 
     //User

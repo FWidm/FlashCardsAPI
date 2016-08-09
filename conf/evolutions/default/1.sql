@@ -9,7 +9,7 @@ create table answer (
   answerHint                varchar(255),
   mediaURI                  varchar(255),
   userId                    bigint,
-  parent_card_id            bigint,
+  parentId                  bigint,
   rating                    integer,
   answerCorrect             tinyint(1) default 0,
   created                   datetime(6) not null,
@@ -98,8 +98,8 @@ create table userGroupJoinTable (
 ;
 alter table answer add constraint fk_answer_author_1 foreign key (userId) references user (userId) on delete restrict on update restrict;
 create index ix_answer_author_1 on answer (userId);
-alter table answer add constraint fk_answer_card_2 foreign key (parent_card_id) references flashCard (flashcardId) on delete restrict on update restrict;
-create index ix_answer_card_2 on answer (parent_card_id);
+alter table answer add constraint fk_answer_card_2 foreign key (parentId) references flashCard (flashcardId) on delete restrict on update restrict;
+create index ix_answer_card_2 on answer (parentId);
 alter table authToken add constraint fk_authToken_user_3 foreign key (userId) references user (userId) on delete restrict on update restrict;
 create index ix_authToken_user_3 on authToken (userId);
 alter table flashCard add constraint fk_flashCard_question_4 foreign key (questionId) references question (questionId) on delete restrict on update restrict;

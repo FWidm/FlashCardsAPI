@@ -64,13 +64,13 @@ public class HomeController extends Controller {
     public Result testRating() {
         User u = new User("Test", "test" + Math.random() + "@example.com", "habla", 0);
         u.save();
-        Answer a = new Answer("hello", "world", User.find.byId(1l));
+        Answer a = new Answer("hello", "world", User.find.byId(u.getId()));
         a.save();
-        FlashCard f = new FlashCard(User.find.byId(1l), false, null);
+        FlashCard f = new FlashCard(User.find.byId(u.getId()), false, null);
         f.save();
         AnswerRating r = new AnswerRating(u, a, -1);
         CardRating r2 = new CardRating(u, f, -1);
-
+        // TODO: 09/08/16 nullpointerexception while saving
         if (!AnswerRating.exists(u, a)) {
             r.save();
         } else
