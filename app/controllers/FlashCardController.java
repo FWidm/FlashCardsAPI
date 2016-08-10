@@ -94,15 +94,24 @@ public class FlashCardController {
             //We expect just id's to set answers/questions/authors - we then check the db for the id's and retrieve all values
             // we nee ourselves.
             if (json.has(JsonKeys.FLASHCARD_ANSWERS)) {
+                // TODO: 10.08.2016 rewrite this part, it is ugly 
+                JsonNode answersNode = json.findValue(JsonKeys.FLASHCARD_ANSWERS);
+                System.out.println("answersNode="+answersNode);
+                for (JsonNode node : answersNode) {
+                    if (node.has(JsonKeys.ANSWER_ID)) {
+                        return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "An answerId is not accepted while creating new cards, please provide a complete answer object with the following components: " + JsonKeys.ANSWER_JSON_ELEMENTS));
+                    }
+                }
                 requestObject.setAnswers(JsonUtil.retrieveAnswers(json));
             }
 
             if (json.has(JsonKeys.FLASHCARD_QUESTION)) {
+
                 if (json.get(JsonKeys.FLASHCARD_QUESTION).has(JsonKeys.QUESTION_ID)) {
-                    Question question = Question.find.byId(json.findValue(JsonKeys.FLASHCARD_QUESTION).findValue(JsonKeys.QUESTION_ID).asLong());
-                    requestObject.setQuestion(question);
+                    return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,"A questionId is not accepted while creating new cards, please provide a complete question object with the following components: "+JsonKeys.QUESTION_JSON_ELEMENTS));
                 } else {
                     try {
+                        System.out.println("HELLO!");
                         Question q = Question.parseQuestion(json.get(JsonKeys.FLASHCARD_QUESTION));
                         q.save();
                         requestObject.setQuestion(q);
@@ -118,6 +127,7 @@ public class FlashCardController {
             }
 
             if (json.has(JsonKeys.FLASHCARD_TAGS)) {
+
                 List<Tag> tags=JsonUtil.retrieveTags(json);
                 if(tags.contains(null)){
                     System.out.println(">> null!");
