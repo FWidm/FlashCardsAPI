@@ -98,8 +98,9 @@ public class CardDeck extends Model {
     @Override
     public void delete() {
         for (FlashCard card : cards) {
-            card.setDeck(null);
-            card.update();
+/*            card.setDeck(null);
+            card.update();*/
+            card.delete();
         }
         super.delete();
     }

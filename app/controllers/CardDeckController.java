@@ -50,6 +50,11 @@ public class CardDeckController extends Controller {
         }
     }
 
+    public Result deleteCardDeck(long id){
+        CardDeck.find.byId(id).delete();
+        return noContent();
+    }
+
     @BodyParser.Of(BodyParser.Json.class)
     public Result addCardDeck() {
         JsonNode json = request().body().asJson();
