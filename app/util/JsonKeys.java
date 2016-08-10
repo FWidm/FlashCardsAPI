@@ -24,6 +24,8 @@ public class JsonKeys {
     public static final String USER_GROUP_TABLE_NAME="userGroup";
     public static final String FLASH_CARD_TABLE_NAME="flashCard";
     public static final String AUTH_TOKEN_TABLE_NAME="authToken";
+    public static final String CARDDECK_TABLE_NAME="cardDeck";
+
 
     //Jointable names
     public static final String CARD_TAG_JOIN_TABLE="cardTagJoinTable";
@@ -37,7 +39,7 @@ public class JsonKeys {
     public static final String FLASHCARD_ANSWERS = "answers";
     public static final String FLASHCARD_TAGS = "tags";
     public static final String FLASHCARD_MULTIPLE_CHOICE = "multipleChoice";
-    public static final String FLASHCARD_PARENT_ID="parentId";
+    public static final String FLASHCARD_PARENT_ID="cardDeckId";
     public static final String FLASHCARD_JSON_ELEMENTS = RATING + ", " + FLASHCARD_ANSWERS + ", " + FLASHCARD_QUESTION + ", " + AUTHOR + ", " + FLASHCARD_MULTIPLE_CHOICE + ", " + FLASHCARD_TAGS;
 
     //User
@@ -65,7 +67,7 @@ public class JsonKeys {
     public static final String ANSWER_ID = "answerId";
     public static final String ANSWER_TEXT = "answerText";
     public static final String ANSWER_HINT = "answerHint";
-    public static final String ANSWER_RATERS = "answerRaters";
+    public static final String ANSWER_CARD_ID = "cardId";
     public static final String ANSWER_CORRECT = "answerCorrect";
     public static final String ANSWER_JSON_ELEMENTS = ANSWER_TEXT + ", " + ANSWER_HINT + ", " + URI + ", " + AUTHOR+", "+ANSWER_CORRECT;
 
@@ -84,5 +86,11 @@ public class JsonKeys {
     public static final String RATING_TYPE="ratingType";
     public static final String RATING_JSON_ELEMENTS = AUTHOR+" (userID), "+FLASHCARD+" (flashcardID) OR "+ANSWER+" (answerId), "+RATING_MODIFIER;
 
+    //CardDeck
+    public static final String CARDDECK_ID = "cardDeckId";
+    public static final String CARDDECK_NAME = "cardDeckName";
+    public static final String CARDDECK_DESCRIPTION ="cardDeckDescpription";
+    public static final String CARDDECK_CARDS="cards";
+    public static final String CARDDECK_JSON_ELEMENTS = CARDDECK_NAME+", "+CARDDECK_DESCRIPTION+", "+CARDDECK_CARDS+" (child: list containing flashcardIDs)";
 
 }

@@ -15,6 +15,7 @@ GET     /testCards          controllers.HomeController.testCards
 GET     /testGroups         controllers.HomeController.testGroups
 GET     /testTokens         controllers.HomeController.testTokens
 GET     /testRating         controllers.HomeController.testRating
+GET     /testCardDeck         controllers.HomeController.testCardDeck
 
 GET     /test               controllers.HomeController.test
 POST    /auth               controllers.HomeController.auth
@@ -58,3 +59,7 @@ GET     /ratings/:id        controllers.RatingController.getRating(id:Long)
 POST    /ratings            controllers.RatingController.addRating
 DELETE  /ratings/:id        controllers.RatingController.deleteRating(id:Long)
 
+#CardDecks
+GET     /cardDecks          controllers.CardDeckController.getCardDecks
+GET     /cardDecks/:id      controllers.CardDeckController.getCardDeck(id:Long)
+POST    /cardDecks          controllers.CardDeckController.addCardDeck

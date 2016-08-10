@@ -15,6 +15,7 @@ import util.JsonKeys;
 import util.JsonUtil;
 import views.html.*;
 
+import javax.xml.transform.sax.SAXSource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -70,7 +71,7 @@ public class HomeController extends Controller {
         f.save();
         AnswerRating r = new AnswerRating(u, a, -1);
         CardRating r2 = new CardRating(u, f, -1);
-        // TODO: 09/08/16 nullpointerexception while saving
+
         if (!AnswerRating.exists(u, a)) {
             r.save();
         } else
@@ -232,7 +233,37 @@ public class HomeController extends Controller {
         }
         return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN, "Login failed, check email and password for errors."));
     }
+    public Result testCardDeck() {
+        User tmp = User.find.where().eq("email", "hello1@world.com").findUnique();
+        if (tmp == null) {
+            tmp = new User("hello", "hello1@world.com", "passwörd", 1);
+            tmp.save();
+        }
+        CardDeck deck = new CardDeck("Deck 1", "This is a test");
+        deck.save();
+        List<FlashCard> flashCardList = new ArrayList<>();
+        for(int i=0; i<60; i++){
+            List<String> tags = new ArrayList<>();
+            tags.add("Tag-"+i);
 
+            FlashCard fc = new FlashCard(tmp, false, tags);
+            fc.save();
+            Question q = new Question("Question-"+i, tmp);
+            q.save();
+            fc.setQuestion(q);
+            for(int j=0; j<20; j++){
+                Answer a = new Answer("Answer-"+i+"|"+j, "none", tmp);
+                a.save();
+                fc.addAnswer(a);
+            }
+
+            fc.setDeck(deck);
+            fc.update();
+            flashCardList.add(fc);
+        }
+
+        return ok(JsonUtil.getJson(CardDeck.find.byId(deck.getId())));
+    }
     @Security.Authenticated(ActionAuthenticator.class)
     public Result auth() {
         return ok(request().username());

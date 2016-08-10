@@ -47,7 +47,7 @@ public class Answer extends Model {
     private User author;
 
     @ManyToOne
-    @JoinColumn(name=JsonKeys.FLASHCARD_PARENT_ID)
+    @JoinColumn(name=JsonKeys.ANSWER_CARD_ID)
     @JsonIgnore
     private FlashCard card;
 

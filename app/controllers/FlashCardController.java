@@ -90,7 +90,7 @@ public class FlashCardController {
             JsonNode json = request().body().asJson();
             ObjectMapper mapper = new ObjectMapper();
             FlashCard requestObject = mapper.convertValue(json, FlashCard.class);
-
+            String information="";
             //We expect just id's to set answers/questions/authors - we then check the db for the id's and retrieve all values
             // we nee ourselves.
             if (json.has(JsonKeys.FLASHCARD_ANSWERS)) {
@@ -118,7 +118,14 @@ public class FlashCardController {
             }
 
             if (json.has(JsonKeys.FLASHCARD_TAGS)) {
-                requestObject.setTags(JsonUtil.retrieveTags(json));
+                List<Tag> tags=JsonUtil.retrieveTags(json);
+                if(tags.contains(null)){
+                    System.out.println(">> null!");
+                    information+=" One or more tag ids where invalid!";
+                    tags.remove(null);
+                }
+                requestObject.setTags(tags);
+
             }
 
             if (json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)) {
@@ -128,7 +135,7 @@ public class FlashCardController {
             System.out.println("Tags="+card.getTags().size());
             card.save();
 
-            return ok(JsonUtil.prepareJsonStatus(OK, "FlashCard with id=" + card.getId() + " has been created!",card.getId()));
+            return ok(JsonUtil.prepareJsonStatus(OK, "FlashCard with id=" + card.getId() + " has been created!"+information,card.getId()));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             return badRequest(JsonUtil

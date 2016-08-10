@@ -60,20 +60,21 @@ public class JsonUtil {
         ObjectNode result = Json.newObject();
         result.put("statuscode", statuscode);
         result.put("description", description);
-        result.put("id",id);
+        result.put("id", id);
         return result;
     }
 
     /**
      * Wraps the Map given as parameter in json.
+     *
      * @param data - in the form of <key, obj>
      * @return json representation of the given data
      */
-    public static ObjectNode convertToJsonNode(Map<String, Object> data){
-        ObjectNode result=Json.newObject();
+    public static ObjectNode convertToJsonNode(Map<String, Object> data) {
+        ObjectNode result = Json.newObject();
 
-        for (String key: data.keySet()) {
-            result.set(key,getJson(data.get(key)));
+        for (String key : data.keySet()) {
+            result.set(key, getJson(data.get(key)));
         }
         return result;
     }
@@ -95,21 +96,27 @@ public class JsonUtil {
             System.out.println("Node=" + node);
             if (node.has(JsonKeys.TAG_ID)) {
                 Tag found = Tag.find.byId(node.get(JsonKeys.TAG_ID).asLong());
-                System.out.println(">> tag: " + found);
-                tags.add(found);
+                // TODO: 10.08.2016 notify user about wrong tag/tag not existing?
+                if (found != null) {
+                    System.out.println(">> tag: " + found);
+                    tags.add(found);
+                }
+                else tags.add(null);
+
+
+
             } else {
                 try {
                     Tag tmpT = parseTag(node);
-                    Tag lookupTag=Tag.find.where().eq(JsonKeys.TAG_NAME,tmpT.getName()).findUnique();
+                    Tag lookupTag = Tag.find.where().eq(JsonKeys.TAG_NAME, tmpT.getName()).findUnique();
                     //check if the tag is unique
-                    if(lookupTag==null){
+                    if (lookupTag == null) {
                         tmpT.save();
                         System.out.println(">> tag: " + tmpT);
                         //save our new tag so that no foreign constraint fails
                         //((`flashcards`.`card_tag`, CONSTRAINT `fk_card_tag_tag_02` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tagId`))]]
                         tags.add(tmpT);
-                    }
-                    else{
+                    } else {
                         tags.add(lookupTag);
                     }
 
@@ -123,18 +130,19 @@ public class JsonUtil {
 
     /**
      * Parses a question from the given JsonNode node.
+     *
      * @param node the json node to parse
      * @return a question object containing the information
      * @throws URISyntaxException
      */
     public static Tag parseTag(JsonNode node) throws URISyntaxException {
-        User author=null;
-        String tagText=null;
+        User author = null;
+        String tagText = null;
 
-        if(node.has(JsonKeys.TAG_NAME)){
-            tagText=node.get(JsonKeys.TAG_NAME).asText();
+        if (node.has(JsonKeys.TAG_NAME)) {
+            tagText = node.get(JsonKeys.TAG_NAME).asText();
         }
-        Tag tag=new Tag(tagText);
+        Tag tag = new Tag(tagText);
 
         return tag;
     }
@@ -156,9 +164,11 @@ public class JsonUtil {
             // when a user id is found we will get the object and add them to the userList.
             System.out.println("Node=" + node);
             if (node.has(JsonKeys.ANSWER_ID)) {
-                Answer found = Answer.find.byId(node.get(JsonKeys.ANSWER_ID).asLong());
+                //do nothing, as an answer can only be attached to one card.
+/*                Answer found = Answer.find.byId(node.get(JsonKeys.ANSWER_ID).asLong());
                 System.out.println(">> answer: " + found);
-                answers.add(found);
+
+                answers.add(found);*/
             } else {
                 try {
                     Answer tmpA = JsonUtil.parseAnswer(node);
@@ -174,30 +184,31 @@ public class JsonUtil {
 
     /**
      * Parses an answer from the given JsonNode node.
+     *
      * @param node the json node to parse
      * @return answer
      * @throws URISyntaxException
      */
     public static Answer parseAnswer(JsonNode node) throws URISyntaxException {
-        User author=null;
-        String answerText=null;
-        String hintText=null;
-        if(node.has(JsonKeys.ANSWER_HINT)){
-            hintText=node.get(JsonKeys.ANSWER_HINT).asText();
+        User author = null;
+        String answerText = null;
+        String hintText = null;
+        if (node.has(JsonKeys.ANSWER_HINT)) {
+            hintText = node.get(JsonKeys.ANSWER_HINT).asText();
         }
-        if(node.has(JsonKeys.AUTHOR)){
-            if(node.get(JsonKeys.AUTHOR).has(JsonKeys.USER_ID)){
-                long uid=node.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong();
-                author=User.find.byId(uid);
-                System.out.println("Search for user with id="+uid+" details="+author);
+        if (node.has(JsonKeys.AUTHOR)) {
+            if (node.get(JsonKeys.AUTHOR).has(JsonKeys.USER_ID)) {
+                long uid = node.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong();
+                author = User.find.byId(uid);
+//                System.out.println("Search for user with id=" + uid + " details=" + author);
             }
         }
-        if(node.has(JsonKeys.ANSWER_TEXT)){
-            answerText=node.get(JsonKeys.ANSWER_TEXT).asText();
+        if (node.has(JsonKeys.ANSWER_TEXT)) {
+            answerText = node.get(JsonKeys.ANSWER_TEXT).asText();
         }
-        Answer answer=new Answer(answerText,hintText,author);
+        Answer answer = new Answer(answerText, hintText, author);
 
-        if(node.has(JsonKeys.URI)){
+        if (node.has(JsonKeys.URI)) {
             answer.setUri(new URI(node.get(JsonKeys.URI).asText()));
         }
         return answer;
@@ -205,6 +216,7 @@ public class JsonUtil {
 
     /**
      * Parses the given json to gain access to the given Usergroups.
+     *
      * @param json
      * @return
      */
@@ -217,14 +229,14 @@ public class JsonUtil {
         // "users" key.
         for (JsonNode node : answersNode) {
             // when a user id is found we will get the object and add them to the userList.
-            System.out.println("Node=" + node);
+//            System.out.println("Node=" + node);
             if (node.has(JsonKeys.GROUP_ID)) {
                 UserGroup found = UserGroup.find.byId(node.get(JsonKeys.GROUP_ID).asLong());
-                System.out.println(">> answer: " + found);
+//                System.out.println(">> group: " + found);
                 userGroups.add(found);
             } else {
                 UserGroup tmpG = JsonUtil.parseGroup(node);
-                System.out.println(">> group: " + tmpG);
+//                System.out.println(">> group: " + tmpG);
                 userGroups.add(tmpG);
                 tmpG.save();
             }
@@ -234,60 +246,62 @@ public class JsonUtil {
 
     /**
      * Parses a answerrating object from the given jsonnode.
+     *
      * @param json
      * @return answerrating
      */
     public static AnswerRating parseAnswerRating(JsonNode json) {
-        User author=null;
-        Answer answer=null;
-        int modifier=0;
+        User author = null;
+        Answer answer = null;
+        int modifier = 0;
 
-        if(json.has(JsonKeys.AUTHOR)){
-            author=User.find.byId(json.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong());
-            System.out.println("Rating user="+author);
-
-        }
-        if(json.has(JsonKeys.ANSWER)){
-            answer=Answer.find.byId(json.get(JsonKeys.ANSWER).get(JsonKeys.ANSWER_ID).asLong());
-            System.out.println("Rating answer="+answer);
+        if (json.has(JsonKeys.AUTHOR)) {
+            author = User.find.byId(json.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong());
+//            System.out.println("Rating user=" + author);
 
         }
-        if(json.has(JsonKeys.RATING_MODIFIER)){
-            modifier=json.get(JsonKeys.RATING_MODIFIER).asInt();
+        if (json.has(JsonKeys.ANSWER)) {
+            answer = Answer.find.byId(json.get(JsonKeys.ANSWER).get(JsonKeys.ANSWER_ID).asLong());
+//            System.out.println("Rating answer=" + answer);
+
+        }
+        if (json.has(JsonKeys.RATING_MODIFIER)) {
+            modifier = json.get(JsonKeys.RATING_MODIFIER).asInt();
         }
 
-        AnswerRating rating=new AnswerRating(author,answer,modifier);
-        System.out.println("Rating object="+rating);
+        AnswerRating rating = new AnswerRating(author, answer, modifier);
+//        System.out.println("Rating object=" + rating);
 
         return rating;
     }
 
     /**
      * Parses a cardrating object from the given jsonnode.
+     *
      * @param json
      * @return cardrating
      */
     public static CardRating parseCardRating(JsonNode json) {
-        User author=null;
-        FlashCard flashCard=null;
-        int modifier=0;
+        User author = null;
+        FlashCard flashCard = null;
+        int modifier = 0;
 
-        if(json.has(JsonKeys.AUTHOR)){
-            author=User.find.byId(json.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong());
-            System.out.println("Rating user="+author);
-
-        }
-        if(json.has(JsonKeys.FLASHCARD)){
-            flashCard=FlashCard.find.byId(json.get(JsonKeys.FLASHCARD).get(JsonKeys.FLASHCARD_ID).asLong());
-            System.out.println("Rating answer="+flashCard);
+        if (json.has(JsonKeys.AUTHOR)) {
+            author = User.find.byId(json.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong());
+//            System.out.println("Rating user=" + author);
 
         }
-        if(json.has(JsonKeys.RATING_MODIFIER)){
-            modifier=json.get(JsonKeys.RATING_MODIFIER).asInt();
+        if (json.has(JsonKeys.FLASHCARD)) {
+            flashCard = FlashCard.find.byId(json.get(JsonKeys.FLASHCARD).get(JsonKeys.FLASHCARD_ID).asLong());
+//            System.out.println("Rating answer=" + flashCard);
+
+        }
+        if (json.has(JsonKeys.RATING_MODIFIER)) {
+            modifier = json.get(JsonKeys.RATING_MODIFIER).asInt();
         }
 
-        CardRating rating=new CardRating(author,flashCard,modifier);
-        System.out.println("Rating object="+rating);
+        CardRating rating = new CardRating(author, flashCard, modifier);
+//        System.out.println("Rating object=" + rating);
 
         return rating;
     }
@@ -295,20 +309,21 @@ public class JsonUtil {
 
     /**
      * Create a new UserGroup with the given name and description.
+     *
      * @param json
      * @return
      */
     private static UserGroup parseGroup(JsonNode json) {
-        System.out.println("json="+json);
-        String name=null, description=null;
+//        System.out.println("json=" + json);
+        String name = null, description = null;
 
-        if(json.has(JsonKeys.GROUP_NAME)){
-            name=json.get(JsonKeys.GROUP_NAME).asText();
+        if (json.has(JsonKeys.GROUP_NAME)) {
+            name = json.get(JsonKeys.GROUP_NAME).asText();
         }
-        if(json.has(JsonKeys.GROUP_DESCRIPTION)){
-            description=json.get(JsonKeys.GROUP_DESCRIPTION).asText();
+        if (json.has(JsonKeys.GROUP_DESCRIPTION)) {
+            description = json.get(JsonKeys.GROUP_DESCRIPTION).asText();
         }
-        UserGroup group = new UserGroup(name,description,null);
+        UserGroup group = new UserGroup(name, description, null);
         return group;
     }
 }

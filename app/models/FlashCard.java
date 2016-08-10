@@ -74,6 +74,12 @@ public class FlashCard extends Model {
     @JsonProperty(JsonKeys.AUTHOR)
     private User author;
 
+
+    @ManyToOne
+    @JoinColumn(name=JsonKeys.FLASHCARD_PARENT_ID)
+    @JsonIgnore
+    private CardDeck deck;
+
     @JsonProperty(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)
     @Column(name = JsonKeys.FLASHCARD_MULTIPLE_CHOICE)
     private boolean multipleChoice;
@@ -210,6 +216,14 @@ public class FlashCard extends Model {
     public void setAnswers(List<Answer> answers) {
         this.answers = answers;
 
+    }
+
+    public CardDeck getDeck() {
+        return deck;
+    }
+
+    public void setDeck(CardDeck deck) {
+        this.deck = deck;
     }
 
     public User getAuthor() {
