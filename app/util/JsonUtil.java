@@ -153,7 +153,7 @@ public class JsonUtil {
      * @param json the root json object
      * @return a list of answers
      */
-    public static List<Answer> retrieveAnswers(JsonNode json) {
+    public static List<Answer> retrieveAnswers(JsonNode json) throws ParameterNotSupportedException {
         List<Answer> answers = new ArrayList<>();
 
         //get the specific nods in the json
@@ -164,11 +164,7 @@ public class JsonUtil {
             // when a user id is found we will get the object and add them to the userList.
             System.out.println("Node=" + node);
             if (node.has(JsonKeys.ANSWER_ID)) {
-                //do nothing, as an answer can only be attached to one card.
-/*                Answer found = Answer.find.byId(node.get(JsonKeys.ANSWER_ID).asLong());
-                System.out.println(">> answer: " + found);
-
-                answers.add(found);*/
+                throw new ParameterNotSupportedException();
             } else {
                 try {
                     Answer tmpA = JsonUtil.parseAnswer(node);

@@ -8,6 +8,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import util.JsonKeys;
 import util.JsonUtil;
+import util.ParameterNotSupportedException;
 import util.RequestKeys;
 
 import java.net.URISyntaxException;
@@ -90,13 +91,13 @@ public class FlashCardController {
             JsonNode json = request().body().asJson();
             ObjectMapper mapper = new ObjectMapper();
             FlashCard requestObject = mapper.convertValue(json, FlashCard.class);
-            String information="";
+            String information = "";
             //We expect just id's to set answers/questions/authors - we then check the db for the id's and retrieve all values
             // we nee ourselves.
             if (json.has(JsonKeys.FLASHCARD_ANSWERS)) {
                 // TODO: 10.08.2016 rewrite this part, it is ugly 
                 JsonNode answersNode = json.findValue(JsonKeys.FLASHCARD_ANSWERS);
-                System.out.println("answersNode="+answersNode);
+                System.out.println("answersNode=" + answersNode);
                 for (JsonNode node : answersNode) {
                     if (node.has(JsonKeys.ANSWER_ID)) {
                         return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "An answerId is not accepted while creating new cards, please provide a complete answer object with the following components: " + JsonKeys.ANSWER_JSON_ELEMENTS));
@@ -108,7 +109,8 @@ public class FlashCardController {
             if (json.has(JsonKeys.FLASHCARD_QUESTION)) {
 
                 if (json.get(JsonKeys.FLASHCARD_QUESTION).has(JsonKeys.QUESTION_ID)) {
-                    return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,"A questionId is not accepted while creating new cards, please provide a complete question object with the following components: "+JsonKeys.QUESTION_JSON_ELEMENTS));
+                    return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "A questionId is not accepted while creating " +
+                            "new cards, please provide a complete question object with the following components: " + JsonKeys.QUESTION_JSON_ELEMENTS));
                 } else {
                     try {
                         System.out.println("HELLO!");
@@ -128,10 +130,10 @@ public class FlashCardController {
 
             if (json.has(JsonKeys.FLASHCARD_TAGS)) {
 
-                List<Tag> tags=JsonUtil.retrieveTags(json);
-                if(tags.contains(null)){
+                List<Tag> tags = JsonUtil.retrieveTags(json);
+                if (tags.contains(null)) {
                     System.out.println(">> null!");
-                    information+=" One or more tag ids where invalid!";
+                    information += " One or more tag ids where invalid!";
                     tags.remove(null);
                 }
                 requestObject.setTags(tags);
@@ -142,11 +144,16 @@ public class FlashCardController {
                 requestObject.setMultipleChoice(json.findValue(JsonKeys.FLASHCARD_MULTIPLE_CHOICE).asBoolean());
             }
             FlashCard card = new FlashCard(requestObject);
-            System.out.println("Tags="+card.getTags().size());
+            System.out.println("Tags=" + card.getTags().size());
             card.save();
 
-            return ok(JsonUtil.prepareJsonStatus(OK, "FlashCard with id=" + card.getId() + " has been created!"+information,card.getId()));
+            return ok(JsonUtil.prepareJsonStatus(OK, "FlashCard with id=" + card.getId() + " has been created!" + information, card.getId()));
         } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return badRequest(JsonUtil
+                    .prepareJsonStatus(
+                            BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+        } catch (ParameterNotSupportedException e) {
             e.printStackTrace();
             return badRequest(JsonUtil
                     .prepareJsonStatus(
@@ -159,24 +166,25 @@ public class FlashCardController {
      * Update a  Flashcard either completely via put or partially via patch.
      * Allows the user to append instead of replace by adding the URL Parameter "?append=(true|false)" which is false by default.
      * with append only two update operations for attributes change:
-     *  - Tags that would be duplicates are merged by hand, before adding we check if the element is contained and don't
-     *    add in that case. This is to remove duplicate tags completely. Tags have unique names, which allows checking for
-     *    duplicates before creating new tags.
-     *  - Answers can be complete duplicates
+     * - Tags that would be duplicates are merged by hand, before adding we check if the element is contained and don't
+     * add in that case. This is to remove duplicate tags completely. Tags have unique names, which allows checking for
+     * duplicates before creating new tags.
+     * - Answers can be complete duplicates
+     *
      * @return httpResult
      */
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateFlashCard(long id) {
         JsonNode json = request().body().asJson();
         ObjectMapper mapper = new ObjectMapper();
-        boolean appendMode=false;
-
+        boolean appendMode = false;
         Map<String, String[]> urlParams = Controller.request().queryString();
         int answersSize = -1;
+
         if (urlParams.containsKey(RequestKeys.APPEND)) {
-                appendMode = Boolean.parseBoolean(urlParams.get(RequestKeys.APPEND)[0]);
+            appendMode = Boolean.parseBoolean(urlParams.get(RequestKeys.APPEND)[0]);
         }
-        System.out.println("Appending mode enabled? "+appendMode);
+        System.out.println("Appending mode enabled? " + appendMode);
         try {
             FlashCard toUpdate = FlashCard.find.byId(id);
 
@@ -191,22 +199,21 @@ public class FlashCardController {
             }
 
 
-            if (json.has(JsonKeys.FLASHCARD_ANSWERS)){
-                if(appendMode) {
+            if (json.has(JsonKeys.FLASHCARD_ANSWERS)) {
+                if (appendMode) {
                     List<Answer> mergedAnswers = new ArrayList<>();
                     mergedAnswers.addAll(toUpdate.getAnswers());
                     mergedAnswers.addAll(JsonUtil.retrieveAnswers(json));
                     toUpdate.setAnswers(mergedAnswers);
-                }
-                else {
+                } else {
                     toUpdate.setAnswers(JsonUtil.retrieveAnswers(json));
                 }
             }
 
             if (json.has(JsonKeys.FLASHCARD_QUESTION)) {
                 if (json.get(JsonKeys.FLASHCARD_QUESTION).has(JsonKeys.QUESTION_ID)) {
-                    Question question = Question.find.byId(json.findValue(JsonKeys.FLASHCARD_QUESTION).findValue(JsonKeys.QUESTION_ID).asLong());
-                    toUpdate.setQuestion(question);
+                    return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "A questionId is not accepted while creating new cards," +
+                            " please provide a complete question object with the following components: " + JsonKeys.QUESTION_JSON_ELEMENTS));
                 } else {
                     try {
                         Question q = Question.parseQuestion(json.get(JsonKeys.FLASHCARD_QUESTION));
@@ -225,19 +232,18 @@ public class FlashCardController {
             }
 
             if (json.has(JsonKeys.FLASHCARD_TAGS)) {
-                if(appendMode) {
+                if (appendMode) {
                     List<Tag> mergedTags = new ArrayList<>();
                     mergedTags.addAll(toUpdate.getTags());
-                    for(Tag t: JsonUtil.retrieveTags(json)){
-                        if(!mergedTags.contains(t)){
+                    for (Tag t : JsonUtil.retrieveTags(json)) {
+                        if (!mergedTags.contains(t)) {
                             mergedTags.add(t);
                         }
                     }
 //                    mergedTags.addAll(JsonUtil.retrieveTags(json));
                     toUpdate.setTags(mergedTags);
-                    System.out.println("append: "+mergedTags);
-                }
-                else {
+                    System.out.println("append: " + mergedTags);
+                } else {
                     toUpdate.setTags(JsonUtil.retrieveTags(json));
                 }
             }
@@ -258,6 +264,11 @@ public class FlashCardController {
             return badRequest(JsonUtil
                     .prepareJsonStatus(
                             BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+        } catch (ParameterNotSupportedException e) {
+            e.printStackTrace();
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,"An answerId is not accepted while creating new cards, " +
+                    "please provide a complete list of answers object with the following components: "+JsonKeys.QUESTION_JSON_ELEMENTS));
+
         }
 
     }
@@ -304,6 +315,7 @@ public class FlashCardController {
     public Result getAnswers(long id) {
         Map<String, String[]> urlParams = Controller.request().queryString();
         int answersSize = -1;
+        String sortBy="";
         if (urlParams.containsKey(RequestKeys.SIZE)) {
             try {
                 answersSize = Integer.parseInt(urlParams.get(RequestKeys.SIZE)[0]);
@@ -312,14 +324,15 @@ public class FlashCardController {
                         "Parameter size=" + urlParams.get("size")[0] + " could not be parsed to integer."));
             }
         }
+        if (urlParams.containsKey(RequestKeys.SORT_BY)) {
+                sortBy = urlParams.get(RequestKeys.SORT_BY)[0];
+                System.out.println("sortBy found="+sortBy);
+        }
         System.out.println("answers size=" + answersSize);
         List<Answer> ret;
         try {
             // TODO: 27/06/16 Allow sorting by date, rating o.A., handle multichoice etc.
-            ret = FlashCard.find.byId(id).getAnswers();
-            //Return a sublist from 0 to either the size of answers OR the cap we get via parameter.
-            if (answersSize > 0)
-                ret = ret.subList(0, Math.min(answersSize, ret.size()));
+            ret = Answer.find.where().eq(JsonKeys.ANSWER_CARD_ID,id).orderBy(sortBy).setMaxRows(answersSize).findList();
 
 
         } catch (Exception e) {
@@ -361,7 +374,6 @@ public class FlashCardController {
         }
         return ok(JsonUtil.getJson(ret));
     }
-
 
 
 }

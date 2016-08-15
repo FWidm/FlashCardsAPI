@@ -3,19 +3,19 @@
 ### Users
 | Resource | GET | PUT | POST | PATCH | DELETE|
 | -------- | --- | --- | ---- | ----- | ----- |
-| `/users` | Retrieve a list of users. Can be filtered via url params `?name=x` or `?email=y`.| - | Creates a new User. | - | - |
+| `/users` | Retrieve a list of users. Can be filtered via url params `?name=x` or `?email=y`.| - | Creates a new user. | - | - |
 | `/users/x` | Retrieve the details of the specified user. can filter by email with `?email=x@y.com` | Update the complete resource with this id. | - | Partial update of the resource. | Deletes the specified resource. |
 | `/users/x/groups` | Retrieve all groups for a specific user. | | | | | |
 ### UserGroups
 | Resource | GET | PUT | POST | PATCH | DELETE|
 | -------- | --- | --- | ---- | ----- | ----- |
-| `/groups`| A list of all groups, can be filtered with `?empty=y` where y={true,false}. | |Create a new resource with a name, description and a list of user ids. | | |
+| `/groups`| A list of all groups, can be filtered with `?empty=y` where y={true,false}. | | Create a new resource with a name, description and a list of user ids. | | |
 | ´/groups´| Retrieve one group |  Update a resource completely with name, description, users. | | Update a resource partially with name, description, users. | Delete a group. |
 ### Flashcards
 | Resource | GET | PUT | POST | PATCH | DELETE|
 | -------- | --- | --- | ---- | ----- | ----- |
-| `/cards` | Retrieve a list of all cards that are available. | - | Create a new Flashcard. The Body can contain either Question/Answer ids or the completely resource that in turn will be displayed. | - | - |
-| `/cards/x` | Retrieves a specific card by it's id. | Updates one specific card completely, answers and question can be passed via id or as a new resource. Can be switched to append the list instead of replacing it via `?append=true`. | - | Updates one specific card partially, answers ans question can be passed via id or as a new resource. Can be switched to append the list instead of replacing it via `?append=true`. | - |
+| `/cards` | Retrieve a list of all cards that are available. | - | Create a new Flashcard. The body has to contain the question and answer as a whole (without an id, as both can be only part of a card), additionally tags can be either in the form of an id or the complete tag information. | - | - |
+| `/cards/x` | Retrieves a specific card by  id. | Updates one specific card completely, answers and questions do need to be passed as a complete json file (referencing via id does not work), tags can be referenced or put in as complete resource. Can be switched to append the list instead of replacing it via `?append=true`. | - | Updates one specific card partially, answers and questions do need to be passed as a complete json file (referencing via id does not work), tags can be referenced or put in as complete resource. Can be switched to append the list instead of replacing it via `?append=true`. | - |
 | `/cards/x/question` | Retrieves a specific cards question by id. | | | | |
 | `/cards/x/answers` | Retrieves a specific cards answers by id, `size=y` can be used as optional parameter to get a number of answers to display. | | | | | |
 ### Ratings
