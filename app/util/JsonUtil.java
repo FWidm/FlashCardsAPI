@@ -207,6 +207,9 @@ public class JsonUtil {
         if (node.has(JsonKeys.URI)) {
             answer.setUri(new URI(node.get(JsonKeys.URI).asText()));
         }
+        if(node.has(JsonKeys.RATING)){
+            answer.setRating(node.get(JsonKeys.RATING).asInt());
+        }
         return answer;
     }
 

@@ -92,7 +92,7 @@ public class RatingController extends Controller {
         try {
             JsonNode json = request().body().asJson();
             ObjectMapper mapper = new ObjectMapper();
-            System.out.println(json);
+            if(JsonKeys.debugging)System.out.println(json);
             if (json.has(JsonKeys.ANSWER)) {
                 AnswerRating answerRating = JsonUtil.parseAnswerRating(json);
                 if (answerRating.getAuthor() != null && answerRating.getRatedAnswer() != null && answerRating.getRatingModifier() != 0) {

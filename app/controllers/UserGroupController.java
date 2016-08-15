@@ -25,7 +25,7 @@ public class UserGroupController extends Controller {
 	public Result getUserGroupList() {
 		Map<String, String[]> urlParams = Controller.request().queryString();
 		if(urlParams.keySet().contains("empty")){
-			System.out.println("only print empty or nonempty groups");
+			if(JsonKeys.debugging)System.out.println("only print empty or nonempty groups");
 			//only print the first val we get for the key, this is possible as /groups?empty=true&empty=false could return
 			//multiple values.
 			if(urlParams.get("empty")[0].equals("true")){
@@ -40,11 +40,11 @@ public class UserGroupController extends Controller {
 			}
 		}
 		for(UserGroup ug:UserGroup.find.all()){
-			System.out.print("id="+ug.getId()+" | users size="+ug.getUsers().size()+" | users is null? "+(ug.getUsers()==null)+" | users=");
+			if(JsonKeys.debugging)System.out.print("id="+ug.getId()+" | users size="+ug.getUsers().size()+" | users is null? "+(ug.getUsers()==null)+" | users=");
 			for(User u: ug.getUsers()){
-				System.out.print("["+u+"];");
+				if(JsonKeys.debugging)System.out.print("["+u+"];");
 			}
-			System.out.println();
+			if(JsonKeys.debugging)System.out.println();
 		}
 		return ok(JsonUtil.getJson(UserGroup.find.all()));
 	}
@@ -76,7 +76,7 @@ public class UserGroupController extends Controller {
 	 */
 	@BodyParser.Of(BodyParser.Json.class)
 	public Result updateUserGroup(Long id) {
-		System.out.println(request().method());
+		if(JsonKeys.debugging)System.out.println(request().method());
 		String information = "";
 		JsonNode json = request().body().asJson();
 		ObjectMapper mapper = new ObjectMapper();
@@ -93,7 +93,7 @@ public class UserGroupController extends Controller {
 			UserGroup requestGroup = mapper.convertValue(json, UserGroup.class);
 			UserGroup toUpdate = UserGroup.find.byId(id);
 
-			System.out.println("Update group with details: " + requestGroup
+			if(JsonKeys.debugging)System.out.println("Update group with details: " + requestGroup
 					+ "\n JSON Size=" + json.size());
 
 			if (json.size() == 0)
@@ -110,7 +110,7 @@ public class UserGroupController extends Controller {
 			if (json.has(JsonKeys.GROUP_USERS)) {
 				JsonNode users = json.findValue(JsonKeys.GROUP_USERS);
 
-				System.out.println("Users=" + users + " isArray? "
+				if(JsonKeys.debugging)System.out.println("Users=" + users + " isArray? "
 						+ users.isArray());
 				// Loop through all objects in the values associated with the
 				// JsonKeys.GROUP_USERS key.
@@ -162,7 +162,7 @@ public class UserGroupController extends Controller {
 				//get the specific nods in the json
 				JsonNode users = json.findValue(JsonKeys.GROUP_USERS);
 				if(users!=null){
-				    System.out.println("Users=" + users);
+				    if(JsonKeys.debugging)System.out.println("Users=" + users);
 
 				// Loop through all objects in the values associated with the
 				// JsonKeys.GROUP_USERS key.
@@ -178,13 +178,13 @@ public class UserGroupController extends Controller {
                         return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "One user that was specified did not contain an id."));
 				}
 				//set the list for the group created from the content of the json body
-				System.out.println("Adding users to the group: "+userList);
+				if(JsonKeys.debugging)System.out.println("Adding users to the group: "+userList);
                     group.setUsers(userList);
 
                 }
 			}
 			group.save();
-			System.out.println(group);
+			if(JsonKeys.debugging)System.out.println(group);
 
 			return ok(JsonUtil.prepareJsonStatus(OK, "Usergroup has been created!",group.getId()));
 		} catch (IllegalArgumentException e) {

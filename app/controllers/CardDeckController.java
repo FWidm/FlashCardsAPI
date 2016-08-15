@@ -74,7 +74,7 @@ public class CardDeckController extends Controller {
                         FlashCard tmp=FlashCard.find.byId(currentCard.getId());
                         if(tmp!=null)
                             cardList.add(tmp);
-                        System.out.println(i+" >> "+cardList.size());
+                        if(JsonKeys.debugging)System.out.println(i+" >> "+cardList.size());
                     }catch (NullPointerException e){
                         e.printStackTrace();
                         return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,"No Card found with the given id",currentCard.getId()));
@@ -84,7 +84,7 @@ public class CardDeckController extends Controller {
             requestObject.setCards(cardList);
             CardDeck deck=new CardDeck(requestObject);
             deck.save();
-            System.out.println(deck.getId());
+            if(JsonKeys.debugging)System.out.println(deck.getId());
             return ok(JsonUtil.prepareJsonStatus(OK,"Carddeck has been created!",deck.getId()));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
