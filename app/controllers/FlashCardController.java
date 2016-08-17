@@ -196,8 +196,7 @@ public class FlashCardController {
                         + " " + !json.has(JsonKeys.AUTHOR) + " " + !json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE) + " " + json.has(JsonKeys.FLASHCARD_TAGS));
                 return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
                         "The Update method needs all details of the card, such as name, " +
-                                "description and a user group (array of users or null). An attribute was missing for id="
-                                + id + "."));
+                                "description and a user group (array of users or null).",id));
             }
 
 

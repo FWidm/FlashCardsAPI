@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "FlashCards",
-		"_postman_id": "f63a8173-014a-ed95-bf6a-e02b88ff0f29",
+		"_postman_id": "6a807860-4dc2-78c0-d9cf-06f4627de5d0",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -92,6 +92,170 @@
 			]
 		},
 		{
+			"name": "CardDeck",
+			"description": "",
+			"item": [
+				{
+					"name": "Create card 1 for the deck",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardId1\", jsonData.id);"
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
+						},
+						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "Create card 2 for the deck",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardId2\", jsonData.id);"
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
+						},
+						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "Create a new Carddeck",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardDeckId\", jsonData.id);"
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cardDeckName\": \"Deck 12\",\n    \"cardDeckDescpription\": \"This is a test\",\n    \"cards\": [\n      {\n        \"flashcardId\": {{cardId1}}\n      },\n      {\n        \"flashcardId\": {{cardId2}}\n      }\n    ]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "get all carddecks",
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "get one cardDeck by id",
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "delete one cardDeck by id",
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}",
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update Carddeck",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardDeckId\", jsonData.id);"
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks/35",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cardDeckName\": \"Deck 12\",\n    \"cardDeckDescpription\": \"This is a test\",\n    \"cards\": [\n      {\n        \"flashcardId\": {{cardId1}}\n      },\n      {\n        \"flashcardId\": {{cardId2}}\n      }\n    ]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Cards",
 			"description": "",
 			"item": [
@@ -149,7 +313,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":23\n    }]\n  }"
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
 						},
 						"description": "Inserts a question to the db instead of using one already created."
 					},
@@ -270,6 +434,20 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n\"rating\": 3,\n    \"question\": {\n      \"question\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"tags\": [\n        {\n            \"tagName\":\"testTag\"\n        }\n    ],\n    \"answers\": [\n      {\n        \"answerText\": \"answer1\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": true\n  }"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Answers of a card sorted by rating",
+					"request": {
+						"url": "{{url}}{{port}}/cards/{{cardId1}}/answers?sortBy=rating%20asc",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
 						},
 						"description": ""
 					},
@@ -444,7 +622,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+							"raw": ""
 						},
 						"description": "Deletes the specific group 20. Also deletes memberships."
 					},
@@ -604,6 +782,13 @@
 								"type": "text/javascript",
 								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"userId\", jsonData.id);"
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": "postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r\npostman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r\n"
+							}
 						}
 					],
 					"request": {
@@ -700,7 +885,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPass}}\",\n    \"rating\": \"{{userRating}}\",\n    \"email\": \"{{userEmail}}\",\n    \"group\": null\n}"
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPass}}\",\n    \"rating\": \"{{userRating}}\",\n    \"email\": \"{{userEmail}}\",\n    \"groups\": []\n}"
 						},
 						"description": ""
 					},

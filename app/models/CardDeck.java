@@ -32,7 +32,7 @@ public class CardDeck extends Model {
     @JsonProperty(JsonKeys.CARDDECK_DESCRIPTION)
     private String description;
     //this cascades from the "tag" to "join_cards_tag" - e.g. tag.delete -> delete evey entry with tag.id
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "deck")
+    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "deck")
     @PrivateOwned
     @JsonProperty(JsonKeys.CARDDECK_CARDS)
     private List<FlashCard> cards;
@@ -84,6 +84,9 @@ public class CardDeck extends Model {
     }
 
     public void setCards(List<FlashCard> cards) {
+        for (FlashCard c:this.cards) {
+            c.setDeck(null);
+        }
         this.cards = cards;
     }
 

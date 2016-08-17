@@ -261,6 +261,7 @@ public class HomeController extends Controller {
 
             fc.setDeck(deck);
             fc.update();
+
             flashCardList.add(fc);
         }
 

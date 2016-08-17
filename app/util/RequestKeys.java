@@ -12,6 +12,7 @@ public class RequestKeys {
     public static final String NAME="name";
     public static final String SIZE = "size";
     public static final String APPEND = "append";
+    public static final String REDIRECT ="redirect";
     public static final String SORT_BY="sortBy";
 
     public static final String ANSWER_RATING = "answerRating";
