@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import models.*;
+import play.Logger;
 import play.data.validation.Constraints;
 import util.JsonKeys;
 import util.JsonUtil;
@@ -35,7 +36,7 @@ public class UserController extends Controller {
             if (u == null)
                 return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
                         "The user with the email=" + email + " could not be found."));
-            if(JsonKeys.debugging)System.out.println(u);
+            if(JsonKeys.debugging)Logger.debug(""+u);
             return ok(JsonUtil.getJson(u));
         }
 
@@ -45,7 +46,7 @@ public class UserController extends Controller {
             if (u == null)
                 return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
                         "The user with the name=" + name + " could not be found."));
-            if(JsonKeys.debugging)System.out.println(u);
+            if(JsonKeys.debugging)Logger.debug(""+u);
             return ok(JsonUtil.getJson(u));
         } else {
             List<User> u = User.find.all();
@@ -79,9 +80,9 @@ public class UserController extends Controller {
             if (urlParams.containsKey(RequestKeys.APPEND)) {
                 appendMode = Boolean.parseBoolean(urlParams.get(RequestKeys.APPEND)[0]);
             }
-            if(JsonKeys.debugging)System.out.println("Appending mode enabled? " + appendMode);
+            if(JsonKeys.debugging) Logger.debug("Appending mode enabled? " + appendMode);
 
-            if(JsonKeys.debugging)System.out.println("Update method=" + request().method());
+            if(JsonKeys.debugging)Logger.debug("Update method=" + request().method());
             if (request().method().equals("PUT") && (!json.has(JsonKeys.USER_EMAIL) || !json.has(JsonKeys.RATING)
                     || !json.has(JsonKeys.USER_NAME) || !json.has(JsonKeys.USER_GROUPS) || !json.has(JsonKeys.USER_PASSWORD)))
                 return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
@@ -99,7 +100,7 @@ public class UserController extends Controller {
             if (json.has(JsonKeys.USER_EMAIL) && emailValidator.isValid(json.get(JsonKeys.USER_EMAIL).asText())) {
                 User checkEmail = User.find.where()
                         .eq(JsonKeys.USER_EMAIL, json.get(JsonKeys.USER_EMAIL).asText()).findUnique();
-                if(JsonKeys.debugging)System.out.println("does email exist? " + checkEmail);
+                if(JsonKeys.debugging)Logger.debug("does email exist? " + checkEmail);
                 if (checkEmail == null)
                     u.setEmail(json.get(JsonKeys.USER_EMAIL).asText());
                 else
@@ -119,7 +120,7 @@ public class UserController extends Controller {
                 u.setName(json.get(JsonKeys.USER_NAME).asText());
             if (json.has(JsonKeys.USER_GROUPS)) {
                 if (appendMode) {
-                    if(JsonKeys.debugging)System.out.println("Found group");
+                    if(JsonKeys.debugging)Logger.debug("Found group");
                     List<UserGroup> mergedGroups = new ArrayList<UserGroup>();
 
                     //add all old valid information
@@ -131,14 +132,14 @@ public class UserController extends Controller {
                             mergedGroups.add(ug);
                         }
                     }
-                    if(JsonKeys.debugging)System.out.println("New groups: " + mergedGroups);
+                    if(JsonKeys.debugging)Logger.debug("New groups: " + mergedGroups);
                     u.setUserGroups(mergedGroups);
                 } else {
                     u.setUserGroups(JsonUtil.retrieveGroups(json));
                 }
             }
             if (json.has(JsonKeys.USER_AVATAR)) {
-                if(JsonKeys.debugging)if(JsonKeys.debugging)System.out.println(json.get(JsonKeys.USER_AVATAR));
+                if(JsonKeys.debugging)if(JsonKeys.debugging)Logger.debug("avatar="+json.get(JsonKeys.USER_AVATAR));
                 u.setAvatar(json.get(JsonKeys.USER_AVATAR).asText());
             }
             u.update();
@@ -166,7 +167,7 @@ public class UserController extends Controller {
         if (u == null)
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
                     "The user with the id=" + id + " could not be found."));
-        if(JsonKeys.debugging)if(JsonKeys.debugging)System.out.println(u + "| USER_NAME Key=" + JsonKeys.USER_NAME);
+        if(JsonKeys.debugging)if(JsonKeys.debugging)Logger.debug(u + "| USER_NAME Key=" + JsonKeys.USER_NAME);
         return ok(JsonUtil.getJson(u));
     }
 
@@ -182,7 +183,6 @@ public class UserController extends Controller {
         if (u == null)
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
                     "The user with the email=" + email + " could not be found."));
-        if(JsonKeys.debugging)if(JsonKeys.debugging)System.out.println(u);
         return ok(JsonUtil.getJson(u));
     }
 
@@ -226,7 +226,7 @@ public class UserController extends Controller {
             //Checks if the constraints for @email are met via it's isValid method.
             Constraints.EmailValidator emailValidator = new Constraints.EmailValidator();
             Constraints.MinLengthValidator minLengthValidator = new Constraints.MinLengthValidator();
-            if(JsonKeys.debugging)if(JsonKeys.debugging)System.out.println("json=" + json + " - obj=" + tmp);
+            if(JsonKeys.debugging)if(JsonKeys.debugging)Logger.debug("json=" + json + " - obj=" + tmp);
             if (emailValidator.isValid(tmp.getEmail()) && minLengthValidator.isValid(tmp.getName())
                     && minLengthValidator.isValid(tmp.getPassword())) {
                 // if this entry with specified email does not exist, create, else

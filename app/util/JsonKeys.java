@@ -8,7 +8,7 @@ package util;
  *         Whenever a change is made here, the appropriate class needs to be resaved as well to update th keys.
  */
 public class JsonKeys {
-    public static final boolean debugging=false;
+    public static final boolean debugging=true;
 
     //General
     public static final String RATING = "rating";

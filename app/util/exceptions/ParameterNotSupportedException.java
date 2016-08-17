@@ -1,4 +1,4 @@
-package util;
+package util.exceptions;
 
 /**
  * @author Jonas Kraus

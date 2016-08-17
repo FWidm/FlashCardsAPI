@@ -224,6 +224,7 @@ public class FlashCard extends Model {
 
     public void setDeck(CardDeck deck) {
         this.deck = deck;
+        this.update();
     }
 
     public User getAuthor() {

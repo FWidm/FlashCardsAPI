@@ -14,6 +14,7 @@ import play.libs.Json;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import util.exceptions.ParameterNotSupportedException;
 
 public class JsonUtil {
 //	public final static String dateformat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
@@ -61,6 +62,22 @@ public class JsonUtil {
         result.put("statuscode", statuscode);
         result.put("description", description);
         result.put("id", id);
+        return result;
+    }
+
+    /**
+     * Generates an objectnode that will contain a given statuscode and the
+     * description in human readable form.
+     *
+     * @param statuscode
+     * @param description
+     * @return
+     */
+    public static ObjectNode prepareJsonStatus(int statuscode, String description,String name, List<Object> objectList) {
+        ObjectNode result = Json.newObject();
+        result.put("statuscode", statuscode);
+        result.put("description", description);
+        result.set(name, getJson(objectList));
         return result;
     }
 

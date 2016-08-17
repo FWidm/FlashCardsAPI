@@ -6,6 +6,8 @@ import models.*;
 import models.rating.AnswerRating;
 import models.rating.CardRating;
 import models.rating.Rating;
+import play.Logger;
+import play.api.mvc.Flash;
 import play.libs.Json;
 import play.mvc.*;
 
@@ -34,7 +36,8 @@ public class HomeController extends Controller {
      */
     public Result index() {
         java.io.File file = new java.io.File("_Docs/img/flash_icon.png");
-        System.out.println(file.getAbsolutePath());
+        Logger.debug(file.getAbsolutePath());
+
         return ok(file);
     }
 
@@ -48,7 +51,7 @@ public class HomeController extends Controller {
         if (json.has("image")) {
             String imageDataBytes = json.get("image").asText().substring(json.get("image").asText().indexOf(",") + 1);
 
-            System.out.println(imageDataBytes);
+            Logger.debug(imageDataBytes);
             byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageDataBytes);
             File f = new File("_Docs/img/usr/" + new Date().getTime()+ FileTypeChecker.getFileType(json.get("image").asText()));
             try {
@@ -75,18 +78,17 @@ public class HomeController extends Controller {
         if (!AnswerRating.exists(u, a)) {
             r.save();
         } else
-            System.out.println("nope answer ");
+            Logger.debug("nope answer ");
 
         if (!CardRating.exists(u, f)) {
             r2.save();
         } else
-            System.out.println("nope card ");
+            Logger.debug("nope card ");
 
 
-        System.out.println(AnswerRating.find.where().eq(JsonKeys.USER_ID, u.getId()).findList());
-//        Rating.find.all().forEach((t)->System.out.println(t+" class="+t.getClass().getName()));
-        User.find.all().forEach((user) -> System.out.println("\t uid=" + user.getId() + " rating of this user=" + user.getRating() + ": Ratings from this user: " + Rating.find.where().eq(JsonKeys.USER_ID, user.getId()).findList().size()));
-        System.out.println();
+        Logger.debug(""+AnswerRating.find.where().eq(JsonKeys.USER_ID, u.getId()).findList());
+//        Rating.find.all().forEach((t)->Logger.debug(t+" class="+t.getClass().getName()));
+        User.find.all().forEach((user) -> Logger.debug("\t uid=" + user.getId() + " rating of this user=" + user.getRating() + ": Ratings from this user: " + Rating.find.where().eq(JsonKeys.USER_ID, user.getId()).findList().size()));
         //clean up.
 /*        if (AnswerRating.exists(u, a)) {
             r.delete();
@@ -124,7 +126,7 @@ public class HomeController extends Controller {
         u.addAuthToken(authToken);
         u.deleteTokens();
         u.delete();
-        System.out.println(output);
+        Logger.debug(output);
         return ok(index.render(output));
     }
 
@@ -142,7 +144,7 @@ public class HomeController extends Controller {
 
         FlashCard fc = new FlashCard(tmp, false, tags);
         fc.save();
-        System.out.println("Flashcard created: " + fc);
+        Logger.debug("Flashcard created: " + fc);
         Question q = new Question("Question", tmp);
         q.save();
 
@@ -161,13 +163,13 @@ public class HomeController extends Controller {
         //we only ned to call update from one side it'll call he other side as well.
         fc.update();
 
-        System.out.println("Flashcard added Question and Answer: " + fc);
-        System.out.println("_____________________");
-        System.out.println("Question for Card no. " + fc.getId() + ": " + fc.getQuestion());
-        System.out.println("IsMultiChoice? " + fc.isMultipleChoice());
+        Logger.debug("Flashcard added Question and Answer: " + fc);
+        Logger.debug("_____________________");
+        Logger.debug("Question for Card no. " + fc.getId() + ": " + fc.getQuestion());
+        Logger.debug("IsMultiChoice? " + fc.isMultipleChoice());
 
 
-        System.out.println("Card tags: " + fc.getTags());
+        Logger.debug("Card tags: " + fc.getTags());
         List<Tag> fc_tags = FlashCard.find.byId(fc.getId()).getTags();
 
         return ok(index.render("Card test done!"));
@@ -196,12 +198,12 @@ public class HomeController extends Controller {
         }
 
 
-        System.out.println("__________________________________");
-        System.out.println("Querying the groups");
+        Logger.debug("__________________________________");
+        Logger.debug("Querying the groups");
         List<User> users = User.find.all();
         // set group
         for (User u:users) {
-            u.getUserGroups().forEach((group)-> System.out.println(u.getId()+":"+group));
+            u.getUserGroups().forEach((group)-> Logger.debug(u.getId()+":"+group));
         }
 
         return ok(index.render("Group test done!"));
@@ -219,7 +221,7 @@ public class HomeController extends Controller {
             String pass = json.get(JsonKeys.USER_PASSWORD).asText();
             String email = json.get(JsonKeys.USER_EMAIL).asText();
             User logInTo = User.find.where().and(like(JsonKeys.USER_EMAIL, email), like(JsonKeys.USER_PASSWORD, pass)).findUnique();
-            System.out.println("Login attempt with email=" + email + " User found=" + logInTo);
+            Logger.debug("Login attempt with email=" + email + " User found=" + logInTo);
             if (logInTo != null) {
                 ObjectNode result = Json.newObject();
                 result.put(JsonKeys.STATUS_CODE, OK);

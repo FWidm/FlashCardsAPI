@@ -8,6 +8,7 @@ import models.*;
 import models.rating.AnswerRating;
 import models.rating.CardRating;
 import models.rating.Rating;
+import play.Logger;
 import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
@@ -50,7 +51,7 @@ public class CardDeckController extends Controller {
         }
     }
 
-    public Result deleteCardDeck(long id){
+    public Result deleteCardDeck(long id) {
         CardDeck.find.byId(id).delete();
         return noContent();
     }
@@ -63,29 +64,51 @@ public class CardDeckController extends Controller {
             CardDeck requestObject = mapper.convertValue(json, CardDeck.class);
 
             //retrieve the correct cards list by either parsing the id and getting the correct card or the attributes to a new card.
-            List<FlashCard> cardList=new ArrayList<>();
-            for (int i=0; i<requestObject.getCards().size(); i++) {
-                FlashCard currentCard=requestObject.getCards().get(i);
-                if(currentCard.getId()==0){
-                    // TODO: 10.08.2016 parse flashcard by other values?
-                }
-                else {
-                    try{
-                        FlashCard tmp=FlashCard.find.byId(currentCard.getId());
-                        if(tmp!=null)
-                            cardList.add(tmp);
-                        if(JsonKeys.debugging)System.out.println(i+" >> "+cardList.size());
-                    }catch (NullPointerException e){
+            List<FlashCard> cardList = new ArrayList<>();
+            for (int i = 0; i < requestObject.getCards().size(); i++) {
+                FlashCard currentCard = requestObject.getCards().get(i);
+
+                if (currentCard.getId() > 0) {
+                    try {
+                        FlashCard retrievedCard = FlashCard.find.byId(currentCard.getId());
+                        Logger.debug("Got Card tmp="+retrievedCard);
+                        if (retrievedCard != null) {
+                            cardList.add(retrievedCard);
+                        }
+                        if (JsonKeys.debugging) Logger.debug(i + " >> " + cardList.size());
+                    } catch (NullPointerException e) {
                         e.printStackTrace();
-                        return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,"No Card found with the given id",currentCard.getId()));
+                        return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "No Card found with the given id", currentCard.getId()));
                     }
+                } else {
+                    // TODO: 17.08.2016 Parse new questions if needed.
                 }
             }
-            requestObject.setCards(cardList);
-            CardDeck deck=new CardDeck(requestObject);
-            deck.save();
-            if(JsonKeys.debugging)System.out.println(deck.getId());
-            return ok(JsonUtil.prepareJsonStatus(OK,"Carddeck has been created!",deck.getId()));
+            CardDeck deck = new CardDeck(requestObject);
+
+            boolean canSetCards=true;
+            List<Object> cardIds=new ArrayList<>(cardList.size());
+            for (FlashCard c : cardList) {
+                Logger.debug(c.getId()+"|"+c.getDeck());
+                if(c.getDeck()!=null){
+                    canSetCards=false;
+                    Logger.debug("Card has a deck already, id="+c.getId());
+                    cardIds.add(c.getId());
+                }
+
+            }
+
+            if(canSetCards) {
+                deck.setCards(cardList);
+                deck.save();
+                deck.getCards().forEach(card -> card.setDeck(deck));
+            }
+            else{
+                // TODO: 17.08.2016 Rewrite this to have a better structure in the output {"statuscode":400,"description":"...","cards":[14,15]} 
+                return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Could not create deck with given cards, some of them already are in a deck.",JsonKeys.CARDDECK_CARDS,cardIds));
+            }
+
+            return ok(JsonUtil.prepareJsonStatus(OK, "Carddeck has been created!", deck.getId()));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             Pattern p = Pattern.compile("\\\"(.*?)\\\"");
@@ -93,7 +116,8 @@ public class CardDeckController extends Controller {
             String cause = "";
             if (m.find())
                 cause = m.group().substring(1, m.group().length() - 1);
-            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Request contained an element that is not expected for a card deck. Unknown Attribute=" + cause + ", expected Attributes=" + JsonKeys.CARDDECK_JSON_ELEMENTS));
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Request contained an element that is not " +
+                    "expected for a card deck. Unknown Attribute=" + cause + ", expected Attributes=" + JsonKeys.CARDDECK_JSON_ELEMENTS));
         }
 
 

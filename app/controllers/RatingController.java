@@ -9,6 +9,7 @@ import models.User;
 import models.rating.AnswerRating;
 import models.rating.CardRating;
 import models.rating.Rating;
+import play.Logger;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -92,7 +93,7 @@ public class RatingController extends Controller {
         try {
             JsonNode json = request().body().asJson();
             ObjectMapper mapper = new ObjectMapper();
-            if(JsonKeys.debugging)System.out.println(json);
+            if(JsonKeys.debugging) Logger.debug("json="+json);
             if (json.has(JsonKeys.ANSWER)) {
                 AnswerRating answerRating = JsonUtil.parseAnswerRating(json);
                 if (answerRating.getAuthor() != null && answerRating.getRatedAnswer() != null && answerRating.getRatingModifier() != 0) {

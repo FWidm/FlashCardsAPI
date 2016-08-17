@@ -3,12 +3,13 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import models.*;
+import play.Logger;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import util.JsonKeys;
 import util.JsonUtil;
-import util.ParameterNotSupportedException;
+import util.exceptions.ParameterNotSupportedException;
 import util.RequestKeys;
 
 import java.net.URISyntaxException;
@@ -98,7 +99,7 @@ public class FlashCardController {
                 // TODO: 10.08.2016 rewrite this part, it is ugly
 
                 JsonNode answersNode = json.findValue(JsonKeys.FLASHCARD_ANSWERS);
-                if(JsonKeys.debugging)System.out.println("answersNode=" + answersNode);
+                if(JsonKeys.debugging)Logger.debug("answersNode=" + answersNode);
                 for (JsonNode node : answersNode) {
                     if (node.has(JsonKeys.ANSWER_ID)) {
                         return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "An answerId is not accepted while creating new cards, please provide a complete answer object with the following components: " + JsonKeys.ANSWER_JSON_ELEMENTS));
@@ -114,7 +115,7 @@ public class FlashCardController {
                             "new cards, please provide a complete question object with the following components: " + JsonKeys.QUESTION_JSON_ELEMENTS));
                 } else {
                     try {
-                        if(JsonKeys.debugging)System.out.println("HELLO!");
+                        if(JsonKeys.debugging)Logger.debug("HELLO!");
                         Question q = Question.parseQuestion(json.get(JsonKeys.FLASHCARD_QUESTION));
                         q.save();
                         requestObject.setQuestion(q);
@@ -133,7 +134,7 @@ public class FlashCardController {
 
                 List<Tag> tags = JsonUtil.retrieveTags(json);
                 if (tags.contains(null)) {
-                    if(JsonKeys.debugging)System.out.println(">> null!");
+                    if(JsonKeys.debugging)Logger.debug(">> null!");
                     information += " One or more tag ids where invalid!";
                     tags.remove(null);
                 }
@@ -145,7 +146,7 @@ public class FlashCardController {
                 requestObject.setMultipleChoice(json.findValue(JsonKeys.FLASHCARD_MULTIPLE_CHOICE).asBoolean());
             }
             FlashCard card = new FlashCard(requestObject);
-            if(JsonKeys.debugging)System.out.println("Tags=" + card.getTags().size());
+            if(JsonKeys.debugging)Logger.debug("Tags=" + card.getTags().size());
             card.save();
 
             return ok(JsonUtil.prepareJsonStatus(OK, "FlashCard with id=" + card.getId() + " has been created!" + information, card.getId()));
@@ -185,13 +186,13 @@ public class FlashCardController {
         if (urlParams.containsKey(RequestKeys.APPEND)) {
             appendMode = Boolean.parseBoolean(urlParams.get(RequestKeys.APPEND)[0]);
         }
-        if(JsonKeys.debugging)System.out.println("Appending mode enabled? " + appendMode);
+        if(JsonKeys.debugging)Logger.debug("Appending mode enabled? " + appendMode);
         try {
             FlashCard toUpdate = FlashCard.find.byId(id);
 
             if (request().method().equals("PUT") && (!json.has(JsonKeys.FLASHCARD_ANSWERS) || !json.has(JsonKeys.FLASHCARD_QUESTION)
                     || !json.has(JsonKeys.AUTHOR) || !json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE) || !json.has(JsonKeys.FLASHCARD_TAGS))) {
-                if(JsonKeys.debugging)System.out.println(!json.has(JsonKeys.FLASHCARD_ANSWERS) + " " + !json.has(JsonKeys.FLASHCARD_QUESTION)
+                if(JsonKeys.debugging)Logger.debug(!json.has(JsonKeys.FLASHCARD_ANSWERS) + " " + !json.has(JsonKeys.FLASHCARD_QUESTION)
                         + " " + !json.has(JsonKeys.AUTHOR) + " " + !json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE) + " " + json.has(JsonKeys.FLASHCARD_TAGS));
                 return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
                         "The Update method needs all details of the card, such as name, " +
@@ -243,7 +244,7 @@ public class FlashCardController {
                     }
 //                    mergedTags.addAll(JsonUtil.retrieveTags(json));
                     toUpdate.setTags(mergedTags);
-                    if(JsonKeys.debugging)System.out.println("append: " + mergedTags);
+                    if(JsonKeys.debugging)Logger.debug("append: " + mergedTags);
                 } else {
                     toUpdate.setTags(JsonUtil.retrieveTags(json));
                 }
@@ -254,7 +255,7 @@ public class FlashCardController {
             }
 
             toUpdate.update();
-            if(JsonKeys.debugging)System.out.println("updated");
+            if(JsonKeys.debugging)Logger.debug("updated");
 
             return ok(JsonUtil.prepareJsonStatus(OK, "FlashCard with id=" + id + " has been updated!"));
         } catch (NullPointerException e) {
@@ -327,9 +328,9 @@ public class FlashCardController {
         }
         if (urlParams.containsKey(RequestKeys.SORT_BY)) {
                 sortBy = urlParams.get(RequestKeys.SORT_BY)[0];
-                if(JsonKeys.debugging)System.out.println("sortBy found="+sortBy);
+                if(JsonKeys.debugging)Logger.debug("sortBy found="+sortBy);
         }
-        if(JsonKeys.debugging)System.out.println("answers size=" + answersSize);
+        if(JsonKeys.debugging)Logger.debug("answers size=" + answersSize);
         List<Answer> ret;
         try {
             // TODO: 27/06/16 handle multichoice etc.
@@ -361,7 +362,7 @@ public class FlashCardController {
                         "Parameter size=" + urlParams.get("size")[0] + " has to be a valid integer."));
             }
         }
-        if(JsonKeys.debugging)System.out.println("tags size=" + answersSize);
+        if(JsonKeys.debugging) Logger.debug("tags size=" + answersSize);
         List<Tag> ret;
         try {
             ret = FlashCard.find.byId(id).getTags();
@@ -370,7 +371,7 @@ public class FlashCardController {
                 ret = ret.subList(0, Math.min(answersSize, ret.size()));
 
         } catch (Exception e) {
-            System.err.println(e);
+            e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         }
         return ok(JsonUtil.getJson(ret));

@@ -7,9 +7,9 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.typesafe.config.ConfigException;
 import models.User;
 import models.UserGroup;
+import play.Logger;
 import play.mvc.*;
 import util.JsonKeys;
 import util.JsonUtil;
@@ -20,12 +20,12 @@ public class UserGroupController extends Controller {
 	 * Returns all groups in the JSON format. Optional URL Paramerer is "?empty" which can either be true or false and
 	 * only returns groups that contain or do not contain users.
 	 *
-	 * @return
+	 * @return ok including a json node that contains all groups
 	 */
 	public Result getUserGroupList() {
 		Map<String, String[]> urlParams = Controller.request().queryString();
 		if(urlParams.keySet().contains("empty")){
-			if(JsonKeys.debugging)System.out.println("only print empty or nonempty groups");
+			if(JsonKeys.debugging)Logger.debug("only print empty or nonempty groups");
 			//only print the first val we get for the key, this is possible as /groups?empty=true&empty=false could return
 			//multiple values.
 			if(urlParams.get("empty")[0].equals("true")){
@@ -40,11 +40,8 @@ public class UserGroupController extends Controller {
 			}
 		}
 		for(UserGroup ug:UserGroup.find.all()){
-			if(JsonKeys.debugging)System.out.print("id="+ug.getId()+" | users size="+ug.getUsers().size()+" | users is null? "+(ug.getUsers()==null)+" | users=");
-			for(User u: ug.getUsers()){
-				if(JsonKeys.debugging)System.out.print("["+u+"];");
-			}
-			if(JsonKeys.debugging)System.out.println();
+			if(JsonKeys.debugging)Logger.debug("id="+ug.getId()+" | users size="+ug.getUsers().size()+" | users is null? "+(ug.getUsers()==null)+" | users=");
+			if(JsonKeys.debugging)ug.getUsers().forEach(user -> Logger.debug("["+user+"];"));
 		}
 		return ok(JsonUtil.getJson(UserGroup.find.all()));
 	}
@@ -54,7 +51,7 @@ public class UserGroupController extends Controller {
 	 *
 	 * @param id
 	 *            - GroupID of the group we want to get.
-	 * @return
+	 * @return ok plus the group or notFound when the group does not exist.
 	 */
 	public Result getUserGroup(long id) {
 		UserGroup group = UserGroup.find.byId(id);
@@ -76,7 +73,7 @@ public class UserGroupController extends Controller {
 	 */
 	@BodyParser.Of(BodyParser.Json.class)
 	public Result updateUserGroup(Long id) {
-		if(JsonKeys.debugging)System.out.println(request().method());
+		if(JsonKeys.debugging)Logger.debug(request().method());
 		String information = "";
 		JsonNode json = request().body().asJson();
 		ObjectMapper mapper = new ObjectMapper();
@@ -93,7 +90,7 @@ public class UserGroupController extends Controller {
 			UserGroup requestGroup = mapper.convertValue(json, UserGroup.class);
 			UserGroup toUpdate = UserGroup.find.byId(id);
 
-			if(JsonKeys.debugging)System.out.println("Update group with details: " + requestGroup
+			if(JsonKeys.debugging)Logger.debug("Update group with details: " + requestGroup
 					+ "\n JSON Size=" + json.size());
 
 			if (json.size() == 0)
@@ -110,7 +107,7 @@ public class UserGroupController extends Controller {
 			if (json.has(JsonKeys.GROUP_USERS)) {
 				JsonNode users = json.findValue(JsonKeys.GROUP_USERS);
 
-				if(JsonKeys.debugging)System.out.println("Users=" + users + " isArray? "
+				if(JsonKeys.debugging)Logger.debug("Users=" + users + " isArray? "
 						+ users.isArray());
 				// Loop through all objects in the values associated with the
 				// JsonKeys.GROUP_USERS key.
@@ -154,15 +151,15 @@ public class UserGroupController extends Controller {
 
 			UserGroup requestGroup = mapper.convertValue(json, UserGroup.class);
 			//we do not want the app to send complete users, thus the mapper cant create the list from itself.
-			List<User> userList = null;
+			List<User> userList;
             UserGroup group = new UserGroup(requestGroup);
 			if (json.has(JsonKeys.GROUP_USERS)) {
 				//create a new list of users
-				userList = new ArrayList<User>();
+				userList = new ArrayList<>();
 				//get the specific nods in the json
 				JsonNode users = json.findValue(JsonKeys.GROUP_USERS);
 				if(users!=null){
-				    if(JsonKeys.debugging)System.out.println("Users=" + users);
+				    if(JsonKeys.debugging)Logger.debug("Users=" + users);
 
 				// Loop through all objects in the values associated with the
 				// JsonKeys.GROUP_USERS key.
@@ -178,13 +175,13 @@ public class UserGroupController extends Controller {
                         return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "One user that was specified did not contain an id."));
 				}
 				//set the list for the group created from the content of the json body
-				if(JsonKeys.debugging)System.out.println("Adding users to the group: "+userList);
+				if(JsonKeys.debugging) Logger.debug("Adding users to the group: "+userList);
                     group.setUsers(userList);
 
                 }
 			}
 			group.save();
-			if(JsonKeys.debugging)System.out.println(group);
+			if(JsonKeys.debugging)Logger.debug("group="+group);
 
 			return ok(JsonUtil.prepareJsonStatus(OK, "Usergroup has been created!",group.getId()));
 		} catch (IllegalArgumentException e) {
@@ -197,8 +194,8 @@ public class UserGroupController extends Controller {
 
 	/**
 	 * Grabs the group by its id, deletes the reference to this group from all members and updates them and then deletes the group.
-	 * @param id
-	 * @return
+	 * @param id of a user
+	 * @return ok when deletion is successful, notFound if the user does not exist.
 	 */
 	public Result deleteUserGroup(long id){
 	    try {
