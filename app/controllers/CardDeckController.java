@@ -47,7 +47,6 @@ public class CardDeckController extends Controller {
         try {
             return ok(JsonUtil.getJson(CardDeck.find.byId(id)));
         } catch (NullPointerException e) {
-            e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "CardDeck with the given id does not exist.", id));
         }
     }
@@ -145,13 +144,21 @@ public class CardDeckController extends Controller {
             // TODO: 17.08.2016 Appendmode, testing 
             //retrieve the correct cards list by either parsing the id and getting the correct card or the attributes to a new card.
             try{
-                List<FlashCard> cardList = parseCards(requestObject);
+                List<FlashCard> cardList=new ArrayList<>();
+                if(appendMode){
+                    cardList.addAll(deck.getCards());
+                    cardList.addAll(parseCards(requestObject));
+                }
+                else{
+                    cardList= parseCards(requestObject);
+                }
+
                 Logger.debug("Cardlist size="+cardList.size());
                 boolean canSetCards = true;
                 List<Object> cardIds = new ArrayList<>(cardList.size());
                 for (FlashCard c : cardList) {
                     Logger.debug(c.getId() + "|" + c.getDeck());
-                    if (c.getDeck() != null) {
+                    if (c.getDeck() != null && c.getDeck().getId()!=id) {
                         canSetCards = false;
                         Logger.debug("Card has a deck already, id=" + c.getId());
                         cardIds.add(c.getId());
