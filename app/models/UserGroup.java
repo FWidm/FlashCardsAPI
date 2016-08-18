@@ -37,6 +37,10 @@ public class UserGroup extends Model {
     @JsonIgnore	// to prevent endless recursion.
 	private List<User> users;
 
+	@OneToMany(/*cascade=CascadeType.ALL,*/mappedBy = "userGroup")
+	@JsonIgnore	// to prevent endless recursion.
+	private List<CardDeck> decks;
+
 	public static Model.Finder<Long, UserGroup> find = new Model.Finder<Long, UserGroup>(UserGroup.class);
 
 	public UserGroup(String name, String description, List<User> users) {
@@ -135,5 +139,23 @@ public class UserGroup extends Model {
 			System.out.println("Removing link to tag=" + user);
 		}
 		super.delete();
+	}
+
+	public List<CardDeck> getDecks() {
+		return decks;
+	}
+
+	public void setDecks(List<CardDeck> decks) {
+		this.decks = decks;
+	}
+
+	public void deleteDeck(CardDeck cardDeck) {
+		decks.remove(cardDeck);
+		update();
+	}
+
+	public void addDeck(CardDeck cardDeck) {
+		decks.add(cardDeck);
+		update();
 	}
 }

@@ -51,7 +51,6 @@ public class FlashCard extends Model {
     @JsonProperty(JsonKeys.DATE_UPDATED)
     private Date lastUpdated;
 
-    // TODO: 11/07/16 add Catalogue(CardDeck)
     @ManyToMany/*(cascade = CascadeType.ALL)*/
     @JoinTable(name=JsonKeys.CARD_TAG_JOIN_TABLE,
             joinColumns = @JoinColumn(name=JsonKeys.FLASHCARD_ID, referencedColumnName=JsonKeys.FLASHCARD_ID),

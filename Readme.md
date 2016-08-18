@@ -1,4 +1,5 @@
 # FlashCards RESTful API
+![FlashCards Logo](_Docs/img/flash_icon_250.png)
 ## Methods
 ### Users
 | Resource | GET | PUT | POST | PATCH | DELETE|
@@ -23,6 +24,11 @@
 | -------- | --- | --- | ---- | ----- | ----- |
 | `/ratings` | Retrieves a list of ratings can be filtered via `?cardId=x`, `?answerId=x`, `?userId=x`, `?cardRating`, `?answerRating`. | - | Creates a new Rating object. Automatically update the rating of the associated ansers/cards and users. | - | - |
 | `/ratings/x` | Retrieves one specific rating by  id. | - | - | - | - |
+### CardDecks
+| Resource | GET | PUT | POST | PATCH | DELETE|
+| -------- | --- | --- | ---- | ----- | ----- |
+| `/cardDecks` | Retrieve a list of all CardDecks that are available. | - | Create a new CardDeck. | - | - |
+| `/cardDecks/x` | Retrieve a CardDeck. | Update a carddeck completely. Usable URL parameters: `append={true/false}` to append the list or replace it and `reloacte={true/false}` to enable or disable relocating cards from one deck to another one.| -  | Partial update of the resoruce, all parameters from put work as well. | Delete one specific card deck including every attached card. |
 
 
 for more working routing look at the [routes](conf/routes).
@@ -43,8 +49,8 @@ If you're interested in reading about the things we use, there is a dev log file
 ## Example Calls
 ### Users
 **Elements needed for REST calls:**
-- *String*: name, password, email
-- *int*: rating
+- **String**: name, password, email
+- **int**: rating
 
 **Create a new User:**
 Use a `POST`  request to `localhost:9000/users` with `Content-Type:Application/JSON`.  The body **must** contain name, password, email (*unique*) and **may** contain a rating.
@@ -59,8 +65,8 @@ Use a `POST`  request to `localhost:9000/users` with `Content-Type:Application/J
 
 ### Groups
 **Elements needed for REST calls:**
-- *String*: name, description
-- *Array of users*: users
+- **String**: name, description
+- **Array of users**: users
 
 **Create a new Group:**
 Post a request to the host with `Content-Type:Application/JSON`.
@@ -83,7 +89,7 @@ Use `DELETE` request to `localhost:9000/groups/<id>`.
 
 ### Flashcards
 **Elements needed for Rest calls:**
-- **rating**
+- **int**: rating
 - **question** - either a complete object as seen here or the `questionId`
 - **answers** - an array of complete answer objects or `answerIds`
 
@@ -122,10 +128,10 @@ Use `DELETE` request to `localhost:9000/groups/<id>`.
 
 ### Ratings
 **Elements needed for Rest calls**
-- Author: userId
-- Answer: answerId *ODER*
-- Flashcard: FlashcardI
-- ratingModifier: um wieviel soll der Wert verändert werden (+1,-1)
+- **Author**: userId
+- **Answer**: answerId **or** a complete new answer
+- **Flashcard**: Flashcard
+- **ratingModifier**: how should the rating value change (e.g. +1,-1)
 
 **Example**: Create a Rating made by the author with userId=1 for the answer with answerId=1 that modifies the rating by -1.
 ```json
@@ -139,6 +145,27 @@ Use `DELETE` request to `localhost:9000/groups/<id>`.
     "answerId": 1
     }
   }
+```
+
+###CardDecks
+
+**Example**: Create a Carddeck with a specific cardDeckName, a description saying "", two FlashCards (can be an empty list), one UserGroup (mandatory).
+```json
+{
+    "cardDeckName": "{{cardDeckName}}",
+    "cardDeckDescpription": "",
+    "cards": [
+              {
+        "flashcardId": {{cardId1}}
+      },
+      {
+        "flashcardId": {{cardId2}}
+      }
+    ],
+    "userGroup":{
+        "groupId":{{groupId}}
+    }
+}
 ```
 ### Further Information
 see the Postman Collection for more detailled information: [here](https://github.com/FWidm/FlashCardsAPI/blob/master/_Docs/FlashCards.postman_collection.json).

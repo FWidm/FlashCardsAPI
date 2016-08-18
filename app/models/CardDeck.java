@@ -4,11 +4,13 @@ import com.avaje.ebean.Model;
 import com.avaje.ebean.annotation.PrivateOwned;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import play.Logger;
 import play.data.validation.Constraints;
 import util.JsonKeys;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Jonas Kraus
@@ -23,6 +25,16 @@ public class CardDeck extends Model {
     @Column(name = JsonKeys.CARDDECK_ID)
     @JsonProperty(JsonKeys.CARDDECK_ID)
     private long id;
+
+    @Constraints.Required
+    private boolean visible;
+
+    @Constraints.Required
+    @ManyToOne
+    @JoinColumn(name=JsonKeys.CARDDECK_GROUP)
+    @JsonProperty(JsonKeys.CARDDECK_GROUP)
+    private UserGroup userGroup;
+
     @Constraints.Required
     @Column(name = JsonKeys.CARDDECK_NAME)
     @Constraints.MinLength(3)
@@ -32,7 +44,7 @@ public class CardDeck extends Model {
     @JsonProperty(JsonKeys.CARDDECK_DESCRIPTION)
     private String description;
     //this cascades from the "tag" to "join_cards_tag" - e.g. tag.delete -> delete evey entry with tag.id
-    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "deck")
+    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "deck",fetch = FetchType.EAGER)
     @PrivateOwned
     @JsonProperty(JsonKeys.CARDDECK_CARDS)
     private List<FlashCard> cards;
@@ -59,6 +71,10 @@ public class CardDeck extends Model {
         this.name = otherDeck.getName();
         this.description = otherDeck.getDescription();
         this.cards = otherDeck.getCards();
+        this.userGroup=otherDeck.getUserGroup();
+        userGroup.addDeck(this);
+        this.visible=otherDeck.isVisible();
+        Logger.debug("constructor: "+this);
     }
 
 
@@ -98,13 +114,36 @@ public class CardDeck extends Model {
         this.description = description;
     }
 
+    public UserGroup getUserGroup() {
+        return userGroup;
+    }
+
+    public void setUserGroup(UserGroup userGroup) {
+        this.userGroup = userGroup;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
     @Override
     public void delete() {
+        userGroup.deleteDeck(this);
         for (FlashCard card : cards) {
 /*            card.setDeck(null);
             card.update();*/
             card.delete();
         }
+        String gIds="";
+
+        StringBuilder b = new StringBuilder();
+        Logger.debug("GroupID="+userGroup.getId()+" | "+userGroup.getDecks());
+        userGroup.getDecks().forEach(deck->b.append(deck.getId()+"; "));
+        Logger.debug("delete: usergroup.deck="+b.toString());
         super.delete();
     }
 
@@ -112,6 +151,8 @@ public class CardDeck extends Model {
     public String toString() {
         return "CardDeck{" +
                 "id=" + id +
+                ", visible=" + visible +
+                ", userGroup=" + userGroup +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", cards=" + cards +
