@@ -35,6 +35,14 @@ public class CardDeckController extends Controller {
         }
     }
 
+    public Result getCardDeckCards(long id){
+        try {
+            return ok(JsonUtil.getJson(CardDeck.find.byId(id).getCards()));
+        } catch (NullPointerException e) {
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "CardDeck with the given id does not exist.", id));
+        }
+    }
+
     public Result deleteCardDeck(long id) {
         CardDeck.find.byId(id).delete();
         return noContent();
@@ -50,7 +58,7 @@ public class CardDeckController extends Controller {
             CardDeck requestObject = mapper.convertValue(json, CardDeck.class);
 
             //retrieve the correct cards list by either parsing the id and getting the correct card or the attributes to a new card.
-
+// TODO: 23/08/16 When an empty group is specified, catch error
             List<FlashCard> cardList = parseCards(requestObject);
 
             CardDeck deck = new CardDeck(requestObject);

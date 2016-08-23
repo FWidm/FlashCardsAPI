@@ -62,6 +62,8 @@ DELETE  /ratings/:id        controllers.RatingController.deleteRating(id:Long)
 #CardDecks
 GET     /cardDecks          controllers.CardDeckController.getCardDecks
 GET     /cardDecks/:id      controllers.CardDeckController.getCardDeck(id:Long)
+GET     /cardDecks/:id/cards controllers.CardDeckController.getCardDeckCards(id:Long)
+
 POST    /cardDecks          controllers.CardDeckController.addCardDeck
 PUT     /cardDecks/:id      controllers.CardDeckController.updateCardDeck(id:Long)
 PATCH   /cardDecks/:id      controllers.CardDeckController.updateCardDeck(id:Long)
