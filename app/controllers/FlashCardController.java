@@ -299,11 +299,14 @@ public class FlashCardController {
      */
     public Result getAuthor(long id) {
         User ret;
-        try {
+
             ret = FlashCard.find.byId(id).getAuthor();
-        } catch (Exception e) {
-            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
-        }
+            if(ret==null){
+                Logger.debug("Getting author="+ret);
+                return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
+
+            }
+
         return ok(JsonUtil.getJson(ret));
     }
 

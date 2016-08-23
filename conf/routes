@@ -18,6 +18,7 @@ GET     /testRating         controllers.HomeController.testRating
 GET     /testCardDeck         controllers.HomeController.testCardDeck
 
 GET     /test               controllers.HomeController.test
+GET     /heartbeat          controllers.HomeController.heartbeat
 POST    /auth               controllers.HomeController.auth
 POST    /login              controllers.HomeController.login
 POST    /upload              controllers.HomeController.imageUpload

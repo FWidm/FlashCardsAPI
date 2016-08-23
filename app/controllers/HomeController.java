@@ -275,4 +275,10 @@ public class HomeController extends Controller {
     public Result test() {
         return ok(JsonUtil.prepareJsonStatus(OK, "hello world"));
     }
+
+    public Result heartbeat(){
+        Map<String,Object> map=new HashMap<>();
+        map.put("currentDate",""+new Date());
+        return ok(JsonUtil.convertToJsonNode(map));
+    }
 }
