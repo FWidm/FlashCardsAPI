@@ -16,6 +16,7 @@ GET     /testGroups         controllers.HomeController.testGroups
 GET     /testTokens         controllers.HomeController.testTokens
 GET     /testRating         controllers.HomeController.testRating
 GET     /testCardDeck         controllers.HomeController.testCardDeck
+GET     /testCategories     controllers.HomeController.testCategories
 
 GET     /test               controllers.HomeController.test
 GET     /heartbeat          controllers.HomeController.heartbeat
@@ -69,3 +70,5 @@ POST    /cardDecks          controllers.CardDeckController.addCardDeck
 PUT     /cardDecks/:id      controllers.CardDeckController.updateCardDeck(id:Long)
 PATCH   /cardDecks/:id      controllers.CardDeckController.updateCardDeck(id:Long)
 DELETE  /cardDecks/:id      controllers.CardDeckController.deleteCardDeck(id:Long)
+
+#Categories

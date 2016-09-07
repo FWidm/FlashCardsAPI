@@ -41,6 +41,8 @@ public class JsonKeys {
     public static final String FLASHCARD_TAGS = "tags";
     public static final String FLASHCARD_MULTIPLE_CHOICE = "multipleChoice";
     public static final String FLASHCARD_PARENT_ID="cardDeckId";
+    public static final String FLASHCARD_DECK= "deck";
+
     public static final String FLASHCARD_JSON_ELEMENTS = RATING + ", " + FLASHCARD_ANSWERS + ", " + FLASHCARD_QUESTION + ", " + AUTHOR + ", " + FLASHCARD_MULTIPLE_CHOICE + ", " + FLASHCARD_TAGS;
 
     //User
@@ -95,5 +97,13 @@ public class JsonKeys {
     public static final String CARDDECK_VISIBLE="visible";
     public static final String CARDDECK_GROUP="userGroup";
     public static final String CARDDECK_JSON_ELEMENTS = CARDDECK_NAME+", "+CARDDECK_DESCRIPTION+", "+CARDDECK_CARDS+" (child: list containing flashcardIDs)";
+    public static final String CARDDECK_CATEGORY= "category";
+
+    //Category
+    public static final String CATEGORY_ID = "categoryId";
+    public static final String CATEGORY_NAME = "categoryName";
+    public static final String CATEGORY_PARENT = "parent";
+    public static final String CATEGORY_DECK = "cardDecks";
+
 
 }

@@ -38,16 +38,21 @@ public class CardDeck extends Model {
     @Constraints.Required
     @Column(name = JsonKeys.CARDDECK_NAME)
     @Constraints.MinLength(3)
-    @Constraints.MaxLength(16)
+    @Constraints.MaxLength(30)
     @JsonProperty(JsonKeys.CARDDECK_NAME)
     private String name;
     @JsonProperty(JsonKeys.CARDDECK_DESCRIPTION)
     private String description;
     //this cascades from the "tag" to "join_cards_tag" - e.g. tag.delete -> delete evey entry with tag.id
-    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "deck",fetch = FetchType.EAGER)
+    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = JsonKeys.FLASHCARD_DECK,fetch = FetchType.EAGER)
     @PrivateOwned
     @JsonProperty(JsonKeys.CARDDECK_CARDS)
     private List<FlashCard> cards;
+
+    @ManyToOne
+    @JoinColumn(name=JsonKeys.CARDDECK_CATEGORY)
+    @JsonProperty(JsonKeys.CARDDECK_CATEGORY)
+    private Category category;
 
     public static Finder<Long, CardDeck> find = new Finder<Long, CardDeck>(CardDeck.class);
 
@@ -128,6 +133,14 @@ public class CardDeck extends Model {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     @Override

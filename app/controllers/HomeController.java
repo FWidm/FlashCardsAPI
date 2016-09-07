@@ -281,4 +281,68 @@ public class HomeController extends Controller {
         map.put("currentDate",""+new Date());
         return ok(JsonUtil.convertToJsonNode(map));
     }
+
+    public Result testCategories(){
+        Category root = new Category("0");
+        root.save();
+        Category firstLevel = new Category("1",root);
+        firstLevel.save();
+        Category secondLevel = new Category("2",firstLevel);
+        secondLevel.save();
+
+        List<CardDeck> cardDeckList = generateDeckList(2,5,5);
+        Category thirdLevel = new Category("3",secondLevel);
+        thirdLevel.save();
+
+        thirdLevel.setCardDeckList(cardDeckList);
+        thirdLevel.update();
+
+        Logger.debug("Root="+root+ "parent="+ root.getParent());
+        Logger.debug("1st Level="+firstLevel+" parent="+firstLevel.getParent());
+        Logger.debug("2nd Level="+secondLevel+" parent="+secondLevel.getParent());
+        Logger.debug("3rd Level="+thirdLevel+" parent="+thirdLevel.getParent()+ "deck#="+thirdLevel.getCardDeckList().size());
+
+
+        return ok();
+    }
+
+    private List<CardDeck> generateDeckList(int noDecks, int noCards, int noAnswers){
+        List<CardDeck> cardDeckList = new ArrayList<>();
+
+        User tmp = User.find.where().eq("email", "hello1@world.com").findUnique();
+        if (tmp == null) {
+            tmp = new User("hello", "hello1@world.com", "passwörd", 1);
+            tmp.save();
+        }
+        CardDeck deck;
+        for(int x=0; x<noDecks; x++) {
+            deck = new CardDeck("Deck "+x, "This is a test");
+            deck.save();
+            List<FlashCard> flashCardList = new ArrayList<>();
+            for (int i = 0; i < noCards; i++) {
+                List<String> tags = new ArrayList<>();
+                tags.add("Tag-" + i);
+
+                FlashCard fc = new FlashCard(tmp, false, tags);
+                fc.save();
+                Question q = new Question("Question-" + i, tmp);
+                q.save();
+                fc.setQuestion(q);
+                for (int j = 0; j < noAnswers; j++) {
+                    Answer a = new Answer("Answer-" + i + "|" + j, "none", tmp);
+                    a.save();
+                    fc.addAnswer(a);
+                }
+
+                fc.setDeck(deck);
+                fc.update();
+
+                flashCardList.add(fc);
+            }
+            cardDeckList.add(deck);
+        }
+        Logger.debug("Finished creating "+cardDeckList.size()+" decks!");
+        return cardDeckList;
+    }
+
 }
