@@ -52,6 +52,7 @@ public class CardDeck extends Model {
     @ManyToOne
     @JoinColumn(name=JsonKeys.CARDDECK_CATEGORY)
     @JsonProperty(JsonKeys.CARDDECK_CATEGORY)
+    @JsonIgnore
     private Category category;
 
     public static Finder<Long, CardDeck> find = new Finder<Long, CardDeck>(CardDeck.class);
@@ -135,6 +136,7 @@ public class CardDeck extends Model {
         this.visible = visible;
     }
 
+    @JsonIgnore
     public Category getCategory() {
         return category;
     }

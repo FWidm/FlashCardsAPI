@@ -303,7 +303,7 @@ public class HomeController extends Controller {
         Logger.debug("3rd Level="+thirdLevel+" parent="+thirdLevel.getParent()+ "deck#="+thirdLevel.getCardDeckList().size());
 
 
-        return ok();
+        return ok(JsonUtil.getJson(thirdLevel));
     }
 
     private List<CardDeck> generateDeckList(int noDecks, int noCards, int noAnswers){

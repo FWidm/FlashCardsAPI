@@ -2,6 +2,7 @@ package models;
 
 import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import play.data.validation.Constraints;
 import util.JsonKeys;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * @author Jonas Kraus
  * @author Fabian Widmann
  */
+@JsonPropertyOrder({ JsonKeys.CATEGORY_ID, JsonKeys.CATEGORY_NAME})
 @Entity
 public class Category extends Model{
     @Id
@@ -22,15 +24,20 @@ public class Category extends Model{
 
     @Constraints.Required
     @Column(name = JsonKeys.CATEGORY_NAME)
+    @JsonProperty(JsonKeys.CATEGORY_NAME)
     @Constraints.MinLength(3)
     @Constraints.MaxLength(30)
     private String Name;
 
     @Column(name = JsonKeys.CATEGORY_DECK)
     @OneToMany(mappedBy = JsonKeys.CARDDECK_CATEGORY,fetch = FetchType.EAGER)
+    @JsonProperty(JsonKeys.CATEGORY_DECK)
+
     private List<CardDeck> cardDeckList;
 
     @Column(name = JsonKeys.CATEGORY_PARENT)
+    @JsonProperty(JsonKeys.CATEGORY_PARENT)
+
     @ManyToOne
     private Category parent;
 
