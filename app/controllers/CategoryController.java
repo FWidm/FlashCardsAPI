@@ -9,7 +9,7 @@ import java.util.List;
 import static play.mvc.Results.ok;
 
 /**
- * Created by Jonas Kraus jonas.kraus@uni-ulm.de on 09.09.2016.
+ * @author Jonas Kraus jonas.kraus@uni-ulm.de
  */
 public class CategoryController {
 
