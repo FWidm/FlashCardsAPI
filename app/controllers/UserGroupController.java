@@ -13,6 +13,7 @@ import play.Logger;
 import play.mvc.*;
 import util.JsonKeys;
 import util.JsonUtil;
+import util.RequestKeys;
 
 public class UserGroupController extends Controller {
 
@@ -24,11 +25,11 @@ public class UserGroupController extends Controller {
 	 */
 	public Result getUserGroupList() {
 		Map<String, String[]> urlParams = Controller.request().queryString();
-		if(urlParams.keySet().contains("empty")){
+		if(urlParams.keySet().contains(RequestKeys.EMPTY)){
 			if(JsonKeys.debugging)Logger.debug("only print empty or nonempty groups");
 			//only print the first val we get for the key, this is possible as /groups?empty=true&empty=false could return
 			//multiple values.
-			if(urlParams.get("empty")[0].equals("true")){
+			if(urlParams.get(RequestKeys.EMPTY)[0].equals("true")){
 				// TODO: 27/06/16 check why the opposite of UserGroup.find.where().isNotNull(JsonKeys.GROUP_USERS).findList() does not work for this. Always returns 0.
 				List<UserGroup> nonEmptyGroups=UserGroup.find.where().isNotNull(JsonKeys.GROUP_USERS).findList();
 				List<UserGroup> emptyGroups=UserGroup.find.all();

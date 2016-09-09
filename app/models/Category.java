@@ -27,7 +27,7 @@ public class Category extends Model{
     @JsonProperty(JsonKeys.CATEGORY_NAME)
     @Constraints.MinLength(3)
     @Constraints.MaxLength(30)
-    private String Name;
+    private String name;
 
     @Column(name = JsonKeys.CATEGORY_DECK)
     @OneToMany(mappedBy = JsonKeys.CARDDECK_CATEGORY,fetch = FetchType.EAGER)
@@ -44,19 +44,29 @@ public class Category extends Model{
     public static Model.Finder<Long, Category> find = new Model.Finder<Long, Category>(Category.class);
 
     public Category(String name) {
-        Name = name;
+        this.name = name;
     }
 
     public Category(String name, Category parent) {
-        Name = name;
+        this.name = name;
         this.parent = parent;
     }
 
     public Category(String name, List<CardDeck> cardDeckList, Category parent) {
-        Name = name;
+        this.name = name;
         this.cardDeckList = cardDeckList;
 
         this.parent = parent;
+    }
+
+    /**
+     * Create a new object with the same attribute value as another one.
+     * @param category
+     */
+    public Category(Category category) {
+        this.name = category.getName();
+        this.parent=category.getParent();
+        this.cardDeckList=category.getCardDeckList();
     }
 
     public long getId() {
@@ -68,11 +78,11 @@ public class Category extends Model{
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        this.name = name;
     }
 
     public List<CardDeck> getCardDeckList() {
@@ -83,7 +93,6 @@ public class Category extends Model{
         this.cardDeckList = cardDeckList;
         for (CardDeck deck: cardDeckList) {
             deck.setCategory(this);
-            deck.update();
         }
     }
 
@@ -99,7 +108,7 @@ public class Category extends Model{
     public String toString() {
         return "Category{" +
                 "id=" + id +
-                ", Name='" + Name + '\'' +
+                ", name='" + name + '\'' +
                 ", cardDeckList=" + cardDeckList +
                 ", parent=" + parent +
                 '}';

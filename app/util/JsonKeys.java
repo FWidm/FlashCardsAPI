@@ -96,14 +96,15 @@ public class JsonKeys {
     public static final String CARDDECK_CARDS="cards";
     public static final String CARDDECK_VISIBLE="visible";
     public static final String CARDDECK_GROUP="userGroup";
-    public static final String CARDDECK_JSON_ELEMENTS = CARDDECK_NAME+", "+CARDDECK_DESCRIPTION+", "+CARDDECK_CARDS+" (child: list containing flashcardIDs)";
     public static final String CARDDECK_CATEGORY= "category";
+    public static final String CARDDECK_JSON_ELEMENTS = CARDDECK_NAME+", "+CARDDECK_DESCRIPTION+", "+CARDDECK_CARDS+" (child: list containing flashcardIds)";
 
     //Category
     public static final String CATEGORY_ID = "categoryId";
     public static final String CATEGORY_NAME = "categoryName";
     public static final String CATEGORY_PARENT = "parent";
     public static final String CATEGORY_DECK = "cardDecks";
+    public static final String CATEGORY_JSON_ELEMENTS = CATEGORY_NAME+", "+CATEGORY_PARENT+", "+CATEGORY_DECK+" (list containing cardDeckIds)";
 
 
 }

@@ -295,6 +295,9 @@ public class HomeController extends Controller {
         thirdLevel.save();
 
         thirdLevel.setCardDeckList(cardDeckList);
+        for (CardDeck deck:cardDeckList) {
+            deck.update();
+        }
         thirdLevel.update();
 
         Logger.debug("Root="+root+ "parent="+ root.getParent());

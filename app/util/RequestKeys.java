@@ -14,6 +14,8 @@ public class RequestKeys {
     public static final String APPEND = "append";
     public static final String REDIRECT ="redirect";
     public static final String SORT_BY="sortBy";
+    public static final String EMPTY= "empty";
+    public static final String ROOT= "root";
 
     public static final String ANSWER_RATING = "answerRating";
     public static final String FLASHCARD_RATING = "cardRating";
