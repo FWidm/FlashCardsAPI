@@ -47,8 +47,8 @@ If you're interested in reading about the things we use, there is a dev log file
 - [x] Session Management/Authentication/Token based system
 - [x] Write Ratingsystem
 - [x] Rewrite Group System
-- [] Implement CardDeck and Categories
-    - [] Implement Categories
+- [ ] Implement CardDeck and Categories
+    - [ ] Implement Categories
       - [ ] Write Postman tests
       - [ ] Implement delete function
     - [x] Implement CardDeck
