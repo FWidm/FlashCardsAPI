@@ -83,8 +83,7 @@ public class UserGroupController extends Controller {
 		if(request().method().equals("PUT") && (!json.has(JsonKeys.GROUP_NAME) || !json.has(JsonKeys.GROUP_DESCRIPTION) || !json.has(JsonKeys.GROUP_USERS))){
 			return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
 					"The Update method needs all details of the group, such as name, " +
-							"description and a user group (array of users or null). An attribute was missing for id="
-							+ id + "."));
+							"description and a user group (array of users or null). An attribute was missing.",id ));
 		}
 
 		try {

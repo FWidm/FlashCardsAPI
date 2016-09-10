@@ -38,13 +38,17 @@ If you're interested in reading about the things we use, there is a dev log file
 
 ## TODO
 - [ ] Decide where appending is useful in the future
-- [x] Add append via url paramter to card PUT/PATCH methods
+- [x] Add append via url parameter to card PUT/PATCH methods
 - [x] Session Management/Authentication/Token based system
 - [x] Write Ratingsystem
 - [x] Rewrite Group System
 - [ ] Implement CardDeck and Categories
+    - [ ] Implement Categories
+    - [x] Implement CardDeck
 - [ ] Write proper Unit-Tests in Postman
-    - [x] started this process with the `/users` category
+    - [x] `/users`
+    - [x] `/cardDecks`
+- [ ]
 
 ## Example Calls
 ### Users

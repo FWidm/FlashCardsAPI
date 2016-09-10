@@ -143,7 +143,7 @@ public class FlashCard extends Model {
      * @param answer
      */
     public void addAnswer(Answer answer){
-        System.out.println("Flashcard: addAnswer a="+answer);
+//        System.out.println("Flashcard: addAnswer a="+answer);
         if(answer!=null && !this.answers.contains(answer)){
             this.answers.add(answer);
             answer.setCard(this);
@@ -156,7 +156,7 @@ public class FlashCard extends Model {
      * @param question
      */
     public void setQuestion(Question question) {
-        System.out.println("Flashcard: setQuestionText q="+question);
+//        System.out.println("Flashcard: setQuestionText q="+question);
         this.question = question;
     }
 
