@@ -30,6 +30,10 @@
 | `/cardDecks` | Retrieve a list of all CardDecks that are available. | - | Create a new CardDeck. | - | - |
 | `/cardDecks/x` | Retrieve a CardDeck. | Update a carddeck completely. Usable URL parameters: `append={true/false}` to append the list or replace it and `reloacte={true/false}` to enable or disable relocating cards from one deck to another one.| -  | Partial update of the resoruce, all parameters from put work as well. | Delete one specific card deck including every attached card. |
 
+| Resource | GET | PUT | POST | PATCH | DELETE|
+| -------- | --- | --- | ---- | ----- | ----- |
+| `/categories` | Retrieve a list of all categories that are available. Usable URL params: `?root=true` to get all nodes that have no parent and are thus root directories. | - | Create a new category. | - | - |
+| `/categories/x` | Retrieve a category by id. Usable URL parameters: `/children` retrieves a list of all children of node with the id x. | Update a category completely. Usable URL parameters: `append={true/false}` to append the list or replace it. | -  | Partial update of the category, all parameters from put work as well. | -|
 
 for more working routing look at the [routes](conf/routes).
 

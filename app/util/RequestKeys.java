@@ -15,7 +15,6 @@ public class RequestKeys {
     public static final String REDIRECT ="redirect";
     public static final String SORT_BY="sortBy";
     public static final String EMPTY= "empty";
-    public static final String ROOT= "root";
 
     public static final String ANSWER_RATING = "answerRating";
     public static final String FLASHCARD_RATING = "cardRating";
@@ -23,5 +22,9 @@ public class RequestKeys {
     public static final String USER_ID = "userId";
     public static final String FLASHCARD_ID = "cardId";
     public static final String ANSWER_ID = "answerId";
+
+    //category params
+    public static final String ROOT= "root";
+    public static final String CHILDREN= "children";
 
 }

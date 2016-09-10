@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "FlashCards",
-		"_postman_id": "5e233e97-2b68-3b6e-0666-ebb8eb553754",
+		"_postman_id": "e8a58dd2-2d12-336c-7760-28a65b04ec5e",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -667,12 +667,12 @@
 				{
 					"name": "Retrieve all Categories",
 					"request": {
-						"url": "http://localhost:9000/categories",
+						"url": "{{url}}{{port}}/categories",
 						"method": "GET",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"categoryName\": \"0\",\n  \"name\": \"0\",\n  \"cardDecks\": [\n  \t{\n      \"cardDeckId\": 29\n  \t}],\n  \"parent\": {\"categoryId\": 1}\n}"
+							"raw": "{\n  \"categoryName\": \"0\",\n  \"name\": \"0\",\n  \"cardDecks\": [\n    {\n      \"cardDeckId\": 29\n    }],\n  \"parent\": {\"categoryId\": 1}\n}"
 						},
 						"description": ""
 					},
@@ -681,7 +681,7 @@
 				{
 					"name": "Save a new category",
 					"request": {
-						"url": "http://localhost:9000/categories",
+						"url": "{{url}}{{port}}/categories",
 						"method": "POST",
 						"header": [
 							{
@@ -692,7 +692,35 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"categoryName\": \"0\",\n  \"cardDecks\": [\n  \t{\n      \"cardDeckId\": 29\n  \t},\n  \t{\n      \"cardDeckId\": 29\n  \t},\n  \t{\n      \"cardDeckId\": 29\n  \t}],\n  \"parent\": {\"categoryId\": 1}\n}"
+							"raw": "{\n  \"categoryName\": \"0\",\n  \"cardDecks\": [\n    {\n      \"cardDeckId\": 29\n    },\n    {\n      \"cardDeckId\": 29\n    },\n    {\n      \"cardDeckId\": 29\n    }],\n  \"parent\": {\"categoryId\": 1}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Find children of a node via request param",
+					"request": {
+						"url": "{{url}}{{port}}/categories/{{categoryId}}?children",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Find a specific category",
+					"request": {
+						"url": "{{url}}{{port}}/categories/{{categoryId}}",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
 						},
 						"description": ""
 					},

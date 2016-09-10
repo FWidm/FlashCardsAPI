@@ -9,13 +9,16 @@ import java.util.Map;
 import models.*;
 import models.rating.AnswerRating;
 import models.rating.CardRating;
+import play.Logger;
 import play.libs.Json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import util.exceptions.ObjectNotExistingException;
 import util.exceptions.ParameterNotSupportedException;
 
+// TODO: 10.09.2016 Restructure
 public class JsonUtil {
 //	public final static String dateformat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
@@ -181,6 +184,7 @@ public class JsonUtil {
             // when a user id is found we will get the object and add them to the userList.
             System.out.println("Node=" + node);
             if (node.has(JsonKeys.ANSWER_ID)) {
+                // TODO: 10.09.2016 do we want to support loading existing answers or can it stay this way? e.g. only new answers are allowed for a flashcard.
                 throw new ParameterNotSupportedException();
             } else {
                 try {
@@ -325,11 +329,10 @@ public class JsonUtil {
 
     /**
      * Create a new UserGroup with the given name and description.
-     *
      * @param json
-     * @return
+     * @return the usergroup from the json node
      */
-    private static UserGroup parseGroup(JsonNode json) {
+    public static UserGroup parseGroup(JsonNode json) {
 //        System.out.println("json=" + json);
         String name = null, description = null;
 
@@ -341,5 +344,25 @@ public class JsonUtil {
         }
         UserGroup group = new UserGroup(name, description, null);
         return group;
+    }
+
+    /**
+     * Retrieves the parent category from the given category. If the id of the parent object cant be found in the database, throw the exception.
+     * @param receivedCategory
+     * @return the category from db or null if null is received
+     * @throws ObjectNotExistingException
+     */
+    public static Category parseParent(Category receivedCategory) throws ObjectNotExistingException {
+        if(receivedCategory.getParent()!=null){
+            Category parent = Category.find.byId(receivedCategory.getParent().getId());
+            Logger.debug("got parent="+parent);
+            if(parent!=null){
+                return parent;
+            }
+            else
+                throw new ObjectNotExistingException("Parent does not exist with the id="+receivedCategory.getParent().getId());
+        }
+        else
+            return null;
     }
 }

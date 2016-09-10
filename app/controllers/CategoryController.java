@@ -11,6 +11,8 @@ import play.mvc.Result;
 import util.JsonKeys;
 import util.JsonUtil;
 import util.RequestKeys;
+import util.UrlParamHelper;
+import util.exceptions.ObjectNotExistingException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +31,9 @@ public class CategoryController extends Controller {
      * @return HTTPResult
      */
     public Result getCategoryList() {
-        Map<String, String[]> urlParams = Controller.request().queryString();
-        if(urlParams.keySet().contains(RequestKeys.ROOT)){
-            if(urlParams.get(RequestKeys.ROOT)[0].equals("true")){
-                List<Category> emptyGroups=Category.find.where().isNull(JsonKeys.CATEGORY_PARENT).findList();
-                return ok(JsonUtil.getJson(emptyGroups));
-            }
+        if(UrlParamHelper.checkBool(RequestKeys.ROOT)){
+            List<Category> emptyGroups=Category.find.where().isNull(JsonKeys.CATEGORY_PARENT).findList();
+            return ok(JsonUtil.getJson(emptyGroups));
         }
         return ok(JsonUtil.getJson(Category.find.all()));
     }
@@ -46,6 +45,11 @@ public class CategoryController extends Controller {
      */
     public Result getCategory(Long id) {
         try {
+            if(UrlParamHelper.keyExists(RequestKeys.CHILDREN)){
+                Category parent = Category.find.byId(id);
+                List<Category> children = Category.find.where().eq(JsonKeys.CATEGORY_PARENT,parent).findList();
+                return ok(JsonUtil.getJson(children));
+            }
             return ok(JsonUtil.getJson(Category.find.byId(id)));
         } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Category with the given id does not exist.", id));
@@ -58,7 +62,6 @@ public class CategoryController extends Controller {
      */
     @BodyParser.Of(BodyParser.Json.class)
     public Result addCategory(){
-        // TODO: 10/09/16 when the parent id is wrong the id is incremented without adding it to the db, we should fix this
         try{
             String information="";
             JsonNode json = request().body().asJson();
@@ -71,13 +74,9 @@ public class CategoryController extends Controller {
             if(receivedCategory.getId()>0){
                 receivedCategory.setId(0);
             }
-            //retrieve the parent by it's id
-            if(receivedCategory.getParent()!=null && Category.find.byId(receivedCategory.getParent().getId())!=null){
-                category.setParent(Category.find.byId(receivedCategory.getParent().getId()));
-            }
-            else{
-                badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Specified parent for the category does not exist.",receivedCategory.getParent().getId()));
-            }
+            //retrieve the parent by id
+            category.setParent(JsonUtil.parseParent(receivedCategory));
+
             //handle cardDeck list
             List<CardDeck> cardDeckList=new ArrayList<>();
             if(receivedCategory.getCardDeckList()!=null){
@@ -104,7 +103,7 @@ public class CategoryController extends Controller {
             
             Logger.debug("finishing="+category);
             category.save();
-            //cardDecks themselve can be re-set to a new category at the moment,
+            //cardDecks themselves can be re-set to a new category at the moment,
             for (CardDeck cardDeck : cardDeckList) {
                 cardDeck.setCategory(category);
                 cardDeck.update();
@@ -114,68 +113,85 @@ public class CategoryController extends Controller {
                 msg+= information;
             return ok(JsonUtil.prepareJsonStatus(OK,msg ,category.getId()));
 
-        }catch (Exception e){
+        }catch (IllegalArgumentException e){
             e.printStackTrace();
             return badRequest(JsonUtil
                     .prepareJsonStatus(
                             BAD_REQUEST, "Body did contain elements that are not allowed/expected. A category can contain: " + JsonKeys.CATEGORY_JSON_ELEMENTS));
+        }catch (ObjectNotExistingException e){
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage()));
         }
     }
+
+
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateCategory(Long id){
         try{
             String information="";
+            boolean append=UrlParamHelper.checkBool(RequestKeys.APPEND);
+            Logger.debug("Appending? "+append);
             JsonNode json = request().body().asJson();
             ObjectMapper mapper = new ObjectMapper();
 
             Category receivedCategory=mapper.convertValue(json, Category.class);
             Category category=Category.find.byId(id);
 
-            Logger.debug("rcvd="+receivedCategory);
             //Check whether the request was a put and if it was check if a param is missing, if that is the case --> bad req.
             if(request().method().equals("PUT") && (!json.has(JsonKeys.CATEGORY_NAME) || !json.has(JsonKeys.CATEGORY_DECK) || !json.has(JsonKeys.CATEGORY_PARENT))){
                 return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
                         "The Update method needs all details of the category, such as name, " +
                                 "an array of carddeck (ids) and a parent (null or id of another category).",id));
             }
-
-            //retrieve the parent by it's id
-            if(receivedCategory.getParent()!=null && receivedCategory.getParent().getId()>0){
-                category.setParent(Category.find.byId(receivedCategory.getParent().getId()));
+            if(json.has(JsonKeys.CATEGORY_NAME)){
+                category.setName(receivedCategory.getName());
             }
-            //handle cardDeck list
-            List<CardDeck> cardDeckList=new ArrayList<>();
-            if(receivedCategory.getCardDeckList()!=null){
-                for (CardDeck cardDeck : receivedCategory.getCardDeckList()) {
-                    CardDeck tmp = CardDeck.find.byId(cardDeck.getId());
-                    //add it to the list if it isnt already in and isnt null
-                    if(!cardDeckList.contains(tmp) && tmp!=null && tmp.getCategory()==null) {
-                        cardDeckList.add(cardDeck);
-                    }
-                    //if it is null we can't handle the request, thus we send a notFound to the user
-                    else if(tmp==null){
-                        return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "One cardDeck could not be found.",cardDeck.getId()));
-                    }
-                    //if it is just a duplicate, add it to the information flag we add onto the reply for the user to read.
-                    else if(cardDeckList.contains(tmp))
-                        information+=" Error adding cardDeck"+cardDeck.getId()+", it was sent more than once.";
-                    else if(tmp.getCategory()!=null){
-                        information+=" Error adding cardDeck"+cardDeck.getId()+", it already has a parent.";
+
+            //retrieve the parent by id
+            if(json.has(JsonKeys.CATEGORY_PARENT)){
+                category.setParent(JsonUtil.parseParent(receivedCategory));
+            }
+
+            // TODO: 10.09.2016 Append mode is currently the std.!
+            if(json.has(JsonKeys.CATEGORY_DECK)) {
+                //handle cardDeck list
+                List<CardDeck> cardDeckList = new ArrayList<>();
+                if(!append){
+                    for (CardDeck cardDeck :
+                            category.getCardDeckList()) {
+                            cardDeck.setCategory(null);
+                            cardDeck.update();
                     }
                 }
-                Logger.debug("deckList="+cardDeckList);
-                category.setCardDeckList(cardDeckList);
+                if (receivedCategory.getCardDeckList() != null) {
+                    for (CardDeck cardDeck : receivedCategory.getCardDeckList()) {
+                        CardDeck tmp = CardDeck.find.byId(cardDeck.getId());
+                        //add it to the list if it isn't already in and isn't null
+
+                        if (!cardDeckList.contains(tmp) && tmp != null && tmp.getCategory() == null) {
+                            cardDeckList.add(cardDeck);
+                            cardDeck.setCategory(category);
+                            cardDeck.update();
+                        }
+                        //if it is null we can't handle the request, thus we send a notFound to the user
+                        else if (tmp == null) {
+                            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "One cardDeck could not be found.", cardDeck.getId()));
+                        }
+                        //if it is just a duplicate, add it to the information flag we add onto the reply for the user to read.
+                        else if (cardDeckList.contains(tmp))
+                            information += " Error adding cardDeck" + cardDeck.getId() + ", it was sent more than once.";
+                        else if (tmp.getCategory() != null) {
+                            information += " Error adding cardDeck" + cardDeck.getId() + ", it already has a parent.";
+                        }
+                    }
+                    category.setCardDeckList(cardDeckList);
+                    Logger.debug("deckList=" + cardDeckList+" category list="+category.getCardDeckList());
+                }
             }
 
-            Logger.debug("finishing="+category);
-            category.save();
-            //cardDecks themselve can be re-set to a new category at the moment,
-            for (CardDeck cardDeck : cardDeckList) {
-                cardDeck.setCategory(category);
-                cardDeck.update();
-            }
-            String msg = "Category has been created!";
+            category.update();
+
+            String msg = "Category has been updated!";
             if(information!="")
                 msg+= information;
             return ok(JsonUtil.prepareJsonStatus(OK,msg ,category.getId()));

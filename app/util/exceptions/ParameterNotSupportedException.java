@@ -3,6 +3,7 @@ package util.exceptions;
 /**
  * @author Jonas Kraus
  * @author Fabian Widmann
+ * Should be used if the user specifies information we cannot use such as
  */
 public class ParameterNotSupportedException extends Exception {
 
