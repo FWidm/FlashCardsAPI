@@ -30,6 +30,7 @@
 | `/cardDecks` | Retrieve a list of all CardDecks that are available. | - | Create a new CardDeck. | - | - |
 | `/cardDecks/x` | Retrieve a CardDeck. | Update a carddeck completely. Usable URL parameters: `append={true/false}` to append the list or replace it and `reloacte={true/false}` to enable or disable relocating cards from one deck to another one.| -  | Partial update of the resoruce, all parameters from put work as well. | Delete one specific card deck including every attached card. |
 
+### Categories
 | Resource | GET | PUT | POST | PATCH | DELETE|
 | -------- | --- | --- | ---- | ----- | ----- |
 | `/categories` | Retrieve a list of all categories that are available. Usable URL params: `?root=true` to get all nodes that have no parent and are thus root directories. | - | Create a new category. | - | - |
@@ -155,7 +156,7 @@ Use `DELETE` request to `localhost:9000/groups/<id>`.
   }
 ```
 
-###CardDecks
+### CardDecks
 
 **Example**: Create a Carddeck with a specific cardDeckName, a description saying "", two FlashCards (can be an empty list), one UserGroup (mandatory).
 ```json
@@ -164,15 +165,40 @@ Use `DELETE` request to `localhost:9000/groups/<id>`.
     "cardDeckDescpription": "",
     "cards": [
               {
-        "flashcardId": {{cardId1}}
+        "flashcardId": 1
       },
       {
-        "flashcardId": {{cardId2}}
+        "flashcardId": 2
       }
     ],
     "userGroup":{
-        "groupId":{{groupId}}
+        "groupId":1
     }
+}
+```
+
+### Categories
+The hierarchy of the categories looks like this:
+```
+root (parent=null)
+  |-level 1 (parent=root)
+    |-level 2 (parent=level 1)
+      |-level 3 (parent=level 2)
+        |-level 4 (parent=level 3)
+  |-level 1' (parent=root)
+  |-level 1'' (parent=root)
+    |-level 2' (parent=level 1'')
+```
+But there is no rule to only have one root, more than one root directory is planned.
+**Example**: creates a new category with a name, an array of carddecks and a parent that decides the tree structure.
+```json
+{
+  "categoryName": "Name",
+  "cardDecks": [
+    {
+      "cardDeckId": 1
+    }],
+  "parent": {"categoryId": 1}
 }
 ```
 ### Further Information

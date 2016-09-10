@@ -679,6 +679,20 @@
 					"response": []
 				},
 				{
+					"name": "Retrieve all Root categories",
+					"request": {
+						"url": "{{url}}{{port}}/categories?root=true",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"0\",\n  \"name\": \"0\",\n  \"cardDecks\": [\n    {\n      \"cardDeckId\": 29\n    }],\n  \"parent\": {\"categoryId\": 1}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
 					"name": "Save a new category",
 					"request": {
 						"url": "{{url}}{{port}}/categories",
