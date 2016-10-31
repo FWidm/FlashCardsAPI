@@ -7,6 +7,7 @@ import java.util.Map;
 import models.*;
 import play.Logger;
 import play.data.validation.Constraints;
+import repository.UserRepository;
 import util.JsonKeys;
 import util.JsonUtil;
 import play.mvc.BodyParser;
@@ -16,11 +17,11 @@ import play.mvc.Result;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import util.RequestKeys;
+import util.exceptions.InvalidInputException;
+import util.exceptions.ObjectNotExistingException;
+import util.exceptions.ParameterNotSupportedException;
 
 public class UserController extends Controller {
-    public Result getUserIndex() {
-        return ok(JsonUtil.prepareJsonStatus(OK, "ok!"));
-    }
 
     /**
      * Return all users in the database.
@@ -29,29 +30,8 @@ public class UserController extends Controller {
      */
     public Result getUserList() {
         Map<String, String[]> urlParams = Controller.request().queryString();
-
-        if (urlParams.containsKey(RequestKeys.EMAIL)) {
-            String email = urlParams.get(RequestKeys.EMAIL)[0];
-            User u = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
-            if (u == null)
-                return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
-                        "The user with the email=" + email + " could not be found."));
-            if(JsonKeys.debugging)Logger.debug(""+u);
-            return ok(JsonUtil.getJson(u));
-        }
-
-        if (urlParams.containsKey(RequestKeys.NAME)) {
-            String name = urlParams.get(RequestKeys.NAME)[0];
-            List<User> u = User.find.where().eq(JsonKeys.USER_NAME, name).findList();
-            if (u == null)
-                return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
-                        "The user with the name=" + name + " could not be found."));
-            if(JsonKeys.debugging)Logger.debug(""+u);
-            return ok(JsonUtil.getJson(u));
-        } else {
-            List<User> u = User.find.all();
-            return ok(JsonUtil.getJson(u));
-        }
+        List<User> users = UserRepository.getUsers(urlParams);
+        return ok(JsonUtil.getJson(users));
     }
 
 
@@ -75,85 +55,28 @@ public class UserController extends Controller {
         try {
             JsonNode json = request().body().asJson();
             Map<String, String[]> urlParams = Controller.request().queryString();
-            boolean appendMode = false;
+            String updateMethod = request().method();
 
-            if (urlParams.containsKey(RequestKeys.APPEND)) {
-                appendMode = Boolean.parseBoolean(urlParams.get(RequestKeys.APPEND)[0]);
-            }
-            if(JsonKeys.debugging) Logger.debug("Appending mode enabled? " + appendMode);
-
-            if(JsonKeys.debugging)Logger.debug("Update method=" + request().method());
-            if (request().method().equals("PUT") && (!json.has(JsonKeys.USER_EMAIL) || !json.has(JsonKeys.RATING)
-                    || !json.has(JsonKeys.USER_NAME) || !json.has(JsonKeys.USER_GROUPS) || !json.has(JsonKeys.USER_PASSWORD)))
-                return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
-                        "The Update method needs all details of the user, such as email, " +
-                                "rating, name, group and password! An attribute was missing for id="
-                                + id + "."));
-
-
-            // get the specific user
-            User u = User.find.byId(id);
-
-            // check for new values
-            Constraints.EmailValidator emailValidator = new Constraints.EmailValidator();
-
-            if (json.has(JsonKeys.USER_EMAIL) && emailValidator.isValid(json.get(JsonKeys.USER_EMAIL).asText())) {
-                User checkEmail = User.find.where()
-                        .eq(JsonKeys.USER_EMAIL, json.get(JsonKeys.USER_EMAIL).asText()).findUnique();
-                if(JsonKeys.debugging)Logger.debug("does email exist? " + checkEmail);
-                if (checkEmail == null)
-                    u.setEmail(json.get(JsonKeys.USER_EMAIL).asText());
-                else
-                    return badRequest(JsonUtil
-                            .prepareJsonStatus(
-                                    BAD_REQUEST,
-                                    "The server can't fulfill the request, as the specified email " +
-                                            "is already in use. Try again with a different email."));
-            }
-            Constraints.MinLengthValidator minLengthValidator = new Constraints.MinLengthValidator();
-            if (json.has(JsonKeys.USER_PASSWORD) && minLengthValidator.isValid(json.get(JsonKeys.USER_PASSWORD).asText())) {
-                u.setPassword(json.get(JsonKeys.USER_PASSWORD).asText());
-            }
-            if (json.has(JsonKeys.RATING))
-                u.setRating(json.get(JsonKeys.RATING).asInt());
-            if (json.has(JsonKeys.USER_NAME) && minLengthValidator.isValid(json.get(JsonKeys.USER_NAME).asText()))
-                u.setName(json.get(JsonKeys.USER_NAME).asText());
-            if (json.has(JsonKeys.USER_GROUPS)) {
-                if (appendMode) {
-                    if(JsonKeys.debugging)Logger.debug("Found group");
-                    List<UserGroup> mergedGroups = new ArrayList<UserGroup>();
-
-                    //add all old valid information
-                    mergedGroups.addAll(u.getUserGroups());
-                    //retrieve new, check if not in list already
-                    for (UserGroup ug :
-                            JsonUtil.retrieveGroups(json)) {
-                        if (!mergedGroups.contains(ug)) {
-                            mergedGroups.add(ug);
-                        }
-                    }
-                    if(JsonKeys.debugging)Logger.debug("New groups: " + mergedGroups);
-                    u.setUserGroups(mergedGroups);
-                } else {
-                    u.setUserGroups(JsonUtil.retrieveGroups(json));
-                }
-            }
-            if (json.has(JsonKeys.USER_AVATAR)) {
-                if(JsonKeys.debugging)if(JsonKeys.debugging)Logger.debug("avatar="+json.get(JsonKeys.USER_AVATAR));
-                u.setAvatar(json.get(JsonKeys.USER_AVATAR).asText());
-            }
-            u.update();
-            return ok(JsonUtil.prepareJsonStatus(OK, "User has been changed.", id));
-        } catch (IllegalArgumentException e) {
+            User u = UserRepository.changeUser(id, json, urlParams, updateMethod);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no user with the specified id exists.", id));
+        }catch (IllegalArgumentException e) {
             e.printStackTrace();
             return badRequest(JsonUtil
                     .prepareJsonStatus(
                             BAD_REQUEST,
                             "Body did contain elements that are not allowed/expected. A user can contain: " + JsonKeys.USER_JSON_ELEMENTS));
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no user with the specified id exists.", id));
         }
+        catch (InvalidInputException e) {
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,e.getMessage()));
+        } catch (ParameterNotSupportedException e) {
+            e.printStackTrace();
+        } catch (ObjectNotExistingException e) {
+            e.printStackTrace();
+        }
+        return ok(JsonUtil.prepareJsonStatus(OK, "User has been changed.", id));
+
     }
 
     /**
@@ -163,7 +86,7 @@ public class UserController extends Controller {
      * @return HTTP Status Result OK if found or NOT_FOUND if not found.
      */
     public Result getUser(Long id) {
-        User u = User.find.byId(id);
+        User u = UserRepository.findById(id);
         if (u == null)
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
                     "The user with the id=" + id + " could not be found."));
@@ -179,7 +102,7 @@ public class UserController extends Controller {
      */
     public Result getUserByEmail(String email) {
         // Find a task by ID
-        User u = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
+        User u = UserRepository.findUserByEmail(email);
         if (u == null)
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
                     "The user with the email=" + email + " could not be found."));
@@ -195,7 +118,7 @@ public class UserController extends Controller {
      */
     public Result deleteUser(Long id) {
         try {
-            User.find.ref(id).delete();
+            UserRepository.deleteUserById(id);
 
             return ok(JsonUtil.prepareJsonStatus(OK, "The user has been deleted. All produced content now will be unlinked from this account (author set to null).", id));
         } catch (NullPointerException e) {
@@ -211,42 +134,28 @@ public class UserController extends Controller {
      */
     @BodyParser.Of(BodyParser.Json.class)
     public Result addUser() {
-        try {
-            JsonNode json = request().body().asJson();
-            ObjectMapper mapper = new ObjectMapper();
-
-            if (json.has(JsonKeys.USER_GROUPS)) {
+        JsonNode json = request().body().asJson();
+        User u;
+            try{
+                u=UserRepository.createUser(json);
+            }
+            catch (InvalidInputException e){
+                return badRequest(JsonUtil
+                        .prepareJsonStatus(
+                                BAD_REQUEST,
+                                e.getMessage()));
+            }
+            catch (IllegalArgumentException e) {
+                return badRequest(JsonUtil
+                        .prepareJsonStatus(
+                                BAD_REQUEST,
+                                "Body did contain elements that are not allowed/expected. A user can contain: " + JsonKeys.USER_JSON_ELEMENTS));
+            }
+            catch (Exception e){
                 return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN,
                         "The user could not be created, a user group has to be set via PATCH or PUT. It may not be content of POST."));
             }
-            User tmp = mapper.convertValue(json, User.class);
-            if (json.has(JsonKeys.USER_AVATAR)) {
-                tmp.setAvatar(json.get(JsonKeys.USER_AVATAR).asText());
-            }
-            //Checks if the constraints for @email are met via it's isValid method.
-            Constraints.EmailValidator emailValidator = new Constraints.EmailValidator();
-            Constraints.MinLengthValidator minLengthValidator = new Constraints.MinLengthValidator();
-            if(JsonKeys.debugging)if(JsonKeys.debugging)Logger.debug("json=" + json + " - obj=" + tmp);
-            if (emailValidator.isValid(tmp.getEmail()) && minLengthValidator.isValid(tmp.getName())
-                    && minLengthValidator.isValid(tmp.getPassword())) {
-                // if this entry with specified email does not exist, create, else
-                // throw an error.
-                if (User.find.where().eq(JsonKeys.USER_EMAIL, tmp.getEmail()).findUnique() == null) {
-                    User u = new User(tmp);
-
-                    u.save();
-                    return created(JsonUtil.prepareJsonStatus(CREATED, "User has been created.", u.getId()));
-                }
-            }
-            return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN,
-                    "The user could not be created, please specify email, name, password. " +
-                            "Email has to be valid (e.g. a@b.com)"));
-        } catch (IllegalArgumentException e) {
-            return badRequest(JsonUtil
-                    .prepareJsonStatus(
-                            BAD_REQUEST,
-                            "Body did contain elements that are not allowed/expected. A user can contain: " + JsonKeys.USER_JSON_ELEMENTS));
-        }
+        return created(JsonUtil.prepareJsonStatus(CREATED, "User has been created.", u.getId()));
     }
 
 }

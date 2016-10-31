@@ -1,5 +1,6 @@
 import org.junit.*;
 
+import play.Logger;
 import play.mvc.*;
 import play.test.*;
 
@@ -18,7 +19,8 @@ public class IntegrationTest {
     public void test() {
         running(testServer(3333, fakeApplication(inMemoryDatabase())), HTMLUNIT, browser -> {
             browser.goTo("http://localhost:3333");
-            assertTrue(browser.pageSource().contains("Your new application is ready."));
+            Logger.debug("got="+browser.pageSource());
+            assertTrue(browser.pageSource().contains(".png"));
         });
     }
 
