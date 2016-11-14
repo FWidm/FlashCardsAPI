@@ -7,8 +7,20 @@ package util.exceptions;
  */
 public class ObjectNotExistingException extends Exception {
 
+    public long getObjectId() {
+        return objectId;
+    }
+
+    private long objectId;
+
     public ObjectNotExistingException()
     {
+    }
+
+    public ObjectNotExistingException(String message, long id)
+    {
+        super(message);
+        objectId=id;
     }
 
     public ObjectNotExistingException(String message)

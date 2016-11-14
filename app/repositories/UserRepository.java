@@ -1,4 +1,4 @@
-package repository;
+package repositories;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +23,13 @@ import java.util.Map;
  * @author Fabian Widmann
  */
 public class UserRepository {
+    /**
+     * Parses the given json to a new User object, then saves it in the database.
+     * @param json
+     * @return newly created user object
+     * @throws InvalidInputException
+     * @throws ParameterNotSupportedException
+     */
     public static User createUser(JsonNode json) throws InvalidInputException,ParameterNotSupportedException {
 
         ObjectMapper mapper = new ObjectMapper();
@@ -44,18 +51,26 @@ public class UserRepository {
             // throw an error.
             if (User.find.where().eq(JsonKeys.USER_EMAIL, tmp.getEmail()).findUnique() == null) {
                 User u = new User(tmp);
-
                 u.save();
                 return u;
             }
         }
         throw new InvalidInputException("The user could not be created, please specify email, name, password. " +
                 "Email has to be valid (e.g. a@b.com)");
-
     }
 
+    /**
+     * Changes one user via it's id, it supports appending or replacing current user groups via url params and handles
+     * partial and complete updates.
+     * @param id
+     * @param json
+     * @param urlParams
+     * @param updateMethod
+     * @return updated user object
+     * @throws InvalidInputException
+     */
     public static User changeUser(Long id, JsonNode json, Map<String, String[]> urlParams, String updateMethod)
-    throws NullPointerException, InvalidInputException, ParameterNotSupportedException, ObjectNotExistingException{
+    throws InvalidInputException, NullPointerException{
         boolean appendMode = false;
 
         if (urlParams.containsKey(RequestKeys.APPEND)) {
@@ -125,20 +140,34 @@ public class UserRepository {
         return u;
     }
 
+    /**
+     * Deletes a User object from the database.
+     * @param id
+     */
     public static void deleteUserById(Long id) {
         User.find.ref(id).delete();
     }
 
+    /**
+     * Returns one User by email instead of id.
+     * @param email
+     * @return
+     */
     public static User findUserByEmail(String email) {
         return User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
     }
 
+    /**
+     * Returns one user by id.
+     * @param id
+     * @return
+     */
     public static User findById(Long id) {
         return User.find.byId(id);
     }
 
     /**
-     * 
+     * Get all users, all users with a specific name or all users with the same email (should not happen).
      * @param urlParams
      * @return
      */

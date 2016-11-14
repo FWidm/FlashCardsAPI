@@ -18,7 +18,10 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								]
 							}
 						}
 					],
@@ -47,7 +50,10 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"token\", jsonData.token);"
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"token\", jsonData.token);"
+								]
 							}
 						}
 					],
@@ -102,7 +108,11 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardId1\", jsonData.id);\r\ntests[\"created card with id=\"+jsonData.id]=true;"
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId1\", jsonData.id);\r",
+									"tests[\"created card with id=\"+jsonData.id]=true;"
+								]
 							}
 						}
 					],
@@ -131,7 +141,11 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardId2\", jsonData.id);\r\ntests[\"created card with id=\"+jsonData.id]=true;"
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId2\", jsonData.id);\r",
+									"tests[\"created card with id=\"+jsonData.id]=true;"
+								]
 							}
 						}
 					],
@@ -160,14 +174,21 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								]
 							}
 						},
 						{
 							"listen": "prerequest",
 							"script": {
 								"type": "text/javascript",
-								"exec": "postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r\npostman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r\n"
+								"exec": [
+									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
+									"postman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
 							}
 						}
 					],
@@ -196,14 +217,21 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"groupId\", jsonData.id);\r\ntests[\"created group with id=\"+jsonData.id]=true;"
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"groupId\", jsonData.id);\r",
+									"tests[\"created group with id=\"+jsonData.id]=true;"
+								]
 							}
 						},
 						{
 							"listen": "prerequest",
 							"script": {
 								"type": "text/javascript",
-								"exec": "postman.setEnvironmentVariable(\"groupName\", \"Group \"+Math.random().toString(36).substr(2, 5));\npostman.setEnvironmentVariable(\"groupDescription\", \"Description \"+Math.random().toString(36).substr(2, 5));"
+								"exec": [
+									"postman.setEnvironmentVariable(\"groupName\", \"Group \"+Math.random().toString(36).substr(2, 5));",
+									"postman.setEnvironmentVariable(\"groupDescription\", \"Description \"+Math.random().toString(36).substr(2, 5));"
+								]
 							}
 						}
 					],
@@ -232,14 +260,19 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardDeckId\", jsonData.id);"
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardDeckId\", jsonData.id);"
+								]
 							}
 						},
 						{
 							"listen": "prerequest",
 							"script": {
 								"type": "text/javascript",
-								"exec": "postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));"
+								"exec": [
+									"postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));"
+								]
 							}
 						}
 					],
@@ -282,7 +315,16 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "var jsonData = JSON.parse(responseBody);\ntests[\"Size Check: #cards=\"+jsonData.cards.length]=jsonData.cards.length===2;\n\nvar ids=[];\nfor (i = 0; i < jsonData.cards.length; i++) { \n    ids[i]=jsonData.cards[i].flashcardId;\n}\ntests[\"Card ids=\"+ids]=true;"
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Size Check: #cards=\"+jsonData.cards.length]=jsonData.cards.length===2;",
+									"",
+									"var ids=[];",
+									"for (i = 0; i < jsonData.cards.length; i++) { ",
+									"    ids[i]=jsonData.cards[i].flashcardId;",
+									"}",
+									"tests[\"Card ids=\"+ids]=true;"
+								]
 							}
 						}
 					],
@@ -305,7 +347,10 @@
 							"listen": "prerequest",
 							"script": {
 								"type": "text/javascript",
-								"exec": "postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));\r\n"
+								"exec": [
+									"postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
 							}
 						}
 					],
@@ -334,7 +379,12 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardId1\", jsonData.id);\r\n\r\ntests[\"created card with id=\"+jsonData.id]=true;"
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId1\", jsonData.id);\r",
+									"\r",
+									"tests[\"created card with id=\"+jsonData.id]=true;"
+								]
 							}
 						}
 					],
@@ -363,7 +413,11 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardId2\", jsonData.id);\r\ntests[\"created card with id=\"+jsonData.id]=true;"
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId2\", jsonData.id);\r",
+									"tests[\"created card with id=\"+jsonData.id]=true;"
+								]
 							}
 						}
 					],
@@ -392,14 +446,21 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardDeckId\", jsonData.id);\r\n"
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardDeckId\", jsonData.id);\r",
+									""
+								]
 							}
 						},
 						{
 							"listen": "prerequest",
 							"script": {
 								"type": "text/javascript",
-								"exec": "postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));\r\n"
+								"exec": [
+									"postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
 							}
 						}
 					],
@@ -428,7 +489,14 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "var jsonData = JSON.parse(responseBody);\nvar ids=[];\nfor (i = 0; i < jsonData.cards.length; i++) { \n    ids[i]=jsonData.cards[i].flashcardId;\n}\ntests[\"Card ids=\"+ids]=true;"
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"var ids=[];",
+									"for (i = 0; i < jsonData.cards.length; i++) { ",
+									"    ids[i]=jsonData.cards[i].flashcardId;",
+									"}",
+									"tests[\"Card ids=\"+ids]=true;"
+								]
 							}
 						}
 					],
@@ -747,20 +815,73 @@
 			"description": "",
 			"item": [
 				{
-					"name": "localhost:9000/groups",
+					"name": "Create a new User",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"groupId\", jsonData.id);"
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								]
 							}
 						},
 						{
 							"listen": "prerequest",
 							"script": {
 								"type": "text/javascript",
-								"exec": "postman.setEnvironmentVariable(\"groupName\", \"Group \"+Math.random().toString(36).substr(2, 5));\npostman.setEnvironmentVariable(\"groupDescription\", \"Description \"+Math.random().toString(36).substr(2, 5));"
+								"exec": [
+									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
+									"postman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPass}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "create a new group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"groupId\", jsonData.id);\r",
+									"\r",
+									"",
+									"",
+									"tests[\"Successful POST request\"] = responseCode.code === 201 || responseCode.code === 202;"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"groupName\", \"Group \"+Math.random().toString(36).substr(2, 5));",
+									"postman.setEnvironmentVariable(\"groupDescription\", \"Description \"+Math.random().toString(36).substr(2, 5));"
+								]
 							}
 						}
 					],
@@ -778,12 +899,25 @@
 							"mode": "raw",
 							"raw": "{\n    \"name\":\"{{groupName}}\",\n    \"description\": \"{{groupDescription}}\",\n    \"users\":[{\"userId\":{{userId}}\n    }]\n}"
 						},
-						"description": "Creates a new Group and adds two users."
+						"description": ""
 					},
 					"response": []
 				},
 				{
-					"name": "localhost:9000/groups - get all groups",
+					"name": "get all groups",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"New Group can be found in all groups\"] = responseBody.has(postman.getEnvironmentVariable(\"groupName\"));"
+								]
+							}
+						}
+					],
 					"request": {
 						"url": "{{url}}{{port}}/groups",
 						"method": "GET",
@@ -803,7 +937,20 @@
 					"response": []
 				},
 				{
-					"name": "localhost:9000/groups - get non-empty groups",
+					"name": "get non-empty groups",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"New Group can be found in non-empty groups\"] = responseBody.has(postman.getEnvironmentVariable(\"groupName\"));"
+								]
+							}
+						}
+					],
 					"request": {
 						"url": "{{url}}{{port}}/groups",
 						"method": "GET",
@@ -823,7 +970,20 @@
 					"response": []
 				},
 				{
-					"name": "localhost:9000/groups - get empty groups",
+					"name": "get empty groups",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"New Group can not be found in empty groups\"] = !responseBody.has(postman.getEnvironmentVariable(\"groupName\"));"
+								]
+							}
+						}
+					],
 					"request": {
 						"url": "{{url}}{{port}}/groups?empty=true",
 						"method": "GET",
@@ -843,7 +1003,20 @@
 					"response": []
 				},
 				{
-					"name": "localhost:9000/groups/20",
+					"name": "find the newest created group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Group name matches expected name\"] = responseBody.has(postman.getEnvironmentVariable(\"groupName\"));"
+								]
+							}
+						}
+					],
 					"request": {
 						"url": "{{url}}{{port}}/groups/{{groupId}}",
 						"method": "GET",
@@ -863,7 +1036,29 @@
 					"response": []
 				},
 				{
-					"name": "put localhost:9000/groups/20",
+					"name": "update with new name and description but same users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"groupName\", \"Group ed\"+Math.random().toString(36).substr(2, 5));",
+									"postman.setEnvironmentVariable(\"groupDescription\", \"Description ed\"+Math.random().toString(36).substr(2, 5));"
+								]
+							}
+						}
+					],
 					"request": {
 						"url": "{{url}}{{port}}/groups/{{groupId}}",
 						"method": "PUT",
@@ -876,14 +1071,25 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\":\"wewfeqwef\",\n    \"description\": \"fwqefwqw    \",\n    \"users\":null\n}"
+							"raw": "{\n    \"name\":\"{{groupName}}\",\n    \"description\": \"{{groupDescription}}\",\n    \"users\":[{\"userId\":{{userId}}\n    }]\n}"
 						},
-						"description": "Deletes the specific group 20. Also deletes memberships."
+						"description": ""
 					},
 					"response": []
 				},
 				{
-					"name": "patch localhost:9000/groups/20",
+					"name": "set users to null",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
 					"request": {
 						"url": "{{url}}{{port}}/groups/{{groupId}}",
 						"method": "PATCH",
@@ -898,12 +1104,23 @@
 							"mode": "raw",
 							"raw": "{\n    \"users\":null\n}"
 						},
-						"description": "updates group 20 with a new userlist."
+						"description": ""
 					},
 					"response": []
 				},
 				{
-					"name": "localhost:9000/groups/20",
+					"name": "deletes the new group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
 					"request": {
 						"url": "{{url}}{{port}}/groups/{{groupId}}",
 						"method": "DELETE",
@@ -918,7 +1135,32 @@
 							"mode": "raw",
 							"raw": ""
 						},
-						"description": "Deletes the specific group 20. Also deletes memberships."
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user with id {{userId}}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users/{{userId}}",
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
 					},
 					"response": []
 				}
@@ -930,6 +1172,17 @@
 			"item": [
 				{
 					"name": "Retrieve all ratings",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
 					"request": {
 						"url": "{{url}}{{port}}/ratings",
 						"method": "GET",
@@ -1051,7 +1304,9 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "tests[\"get users\"] = responseCode.code===200;"
+								"exec": [
+									"tests[\"get users\"] = responseCode.code===200;"
+								]
 							}
 						}
 					],
@@ -1074,14 +1329,21 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								]
 							}
 						},
 						{
 							"listen": "prerequest",
 							"script": {
 								"type": "text/javascript",
-								"exec": "postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r\npostman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r\n"
+								"exec": [
+									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
+									"postman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
 							}
 						}
 					],
@@ -1110,7 +1372,10 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "var jsonData = JSON.parse(responseBody);\ntests[\"exists id=\"+jsonData.userId] = responseBody.has(\"userId\");"
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"exists id=\"+jsonData.userId] = responseBody.has(\"userId\");"
+								]
 							}
 						}
 					],
@@ -1133,7 +1398,9 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "tests[\"Status code is 200\"] = responseCode.code === 200;"
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
 							}
 						}
 					],
@@ -1156,14 +1423,20 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "tests[\"Status code is 200\"] = responseCode.code === 200;"
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
 							}
 						},
 						{
 							"listen": "prerequest",
 							"script": {
 								"type": "text/javascript",
-								"exec": "postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r\npostman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r\n"
+								"exec": [
+									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
+									"postman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
 							}
 						}
 					],
@@ -1192,14 +1465,20 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "tests[\"Status code is 200\"] = responseCode.code === 200;"
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
 							}
 						},
 						{
 							"listen": "prerequest",
 							"script": {
 								"type": "text/javascript",
-								"exec": "postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r\npostman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r\n"
+								"exec": [
+									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
+									"postman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
 							}
 						}
 					],
@@ -1215,7 +1494,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"groups\":[{\n        \"name\":\"2\",\n        \"description\":\"2\"\n    },{\n        \"name\":\"1\",\n        \"description\":\"1\"\n    }],\n    \"name\":\"testaaaa\"\n}"
+							"raw": "{\n    \"groups\":[{\n        \"name\":\"2\",\n        \"description\":\"2\"\n    },{\n        \"name\":\"1\",\n        \"description\":\"1\"\n    }],\n    \"name\":\"newName\"\n}"
 						},
 						"description": ""
 					},
@@ -1228,14 +1507,20 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "tests[\"Status code is 200\"] = responseCode.code === 200;"
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
 							}
 						},
 						{
 							"listen": "prerequest",
 							"script": {
 								"type": "text/javascript",
-								"exec": "postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r\npostman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r\n"
+								"exec": [
+									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
+									"postman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
 							}
 						}
 					],
@@ -1264,7 +1549,9 @@
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
-								"exec": "tests[\"Status code is 200\"] = responseCode.code === 200;"
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
 							}
 						}
 					],

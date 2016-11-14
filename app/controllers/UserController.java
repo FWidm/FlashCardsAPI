@@ -1,13 +1,11 @@
 package controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import models.*;
 import play.Logger;
-import play.data.validation.Constraints;
-import repository.UserRepository;
+import repositories.UserRepository;
 import util.JsonKeys;
 import util.JsonUtil;
 import play.mvc.BodyParser;
@@ -15,8 +13,6 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import util.RequestKeys;
 import util.exceptions.InvalidInputException;
 import util.exceptions.ObjectNotExistingException;
 import util.exceptions.ParameterNotSupportedException;
@@ -58,22 +54,13 @@ public class UserController extends Controller {
             String updateMethod = request().method();
 
             User u = UserRepository.changeUser(id, json, urlParams, updateMethod);
+
         } catch (NullPointerException e) {
             e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no user with the specified id exists.", id));
-        }catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            return badRequest(JsonUtil
-                    .prepareJsonStatus(
-                            BAD_REQUEST,
-                            "Body did contain elements that are not allowed/expected. A user can contain: " + JsonKeys.USER_JSON_ELEMENTS));
         }
         catch (InvalidInputException e) {
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,e.getMessage()));
-        } catch (ParameterNotSupportedException e) {
-            e.printStackTrace();
-        } catch (ObjectNotExistingException e) {
-            e.printStackTrace();
         }
         return ok(JsonUtil.prepareJsonStatus(OK, "User has been changed.", id));
 
@@ -88,8 +75,8 @@ public class UserController extends Controller {
     public Result getUser(Long id) {
         User u = UserRepository.findById(id);
         if (u == null)
-            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
-                    "The user with the id=" + id + " could not be found."));
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no user with the specified id exists.", id));
+
         if(JsonKeys.debugging)if(JsonKeys.debugging)Logger.debug(u + "| USER_NAME Key=" + JsonKeys.USER_NAME);
         return ok(JsonUtil.getJson(u));
     }
