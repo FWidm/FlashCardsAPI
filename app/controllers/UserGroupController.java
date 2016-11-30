@@ -1,13 +1,9 @@
 package controllers;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import models.User;
 import models.UserGroup;
 import play.Logger;
 import play.mvc.*;
@@ -15,7 +11,7 @@ import repositories.UserGroupRepository;
 import util.JsonKeys;
 import util.JsonUtil;
 import util.exceptions.InvalidInputException;
-import util.exceptions.ObjectNotExistingException;
+import util.exceptions.ObjectNotFoundException;
 import util.exceptions.PartiallyUpdatedException;
 
 public class UserGroupController extends Controller {
@@ -96,7 +92,7 @@ public class UserGroupController extends Controller {
             return badRequest(JsonUtil
                     .prepareJsonStatus(
                             BAD_REQUEST, "Body did contain elements that are not allowed/expected. A group can contain: " + JsonKeys.GROUP_JSON_ELEMENTS));
-        } catch (ObjectNotExistingException e) {
+        } catch (ObjectNotFoundException e) {
             if(e.getObjectId()>0){
                 return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,e.getMessage(),e.getObjectId()));
             }

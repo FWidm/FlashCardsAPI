@@ -1171,6 +1171,166 @@
 			"description": "",
 			"item": [
 				{
+					"name": "Create a new User copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
+									"postman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r",
+									"postman.setEnvironmentVariable(\"userName\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPass}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "create new card with a custom question. copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId1\", jsonData.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": \"{{userId}}\"\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":\"{{userId}}\"\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": \"{{userId}}\"\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false\n  }"
+						},
+						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "Creates a new CardRating",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"ratingId\", jsonData.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/ratings",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"author\": {\n    \"userId\": \"{{userId}}\"\n  },\n  \n  \"flashcard\": {\n    \"flashcardId\": \"{{cardId1}}\"\n    },\n    \n   \"ratingModifier\": -1\n  }"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "retrieve the 1. answer from the last card we posted",
+					"request": {
+						"url": "{{url}}{{port}}/cards/3/answers?size=1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all answers, can be limited with the parameter size=(int)."
+					},
+					"response": []
+				},
+				{
+					"name": "Creates a new AnswerRating",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"ratingId\", jsonData.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/ratings",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"author\": {\n    \"userId\": \"{{userId}}\"\n  },\n    \"answer\": {\n    \"answerId\": \"{{answerId}}\"\n    },\n  \"ratingModifier\": -1\n  }"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
 					"name": "Retrieve all ratings",
 					"event": [
 						{
@@ -1198,7 +1358,7 @@
 				{
 					"name": "Retrieve all Ratings for one card",
 					"request": {
-						"url": "{{url}}{{port}}/ratings?cardId=1",
+						"url": "{{url}}{{port}}/ratings?cardId={{cardId1}}",
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -1212,7 +1372,7 @@
 				{
 					"name": "Retrieve all ratings for one answer",
 					"request": {
-						"url": "{{url}}{{port}}/ratings?answerId=1",
+						"url": "{{url}}{{port}}/ratings?answerId={{answerId}}",
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -1226,7 +1386,254 @@
 				{
 					"name": "Retrieve all ratings from one user",
 					"request": {
-						"url": "{{url}}{{port}}/ratings?userId=1",
+						"url": "{{url}}{{port}}/ratings?userId={{userId}}",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Rating by ID",
+					"request": {
+						"url": "{{url}}{{port}}/ratings/{{ratingId}}",
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ratings copy",
+			"description": "",
+			"item": [
+				{
+					"name": "Create a new User copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
+									"postman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r",
+									"postman.setEnvironmentVariable(\"userName\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPass}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "create new card with a custom question. copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId1\", jsonData.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": \"{{userId}}\"\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":\"{{userId}}\"\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": \"{{userId}}\"\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false\n  }"
+						},
+						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "Creates a new CardRating",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"ratingId\", jsonData.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/ratings",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"author\": {\n    \"userId\": \"{{userId}}\"\n  },\n  \n  \"flashcard\": {\n    \"flashcardId\": \"{{cardId1}}\"\n    },\n    \n   \"ratingModifier\": -1\n  }"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "retrieve the 1. answer from the last card we posted",
+					"request": {
+						"url": "{{url}}{{port}}/cards/3/answers?size=1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all answers, can be limited with the parameter size=(int)."
+					},
+					"response": []
+				},
+				{
+					"name": "Creates a new AnswerRating",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"ratingId\", jsonData.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/ratings",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"author\": {\n    \"userId\": \"{{userId}}\"\n  },\n    \"answer\": {\n    \"answerId\": \"{{answerId}}\"\n    },\n  \"ratingModifier\": -1\n  }"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve all ratings",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/ratings",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve all Ratings for one card",
+					"request": {
+						"url": "{{url}}{{port}}/ratings?cardId={{cardId1}}",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve all ratings for one answer",
+					"request": {
+						"url": "{{url}}{{port}}/ratings?answerId={{answerId}}",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve all ratings from one user",
+					"request": {
+						"url": "{{url}}{{port}}/ratings?userId={{userId}}",
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -1240,52 +1647,12 @@
 				{
 					"name": "Retrieve one rating by id",
 					"request": {
-						"url": "{{url}}{{port}}/ratings/1",
+						"url": "{{url}}{{port}}/ratings/{{ratingId}}",
 						"method": "GET",
 						"header": [],
 						"body": {
 							"mode": "formdata",
 							"formdata": []
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "Creates a new AnswerRating",
-					"request": {
-						"url": "{{url}}{{port}}/ratings",
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"ratingId\": 1,\n  \"author\": {\n    \"userId\": 1\n  },\n  \"ratingModifier\": -1,\n  \"answer\": {\n    \"answerId\": 1\n    }\n  }"
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "Creates a new CardRating",
-					"request": {
-						"url": "{{url}}{{port}}/ratings",
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"ratingId\": 1,\n  \"author\": {\n    \"userId\": 1\n  },\n  \"ratingModifier\": -1,\n  \"flashcard\": {\n    \"flashcardId\": 2\n    }\n  }"
 						},
 						"description": ""
 					},

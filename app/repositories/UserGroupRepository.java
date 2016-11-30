@@ -6,10 +6,9 @@ import models.User;
 import models.UserGroup;
 import play.Logger;
 import util.JsonKeys;
-import util.JsonUtil;
 import util.RequestKeys;
 import util.exceptions.InvalidInputException;
-import util.exceptions.ObjectNotExistingException;
+import util.exceptions.ObjectNotFoundException;
 import util.exceptions.PartiallyUpdatedException;
 
 import java.util.ArrayList;
@@ -58,10 +57,10 @@ public class UserGroupRepository {
      * Adds a new UserGroup. Can throw an exception when users should be added that either do not exist or have no id in their json.
      * @param json
      * @return
-     * @throws ObjectNotExistingException
+     * @throws ObjectNotFoundException
      * @throws IllegalArgumentException
      */
-    public static UserGroup addUserGroup(JsonNode json) throws ObjectNotExistingException, IllegalArgumentException {
+    public static UserGroup addUserGroup(JsonNode json) throws ObjectNotFoundException, IllegalArgumentException {
             ObjectMapper mapper = new ObjectMapper();
 
             UserGroup requestGroup = mapper.convertValue(json, UserGroup.class);
@@ -84,9 +83,9 @@ public class UserGroupRepository {
                             if (u != null)
                                 userList.add(u);
                             else
-                                throw new ObjectNotExistingException("User does not exist: ",n.get(JsonKeys.USER_ID).asLong());
+                                throw new ObjectNotFoundException("User does not exist: ",n.get(JsonKeys.USER_ID).asLong());
                         } else
-                            throw new ObjectNotExistingException("One user that was specified did not contain an id.");
+                            throw new ObjectNotFoundException("One user that was specified did not contain an id.");
                     }
                     //set the list for the group created from the content of the json body
                     if (JsonKeys.debugging) Logger.debug("Adding users to the group: " + userList);

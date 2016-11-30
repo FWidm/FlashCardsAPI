@@ -2,7 +2,6 @@ package repositories;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.typesafe.config.ConfigException;
 import models.User;
 import models.UserGroup;
 import play.Logger;
@@ -11,7 +10,6 @@ import util.JsonKeys;
 import util.JsonUtil;
 import util.RequestKeys;
 import util.exceptions.InvalidInputException;
-import util.exceptions.ObjectNotExistingException;
 import util.exceptions.ParameterNotSupportedException;
 
 import java.util.ArrayList;

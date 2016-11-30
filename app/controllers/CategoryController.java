@@ -12,11 +12,10 @@ import util.JsonKeys;
 import util.JsonUtil;
 import util.RequestKeys;
 import util.UrlParamHelper;
-import util.exceptions.ObjectNotExistingException;
+import util.exceptions.ObjectNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -118,7 +117,7 @@ public class CategoryController extends Controller {
             return badRequest(JsonUtil
                     .prepareJsonStatus(
                             BAD_REQUEST, "Body did contain elements that are not allowed/expected. A category can contain: " + JsonKeys.CATEGORY_JSON_ELEMENTS));
-        }catch (ObjectNotExistingException e){
+        }catch (ObjectNotFoundException e){
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage()));
         }
     }

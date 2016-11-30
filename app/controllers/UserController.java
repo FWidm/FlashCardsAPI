@@ -14,8 +14,6 @@ import play.mvc.Result;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import util.exceptions.InvalidInputException;
-import util.exceptions.ObjectNotExistingException;
-import util.exceptions.ParameterNotSupportedException;
 
 public class UserController extends Controller {
 

@@ -15,7 +15,7 @@ import play.libs.Json;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import util.exceptions.ObjectNotExistingException;
+import util.exceptions.ObjectNotFoundException;
 import util.exceptions.ParameterNotSupportedException;
 
 // TODO: 10.09.2016 Restructure
@@ -295,36 +295,7 @@ public class JsonUtil {
         return rating;
     }
 
-    /**
-     * Parses a cardrating object from the given jsonnode.
-     *
-     * @param json
-     * @return cardrating
-     */
-    public static CardRating parseCardRating(JsonNode json) {
-        User author = null;
-        FlashCard flashCard = null;
-        int modifier = 0;
 
-        if (json.has(JsonKeys.AUTHOR)) {
-            author = User.find.byId(json.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong());
-//            System.out.println("Rating user=" + author);
-
-        }
-        if (json.has(JsonKeys.FLASHCARD)) {
-            flashCard = FlashCard.find.byId(json.get(JsonKeys.FLASHCARD).get(JsonKeys.FLASHCARD_ID).asLong());
-//            System.out.println("Rating answer=" + flashCard);
-
-        }
-        if (json.has(JsonKeys.RATING_MODIFIER)) {
-            modifier = json.get(JsonKeys.RATING_MODIFIER).asInt();
-        }
-
-        CardRating rating = new CardRating(author, flashCard, modifier);
-//        System.out.println("Rating object=" + rating);
-
-        return rating;
-    }
 
 
     /**
@@ -350,9 +321,9 @@ public class JsonUtil {
      * Retrieves the parent category from the given category. If the id of the parent object cant be found in the database, throw the exception.
      * @param receivedCategory
      * @return the category from db or null if null is received
-     * @throws ObjectNotExistingException
+     * @throws ObjectNotFoundException
      */
-    public static Category parseParent(Category receivedCategory) throws ObjectNotExistingException {
+    public static Category parseParent(Category receivedCategory) throws ObjectNotFoundException {
         if(receivedCategory.getParent()!=null){
             Category parent = Category.find.byId(receivedCategory.getParent().getId());
             Logger.debug("got parent="+parent);
@@ -360,7 +331,7 @@ public class JsonUtil {
                 return parent;
             }
             else
-                throw new ObjectNotExistingException("Parent does not exist with the id="+receivedCategory.getParent().getId());
+                throw new ObjectNotFoundException("Parent does not exist with the id="+receivedCategory.getParent().getId());
         }
         else
             return null;
