@@ -70,7 +70,6 @@ public class RatingRepository {
 
     /**
      * Retrieves a rating by its id.
-     *
      * @param id
      * @return either the card or a notfound with an error status
      */
@@ -85,7 +84,6 @@ public class RatingRepository {
 
     /**
      * Creates a new Rating object for either type (Answer/Cardrating)
-     *
      * @return
      */
     @BodyParser.Of(BodyParser.Json.class)
