@@ -1,6 +1,7 @@
 package models;
 
 import com.avaje.ebean.Model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import play.data.validation.Constraints;
@@ -32,7 +33,7 @@ public class Category extends Model{
     @Column(name = JsonKeys.CATEGORY_DECK)
     @OneToMany(mappedBy = JsonKeys.CARDDECK_CATEGORY,fetch = FetchType.EAGER)
     @JsonProperty(JsonKeys.CATEGORY_DECK)
-
+    @JsonIgnore
     private List<CardDeck> cardDeckList;
 
     @Column(name = JsonKeys.CATEGORY_PARENT)
@@ -84,7 +85,7 @@ public class Category extends Model{
     public void setName(String name) {
         this.name = name;
     }
-
+    @JsonIgnore
     public List<CardDeck> getCardDeckList() {
         return cardDeckList;
     }
