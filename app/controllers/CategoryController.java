@@ -51,6 +51,18 @@ public class CategoryController extends Controller {
     }
 
     /**
+     * Get all card decks in a category.
+     * @param id
+     * @return
+     */
+    public Result getCategoryCardDecks(Long id) {
+        try {
+            return ok(JsonUtil.getJson(Category.find.byId(id).getCardDeckList()));
+        } catch (NullPointerException e) {
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Category with the given id does not exist.", id));
+        }
+    }
+    /**
      * Returns the children of the specified carddeck.
      * @param id
      * @return

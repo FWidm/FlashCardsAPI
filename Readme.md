@@ -37,7 +37,8 @@
 | -------- | --- | --- | ---- | ----- | ----- |
 | `/categories` | Retrieve a list of all categories that are available. Usable URL params: `?root=true` to get all nodes that have no parent and are thus root directories. | - | Create a new category. | - | - |
 | `/categories/x` | Retrieve a category by id. | Update a category completely. Usable URL parameters: `append={true/false}` to append the list or replace it. | -  | Partial update of the category, all parameters from put work as well. | -|
-| `/categories/x` | Retrieve children of a specific category | | | | | |
+| `/categories/x/children` | Retrieve children of a specific category | | | | | |
+| `/categories/x/decks` | Retrieve decks of a specific category | | | | | |
 for more working routing look at the [routes](conf/routes).
 
 ## German Tutorial/Insights
