@@ -1,9 +1,12 @@
 package controllers;
 
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import models.CardDeck;
+import models.User;
 import models.UserGroup;
 import play.Logger;
 import play.mvc.*;
@@ -23,8 +26,29 @@ public class UserGroupController extends Controller {
      * @return ok including a json node that contains all groups
      */
     public Result getUserGroupList() {
+
         Map<String, String[]> urlParams = Controller.request().queryString();
         return ok(JsonUtil.getJson(UserGroupRepository.getGroups(urlParams)));
+    }
+
+    public Result getDecksFromGroup(Long id) {
+        try {
+            return ok(JsonUtil.getJson(UserGroupRepository.getDecks(id)));
+
+        } catch (NullPointerException e) {
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
+                    "The group with the id=" + id + " could not be found."));
+        }
+    }
+
+    public Result getUsersInUserGroup(Long id) {
+        try {
+            return ok(JsonUtil.getJson(UserGroupRepository.getUsers(id)));
+
+        } catch (NullPointerException e) {
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
+                    "The group with the id=" + id + " could not be found."));
+        }
     }
 
     /**
@@ -87,16 +111,16 @@ public class UserGroupController extends Controller {
 
         UserGroup userGroup;
         try {
-            userGroup=UserGroupRepository.addUserGroup(json);
+            userGroup = UserGroupRepository.addUserGroup(json);
         } catch (IllegalArgumentException e) {
             return badRequest(JsonUtil
                     .prepareJsonStatus(
                             BAD_REQUEST, "Body did contain elements that are not allowed/expected. A group can contain: " + JsonKeys.GROUP_JSON_ELEMENTS));
         } catch (ObjectNotFoundException e) {
-            if(e.getObjectId()>0){
-                return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,e.getMessage(),e.getObjectId()));
+            if (e.getObjectId() > 0) {
+                return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage(), e.getObjectId()));
             }
-            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,e.getMessage()));
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage()));
         }
         return created(JsonUtil.prepareJsonStatus(CREATED, "Usergroup has been created!", userGroup.getId()));
 

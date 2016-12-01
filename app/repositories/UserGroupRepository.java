@@ -2,6 +2,7 @@ package repositories;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import models.CardDeck;
 import models.User;
 import models.UserGroup;
 import play.Logger;
@@ -21,10 +22,29 @@ import java.util.Map;
  */
 public class UserGroupRepository {
     /**
+     * Retrieve all Users from one group.
+     * @param id
+     * @return list of Users
+     */
+    public static List<User>  getUsers(Long id)throws NullPointerException{
+        List<User> users=UserGroup.find.byId(id).getUsers();
+        return  users;
+    }
+
+    /**
+     * Retrieve all Carddecks from one group.
+     * @param id
+     * @return list of CardDecks
+     */
+    public static List<CardDeck>  getDecks(Long id) throws NullPointerException{
+        List<CardDeck> decks=UserGroup.find.byId(id).getDecks();
+        return  decks;
+    }
+    /**
      * Returns all models of type group, this method will return a filtered list if the RequestKeys.EMPTY url parameter is sent with value true or false.
      *
      * @param urlParams
-     * @return
+     * @return List of UserGroups
      */
     public static List<UserGroup> getGroups(Map<String, String[]> urlParams) {
         if (urlParams.keySet().contains(RequestKeys.EMPTY)) {

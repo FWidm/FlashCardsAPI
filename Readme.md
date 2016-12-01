@@ -11,7 +11,9 @@
 | Resource | GET | PUT | POST | PATCH | DELETE|
 | -------- | --- | --- | ---- | ----- | ----- |
 | `/groups`| A list of all groups, can be filtered with `?empty=y` where y={true,false}. | | Create a new resource with a name, description and a list of user ids. | | |
-| ´/groups´| Retrieve one group |  Update a resource completely with name, description, users. | | Update a resource partially with name, description, users. | Delete a group. |
+| `/groups/x`| Retrieve one group |  Update a resource completely with name, description, users. | | Update a resource partially with name, description, users. | Delete a group. |
+| `/groups/x/users`| Retrieve users from one group. | | | | | |
+| `/groups/x/decks`| Retrieve decks of one group. | | | | | |
 ### Flashcards
 | Resource | GET | PUT | POST | PATCH | DELETE|
 | -------- | --- | --- | ---- | ----- | ----- |
@@ -55,6 +57,7 @@ If you're interested in reading about the things we use, there is a dev log file
 - [ ] Write proper Unit-Tests in Postman
     - [x] `/users`
     - [x] `/cardDecks`
+- [ ] check if methods exist for querying answers and groups containing ONE user or getting users of ONE group
 
 
 ## Example Calls
