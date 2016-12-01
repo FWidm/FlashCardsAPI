@@ -62,6 +62,7 @@ public class User extends Model {
 			joinColumns = @JoinColumn(name=JsonKeys.USER_ID, referencedColumnName=JsonKeys.USER_ID),
 			inverseJoinColumns = @JoinColumn(name=JsonKeys.GROUP_ID, referencedColumnName = JsonKeys.GROUP_ID))
     @JsonProperty(JsonKeys.USER_GROUPS)
+	@JsonIgnore
 	private List<UserGroup> userGroups;
 
     @OneToMany(mappedBy = "user")
@@ -143,6 +144,7 @@ public class User extends Model {
 		return created;
 	}
 
+	@JsonIgnore
 	public List<UserGroup> getUserGroups() {
 		return userGroups;
 	}

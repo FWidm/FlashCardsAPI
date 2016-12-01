@@ -66,6 +66,7 @@ public class FlashCard extends Model {
     @OneToMany(cascade=CascadeType.ALL,mappedBy = "card")
     @PrivateOwned
     @JsonProperty(JsonKeys.FLASHCARD_ANSWERS)
+    @JsonIgnore
     private List<Answer> answers;
 
     @ManyToOne //OneToMany??
@@ -208,6 +209,7 @@ public class FlashCard extends Model {
         return question;
     }
 
+    @JsonIgnore
     public List<Answer> getAnswers() {
         return answers;
     }

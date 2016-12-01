@@ -525,6 +525,20 @@
 						"description": ""
 					},
 					"response": []
+				},
+				{
+					"name": "get the first card of a carddeck (size & start param)",
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks/1/cards?size=1&start=0",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"description": ""
+					},
+					"response": []
 				}
 			]
 		},
@@ -781,9 +795,9 @@
 					"response": []
 				},
 				{
-					"name": "Find children of a node via request param",
+					"name": "Find children of a category",
 					"request": {
-						"url": "{{url}}{{port}}/categories/{{categoryId}}?children",
+						"url": "{{url}}{{port}}/categories/{{categoryId}}/children",
 						"method": "GET",
 						"header": [],
 						"body": {
