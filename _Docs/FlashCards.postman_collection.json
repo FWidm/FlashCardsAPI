@@ -821,6 +821,20 @@
 						"description": ""
 					},
 					"response": []
+				},
+				{
+					"name": "Find a specific categorys decks",
+					"request": {
+						"url": "{{url}}{{port}}/categories/{{categoryId}}/decks",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"description": ""
+					},
+					"response": []
 				}
 			]
 		},
