@@ -20,7 +20,7 @@ public class UrlParamHelper {
      */
     public static boolean checkBool(String key){
         Map<String, String[]> urlParams = Controller.request().queryString();
-        Logger.debug("params="+urlParams);
+        Logger.debug("params contain "+key+"? "+urlParams.keySet().contains(key));
 
         if(urlParams.keySet().contains(key)){
             return Boolean.parseBoolean(urlParams.get(key)[0]);
@@ -29,13 +29,27 @@ public class UrlParamHelper {
     }
 
     /**
+     * Returns the Value for the key. It is null if the key does not exist.
+     * @param key
+     * @return value or null
+     */
+    public static String getValue(String key){
+        Map<String, String[]> urlParams = Controller.request().queryString();
+        Logger.debug("params contain "+key+"? "+urlParams.keySet().contains(key));
+
+        if(urlParams.keySet().contains(key)){
+            return urlParams.get(key)[0];
+        }
+        return null;
+    }
+    /**
      * Checks whether the given key exists in the url parameters
      * @param key
      * @return true if the key exists, else false
      */
-    public static boolean keyExists(String key){
+    public static boolean checkForKey(String key){
         Map<String, String[]> urlParams = Controller.request().queryString();
-        Logger.debug("params="+urlParams);
+        Logger.debug("params contain "+key+"? "+urlParams.keySet().contains(key));
 
         if(urlParams.keySet().contains(key)){
                 return true;

@@ -47,6 +47,7 @@ public class CardDeck extends Model {
     @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = JsonKeys.FLASHCARD_DECK,fetch = FetchType.EAGER)
     @PrivateOwned
     @JsonProperty(JsonKeys.CARDDECK_CARDS)
+    @JsonIgnore
     private List<FlashCard> cards;
 
     @ManyToOne

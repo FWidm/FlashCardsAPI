@@ -74,6 +74,8 @@ DELETE  /cardDecks/:id      controllers.CardDeckController.deleteCardDeck(id:Lon
 #Categories
 GET     /categories         controllers.CategoryController.getCategoryList
 GET     /categories/:id     controllers.CategoryController.getCategory(id:Long)
+GET     /categories/:id/children     controllers.CategoryController.getChildren(id:Long)
+
 POST    /categories         controllers.CategoryController.addCategory
 PATCH   /categories/:id     controllers.CategoryController.updateCategory(id:Long)
 PUT     /categories/:id     controllers.CategoryController.updateCategory(id:Long)

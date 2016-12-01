@@ -7,10 +7,10 @@ import play.Logger;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
-import scala.collection.concurrent.Debug;
 import util.*;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -35,9 +35,36 @@ public class CardDeckController extends Controller {
         }
     }
 
-    public Result getCardDeckCards(long id){
+    /**
+     * Returns the Cards in one specific deck. Can be filtered by specifying the starting index (?start=x) and
+     * size of the returned list (?size=y).
+     * ex. [1][2][3][4] with size=2, start=1 -> [2][3]
+     * - if start is bigger than the highest index, an empty list is returned.
+     * - if size is equal to 0, an empty list is returned
+     * @param id
+     * @return
+     */
+    public Result getCardDeckCards(long id) {
         try {
-            return ok(JsonUtil.getJson(CardDeck.find.byId(id).getCards()));
+            List<FlashCard> flashCards = CardDeck.find.byId(id).getCards();
+            String limitVal = UrlParamHelper.getValue(RequestKeys.SIZE);
+            String startVal = UrlParamHelper.getValue(RequestKeys.START);
+
+            if (limitVal != null) {
+                if (startVal != null) {
+                    int start = Integer.parseInt(startVal);
+                    if (start >= 0 && start < flashCards.size()) {
+                        flashCards = flashCards.subList(start,
+                                Math.min(Integer.parseInt(limitVal) + start, flashCards.size()));
+                    } else
+                        flashCards= new LinkedList<>();
+
+                } else {
+                    flashCards = flashCards.subList(0,
+                            Math.min(Integer.parseInt(limitVal), flashCards.size()));
+                }
+            }
+            return ok(JsonUtil.getJson(flashCards));
         } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "CardDeck with the given id does not exist.", id));
         }
@@ -80,7 +107,7 @@ public class CardDeckController extends Controller {
 //            Logger.debug("deck=" + cardList + " size=" + cardList.size());
             if (canSetCards) {
                 deck.setCards(cardList);
-                Logger.debug("Saving deck with cards="+deck.getCards());
+                Logger.debug("Saving deck with cards=" + deck.getCards());
                 deck.save();
 
                 deck.getCards().forEach(card -> card.setDeck(deck));
@@ -99,9 +126,9 @@ public class CardDeckController extends Controller {
                 cause = m.group().substring(1, m.group().length() - 1);
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Request contained an element that is not " +
                     "expected for a card deck. Unknown Attribute=" + cause + ", expected Attributes=" + JsonKeys.CARDDECK_JSON_ELEMENTS));
-        }  catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             e.printStackTrace();
-            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error while retrieving cards, "+e.getMessage()));
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error while retrieving cards, " + e.getMessage()));
         }
 
     }
@@ -109,7 +136,7 @@ public class CardDeckController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateCardDeck(long id) {
         JsonNode json = request().body().asJson();
-        Logger.debug("UpdateCardDeck json="+json);
+        Logger.debug("UpdateCardDeck json=" + json);
         ObjectMapper mapper = new ObjectMapper();
         boolean appendMode = false;
         //be able to move cards from deck a to b
@@ -122,7 +149,8 @@ public class CardDeckController extends Controller {
         if (urlParams.containsKey(RequestKeys.REDIRECT)) {
             redirectMode = Boolean.parseBoolean(urlParams.get(RequestKeys.REDIRECT)[0]);
         }
-        if (JsonKeys.debugging) Logger.debug("Appending mode enabled? " + appendMode+" redirect the cards from other decks? " +redirectMode);
+        if (JsonKeys.debugging)
+            Logger.debug("Appending mode enabled? " + appendMode + " redirect the cards from other decks? " + redirectMode);
         try {
             CardDeck toUpdate = CardDeck.find.byId(id);
             if (request().method().equals("PUT") && (!json.has(JsonKeys.CARDDECK_NAME) || !json.has(JsonKeys.CARDDECK_CARDS)
@@ -143,17 +171,16 @@ public class CardDeckController extends Controller {
             if (requestObject.getDescription() != null) {
                 deck.setDescription(requestObject.getDescription());
             }
-            if(requestObject.getUserGroup()!=null){
-                UserGroup userGroup=UserGroup.find.byId(requestObject.getUserGroup().getId());
-                if(userGroup!=null){
+            if (requestObject.getUserGroup() != null) {
+                UserGroup userGroup = UserGroup.find.byId(requestObject.getUserGroup().getId());
+                if (userGroup != null) {
                     deck.setUserGroup(userGroup);
-                }
-                else{
+                } else {
                     return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Request contained a group id that does not exist.", requestObject.getUserGroup().getId()));
                 }
             }
             //retrieve the correct cards list by either parsing the id and getting the correct card or the attributes to a new card.
-            if(json.has(JsonKeys.CARDDECK_CARDS)){
+            if (json.has(JsonKeys.CARDDECK_CARDS)) {
                 try {
                     List<FlashCard> cardList = new ArrayList<>();
                     if (appendMode) {
@@ -184,7 +211,7 @@ public class CardDeckController extends Controller {
                     }
                 } catch (NullPointerException e) {
                     e.printStackTrace();
-                    return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error while retrieving cards, "+e.getMessage()));
+                    return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error while retrieving cards, " + e.getMessage()));
                 }
             }
             deck.update();
@@ -199,8 +226,7 @@ public class CardDeckController extends Controller {
                 cause = m.group().substring(1, m.group().length() - 1);
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Request contained an element that is not " +
                     "expected for a card deck. Unknown Attribute=" + cause + ", expected Attributes=" + JsonKeys.CARDDECK_JSON_ELEMENTS));
-        }
-        catch (NullPointerException e){
+        } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "CardDeck with the given id does not exist.", id));
         }
     }
@@ -217,8 +243,8 @@ public class CardDeckController extends Controller {
                     FlashCard retrievedCard = FlashCard.find.byId(currentCard.getId());
                     if (retrievedCard != null) {
                         cardList.add(retrievedCard);
-                    }
-                    else throw new NullPointerException("Card with the id="+requestObject.getCards().get(i).getId()+" does not exist");
+                    } else
+                        throw new NullPointerException("Card with the id=" + requestObject.getCards().get(i).getId() + " does not exist");
                 } else {
                     // TODO: 17.08.2016 Parse new questions if needed.
                 }

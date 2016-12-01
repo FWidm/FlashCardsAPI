@@ -44,15 +44,21 @@ public class CategoryController extends Controller {
      */
     public Result getCategory(Long id) {
         try {
-            if(UrlParamHelper.keyExists(RequestKeys.CHILDREN)){
-                Category parent = Category.find.byId(id);
-                List<Category> children = Category.find.where().eq(JsonKeys.CATEGORY_PARENT,parent).findList();
-                return ok(JsonUtil.getJson(children));
-            }
             return ok(JsonUtil.getJson(Category.find.byId(id)));
         } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Category with the given id does not exist.", id));
         }
+    }
+
+    /**
+     * Returns the children of the specified carddeck.
+     * @param id
+     * @return
+     */
+    public Result getChildren(Long id){
+        Category parent = Category.find.byId(id);
+        List<Category> children = Category.find.where().eq(JsonKeys.CATEGORY_PARENT,parent).findList();
+        return ok(JsonUtil.getJson(children));
     }
 
     /**
