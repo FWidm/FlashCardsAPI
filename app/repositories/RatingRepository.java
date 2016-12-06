@@ -3,6 +3,7 @@ package repositories;
 import com.avaje.ebean.ExpressionList;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import models.Answer;
 import models.FlashCard;
 import models.User;
 import models.rating.AnswerRating;
@@ -92,7 +93,7 @@ public class RatingRepository {
             Logger.debug("json=" + json);
         //check if the rating is for an answer or a card
         if (json.has(JsonKeys.ANSWER)) {
-            AnswerRating answerRating = JsonUtil.parseAnswerRating(json);
+            AnswerRating answerRating = parseAnswerRating(json);
             if (answerRating.getAuthor() != null && answerRating.getRatedAnswer() != null && answerRating.getRatingModifier() != 0) {
                 //check for duplicates
                 if (!AnswerRating.exists(answerRating.getAuthor(), answerRating.getRatedAnswer())) {
@@ -179,5 +180,35 @@ public class RatingRepository {
 //        System.out.println("Rating object=" + rating);
 
         return rating;
+    }
+
+    /**
+     * Parses a answerrating object from the given jsonnode.
+     *
+     * @param json of a card
+     * @return answerrating
+     */
+    private static AnswerRating parseAnswerRating(JsonNode json) {
+        User author = null;
+        Answer answer = null;
+        int modifier = 0;
+
+        if (json.has(JsonKeys.AUTHOR)) {
+            author = User.find.byId(json.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong());
+//            System.out.println("Rating user=" + author);
+
+        }
+        if (json.has(JsonKeys.ANSWER)) {
+            answer = Answer.find.byId(json.get(JsonKeys.ANSWER).get(JsonKeys.ANSWER_ID).asLong());
+//            System.out.println("Rating answer=" + answer);
+
+        }
+        if (json.has(JsonKeys.RATING_MODIFIER)) {
+            modifier = json.get(JsonKeys.RATING_MODIFIER).asInt();
+        }
+
+        //        System.out.println("Rating object=" + rating);
+
+        return new AnswerRating(author, answer, modifier);
     }
 }

@@ -7,6 +7,7 @@ import models.User;
 import models.UserGroup;
 import play.Logger;
 import util.JsonKeys;
+import util.JsonUtil;
 import util.RequestKeys;
 import util.exceptions.InvalidInputException;
 import util.exceptions.ObjectNotFoundException;
@@ -188,6 +189,36 @@ public class UserGroupRepository {
     }
 
     /**
+     * Parses the given json to gain access to the given Usergroups.
+     *
+     * @param json
+     * @return
+     */
+    public static List<UserGroup> retrieveGroups(JsonNode json) {
+        List<UserGroup> userGroups = new ArrayList<>();
+
+        //get the specific nods in the json
+        JsonNode answersNode = json.findValue(JsonKeys.USER_GROUPS);
+        // Loop through all objects in the values associated with the
+        // "users" key.
+        for (JsonNode node : answersNode) {
+            // when a user id is found we will get the object and add them to the userList.
+//            System.out.println("Node=" + node);
+            if (node.has(JsonKeys.GROUP_ID)) {
+                UserGroup found = UserGroup.find.byId(node.get(JsonKeys.GROUP_ID).asLong());
+//                System.out.println(">> group: " + found);
+                userGroups.add(found);
+            } else {
+                UserGroup tmpG = parseGroup(node);
+//                System.out.println(">> group: " + tmpG);
+                userGroups.add(tmpG);
+                tmpG.save();
+            }
+        }
+        return userGroups;
+    }
+
+    /**
      * Deletes a UserGroup by it's id.
      * @param id
      * @throws NullPointerException
@@ -196,5 +227,24 @@ public class UserGroupRepository {
         UserGroup group = UserGroup.find.byId(id);
         group.update();
         group.delete();
+    }
+
+    /**
+     * Create a new UserGroup with the given name and description.
+     * @param json
+     * @return the usergroup from the json node
+     */
+    public static UserGroup parseGroup(JsonNode json) {
+//        System.out.println("json=" + json);
+        String name = null, description = null;
+
+        if (json.has(JsonKeys.GROUP_NAME)) {
+            name = json.get(JsonKeys.GROUP_NAME).asText();
+        }
+        if (json.has(JsonKeys.GROUP_DESCRIPTION)) {
+            description = json.get(JsonKeys.GROUP_DESCRIPTION).asText();
+        }
+        UserGroup group = new UserGroup(name, description, null);
+        return group;
     }
 }
