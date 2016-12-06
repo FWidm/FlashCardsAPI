@@ -568,6 +568,22 @@
 				},
 				{
 					"name": "create new card with a custom question.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId2\", environment[\"cardId1\"]);\r",
+									"postman.setEnvironmentVariable(\"cardId1\", jsonData.id);\r",
+									"\r",
+									"\r",
+									""
+								]
+							}
+						}
+					],
 					"request": {
 						"url": "{{url}}{{port}}/cards",
 						"method": "POST",
@@ -588,8 +604,19 @@
 				},
 				{
 					"name": "retrieve a specific card",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
 					"request": {
-						"url": "{{url}}{{port}}/cards/3",
+						"url": "{{url}}{{port}}/cards/{{cardId1}}",
 						"method": "GET",
 						"header": [
 							{
@@ -608,8 +635,19 @@
 				},
 				{
 					"name": "retrieve a specific cards question",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
 					"request": {
-						"url": "{{url}}{{port}}/cards/3/question",
+						"url": "{{url}}{{port}}/cards/{{cardId1}}/question",
 						"method": "GET",
 						"header": [
 							{
@@ -629,7 +667,7 @@
 				{
 					"name": "retrieve a specific cards answers (with param)",
 					"request": {
-						"url": "{{url}}{{port}}/cards/3/answers?size=1",
+						"url": "{{url}}{{port}}/cards/{{cardId1}}/answers?size=1",
 						"method": "GET",
 						"header": [
 							{
@@ -649,7 +687,7 @@
 				{
 					"name": "get the author of a specific card.",
 					"request": {
-						"url": "{{url}}{{port}}/cards/3/author",
+						"url": "{{url}}{{port}}/cards/{{cardId1}}/author",
 						"method": "GET",
 						"header": [
 							{
@@ -669,7 +707,7 @@
 				{
 					"name": "Patch card with id3 to be multichoice and have a new answer.",
 					"request": {
-						"url": "{{url}}{{port}}/cards/3",
+						"url": "{{url}}{{port}}/cards/{{cardId1}}",
 						"method": "PATCH",
 						"header": [
 							{
@@ -688,8 +726,19 @@
 				},
 				{
 					"name": "Update card with id 1 completely with relevant data.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
 					"request": {
-						"url": "{{url}}{{port}}/cards/1?append=true",
+						"url": "{{url}}{{port}}/cards/{{cardId1}}?append=true",
 						"method": "PUT",
 						"header": [
 							{
@@ -723,7 +772,7 @@
 				{
 					"name": "deletes card with the given id",
 					"request": {
-						"url": "{{url}}{{port}}/cards/1",
+						"url": "{{url}}{{port}}/cards/{{cardId1}}",
 						"method": "DELETE",
 						"header": [
 							{

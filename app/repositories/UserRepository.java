@@ -119,7 +119,7 @@ public class UserRepository {
                 mergedGroups.addAll(u.getUserGroups());
                 //retrieve new, check if not in list already
                 for (UserGroup ug :
-                        JsonUtil.retrieveGroups(json)) {
+                        UserGroupRepository.retrieveGroups(json)) {
                     if (!mergedGroups.contains(ug)) {
                         mergedGroups.add(ug);
                     }
@@ -127,7 +127,7 @@ public class UserRepository {
                 if(JsonKeys.debugging)Logger.debug("New groups: " + mergedGroups);
                 u.setUserGroups(mergedGroups);
             } else {
-                u.setUserGroups(JsonUtil.retrieveGroups(json));
+                u.setUserGroups(UserGroupRepository.retrieveGroups(json));
             }
         }
         if (json.has(JsonKeys.USER_AVATAR)) {

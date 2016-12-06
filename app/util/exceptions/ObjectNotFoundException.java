@@ -6,12 +6,12 @@ package util.exceptions;
  * This exception can and should be thrown if an incoming json body demands access to a specific object with an id and the acess fails as it does not exist at the moment.
  */
 public class ObjectNotFoundException extends Exception {
+    private long objectId;
 
     public long getObjectId() {
         return objectId;
     }
 
-    private long objectId;
 
     public ObjectNotFoundException()
     {

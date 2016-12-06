@@ -1,14 +1,9 @@
 package util;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import models.*;
-import models.rating.AnswerRating;
-import models.rating.CardRating;
 import play.Logger;
 import play.libs.Json;
 
@@ -16,7 +11,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import util.exceptions.ObjectNotFoundException;
-import util.exceptions.ParameterNotSupportedException;
 
 // TODO: 10.09.2016 Restructure
 public class JsonUtil {
@@ -28,7 +22,7 @@ public class JsonUtil {
      * @param o
      * @return
      */
-    public static JsonNode getJson(Object o) {
+    public static JsonNode toJson(Object o) {
         ObjectMapper mapper = new ObjectMapper();
 //		SimpleDateFormat outputFormat = new SimpleDateFormat(dateformat);
 //		mapper.setDateFormat(outputFormat);
@@ -80,7 +74,7 @@ public class JsonUtil {
         ObjectNode result = Json.newObject();
         result.put("statuscode", statuscode);
         result.put("description", description);
-        result.set(name, getJson(objectList));
+        result.set(name, toJson(objectList));
         return result;
     }
 
@@ -94,7 +88,7 @@ public class JsonUtil {
         ObjectNode result = Json.newObject();
 
         for (String key : data.keySet()) {
-            result.set(key, getJson(data.get(key)));
+            result.set(key, toJson(data.get(key)));
         }
         return result;
     }

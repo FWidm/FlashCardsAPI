@@ -32,9 +32,9 @@ public class CategoryController extends Controller {
     public Result getCategoryList() {
         if(UrlParamHelper.checkBool(RequestKeys.ROOT)){
             List<Category> emptyGroups=Category.find.where().isNull(JsonKeys.CATEGORY_PARENT).findList();
-            return ok(JsonUtil.getJson(emptyGroups));
+            return ok(JsonUtil.toJson(emptyGroups));
         }
-        return ok(JsonUtil.getJson(Category.find.all()));
+        return ok(JsonUtil.toJson(Category.find.all()));
     }
 
     /**
@@ -44,7 +44,7 @@ public class CategoryController extends Controller {
      */
     public Result getCategory(Long id) {
         try {
-            return ok(JsonUtil.getJson(Category.find.byId(id)));
+            return ok(JsonUtil.toJson(Category.find.byId(id)));
         } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Category with the given id does not exist.", id));
         }
@@ -57,7 +57,7 @@ public class CategoryController extends Controller {
      */
     public Result getCategoryCardDecks(Long id) {
         try {
-            return ok(JsonUtil.getJson(Category.find.byId(id).getCardDeckList()));
+            return ok(JsonUtil.toJson(Category.find.byId(id).getCardDeckList()));
         } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Category with the given id does not exist.", id));
         }
@@ -70,7 +70,7 @@ public class CategoryController extends Controller {
     public Result getChildren(Long id){
         Category parent = Category.find.byId(id);
         List<Category> children = Category.find.where().eq(JsonKeys.CATEGORY_PARENT,parent).findList();
-        return ok(JsonUtil.getJson(children));
+        return ok(JsonUtil.toJson(children));
     }
 
     /**

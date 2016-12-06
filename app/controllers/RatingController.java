@@ -1,19 +1,11 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import models.Answer;
-import models.FlashCard;
-import models.User;
-import models.rating.AnswerRating;
-import models.rating.CardRating;
 import models.rating.Rating;
-import play.Logger;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import repositories.RatingRepository;
-import util.JsonKeys;
 import util.JsonUtil;
 import util.RequestKeys;
 import util.exceptions.DuplicateKeyException;
@@ -22,8 +14,6 @@ import util.exceptions.ObjectNotFoundException;
 
 import java.util.List;
 import java.util.Map;
-
-import static com.avaje.ebean.Expr.eq;
 
 
 /**
@@ -41,7 +31,7 @@ public class RatingController extends Controller {
     public Result getRatingList() {
         Map<String, String[]> urlParams = Controller.request().queryString();
         List<Rating> ratingList= RatingRepository.getRatings(urlParams);
-        return ok(JsonUtil.getJson(ratingList));
+        return ok(JsonUtil.toJson(ratingList));
     }
 
     /**
@@ -53,7 +43,7 @@ public class RatingController extends Controller {
     public Result getRating(long id) {
         try {
             Rating card = RatingRepository.getRating(id);
-            return ok(JsonUtil.getJson(card));
+            return ok(JsonUtil.toJson(card));
         } catch (ObjectNotFoundException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, e.getMessage(),e.getObjectId()));
         }

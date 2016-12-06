@@ -14,6 +14,7 @@ import util.RequestKeys;
 import util.exceptions.InvalidInputException;
 import util.exceptions.ObjectNotFoundException;
 import util.exceptions.ParameterNotSupportedException;
+import util.exceptions.PartiallyModifiedException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,7 +38,7 @@ public class FlashCardRepository {
      *
      * @return list of cards
      */
-    public List<FlashCard> getFlashCardList() {
+    public static List<FlashCard> getFlashCardList() {
         List<FlashCard> flashCardList = FlashCard.find.all();
         return flashCardList;
     }
@@ -48,7 +49,7 @@ public class FlashCardRepository {
      * @param id of a card
      * @return card
      */
-    public FlashCard getFlashCard(long id) throws NullPointerException {
+    public static FlashCard getFlashCard(long id) throws NullPointerException {
         FlashCard card = FlashCard.find.byId(id);
         return card;
     }
@@ -59,7 +60,7 @@ public class FlashCardRepository {
      * @param id of a card
      * @return deleted card object
      */
-    public FlashCard deleteFlashCard(long id) throws NullPointerException {
+    public static FlashCard deleteFlashCard(long id) throws NullPointerException {
 
         FlashCard card = FlashCard.find.byId(id);
         card.delete();
@@ -73,10 +74,7 @@ public class FlashCardRepository {
      *
      * @return Card
      */
-    @BodyParser.Of(BodyParser.Json.class)
-    public FlashCard addFlashCard() throws InvalidInputException, ParameterNotSupportedException {
-
-        JsonNode json = request().body().asJson();
+    public static FlashCard addFlashCard(JsonNode json) throws InvalidInputException, ParameterNotSupportedException, PartiallyModifiedException {
         ObjectMapper mapper = new ObjectMapper();
         FlashCard requestObject = mapper.convertValue(json, FlashCard.class);
         String information = "";
@@ -137,7 +135,9 @@ public class FlashCardRepository {
         FlashCard card = new FlashCard(requestObject);
         if (JsonKeys.debugging) Logger.debug("Tags=" + card.getTags().size());
         card.save();
-
+        if(information!=""){
+            throw new PartiallyModifiedException("FlashCard has been created! Additional information: "+information,card.getId());
+        }
         return card;
     }
 
@@ -153,11 +153,9 @@ public class FlashCardRepository {
      *
      * @return httpResult
      */
-    public FlashCard updateFlashCard(long id) throws InvalidInputException, ParameterNotSupportedException, NullPointerException {
-        JsonNode json = request().body().asJson();
+    public static FlashCard updateFlashCard(long id, JsonNode json, Map<String,String[]> urlParams) throws InvalidInputException, ParameterNotSupportedException, NullPointerException {
         ObjectMapper mapper = new ObjectMapper();
         boolean appendMode = false;
-        Map<String, String[]> urlParams = Controller.request().queryString();
         int answersSize = -1;
 
         if (urlParams.containsKey(RequestKeys.APPEND)) {
@@ -244,7 +242,7 @@ public class FlashCardRepository {
      * @param id of a card
      * @return httpresult
      */
-    public Question getQuestion(long id)  throws NullPointerException{
+    public static Question getQuestion(long id)  throws NullPointerException{
         return FlashCard.find.byId(id).getQuestion();
     }
 
@@ -254,7 +252,7 @@ public class FlashCardRepository {
      * @param id of a card
      * @return author of the card including a http result ok OR not found if nothing was found
      */
-    public User getAuthor(long id) throws NullPointerException{
+    public static User getAuthor(long id) throws NullPointerException{
         return FlashCard.find.byId(id).getAuthor();
     }
 
@@ -264,7 +262,7 @@ public class FlashCardRepository {
      * @param id of a card
      * @return answers of the card including a http result ok OR not found if nothing was found
      */
-    public List<Answer> getAnswers(long id) throws NullPointerException, ObjectNotFoundException {
+    public static List<Answer> getAnswers(long id) throws NullPointerException, ObjectNotFoundException {
         Map<String, String[]> urlParams = Controller.request().queryString();
         int answersSize = -1;
         String sortBy = "";
@@ -300,7 +298,7 @@ public class FlashCardRepository {
      * @param id of a card
      * @return list of Tags as json to the caller
      */
-    public List<Tag> getTags(long id) throws IllegalArgumentException, NullPointerException, ObjectNotFoundException {
+    public static List<Tag> getTags(long id) throws IllegalArgumentException, NullPointerException, ObjectNotFoundException {
         Map<String, String[]> urlParams = Controller.request().queryString();
         int answersSize = -1;
         if (urlParams.containsKey(RequestKeys.SIZE)) {

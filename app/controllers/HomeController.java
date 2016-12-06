@@ -7,7 +7,6 @@ import models.rating.AnswerRating;
 import models.rating.CardRating;
 import models.rating.Rating;
 import play.Logger;
-import play.api.mvc.Flash;
 import play.libs.Json;
 import play.mvc.*;
 
@@ -17,7 +16,6 @@ import util.JsonKeys;
 import util.JsonUtil;
 import views.html.*;
 
-import javax.xml.transform.sax.SAXSource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -265,7 +263,7 @@ public class HomeController extends Controller {
             flashCardList.add(fc);
         }
 
-        return ok(JsonUtil.getJson(CardDeck.find.byId(deck.getId())));
+        return ok(JsonUtil.toJson(CardDeck.find.byId(deck.getId())));
     }
     @Security.Authenticated(ActionAuthenticator.class)
     public Result auth() {
@@ -306,7 +304,7 @@ public class HomeController extends Controller {
         Logger.debug("3rd Level="+thirdLevel+" parent="+thirdLevel.getParent()+ "deck#="+thirdLevel.getCardDeckList().size());
 
 
-        return ok(JsonUtil.getJson(thirdLevel));
+        return ok(JsonUtil.toJson(thirdLevel));
     }
 
     private List<CardDeck> generateDeckList(int noDecks, int noCards, int noAnswers){

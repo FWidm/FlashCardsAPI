@@ -25,14 +25,14 @@ public class UserController extends Controller {
     public Result getUserList() {
         Map<String, String[]> urlParams = Controller.request().queryString();
         List<User> users = UserRepository.getUsers(urlParams);
-        return ok(JsonUtil.getJson(users));
+        return ok(JsonUtil.toJson(users));
     }
 
 
     public Result getUserGroups(Long id) {
         try {
             List<UserGroup> group = User.find.byId(id).getUserGroups();
-            return ok(JsonUtil.getJson(group));
+            return ok(JsonUtil.toJson(group));
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
@@ -76,7 +76,7 @@ public class UserController extends Controller {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no user with the specified id exists.", id));
 
         if(JsonKeys.debugging)if(JsonKeys.debugging)Logger.debug(u + "| USER_NAME Key=" + JsonKeys.USER_NAME);
-        return ok(JsonUtil.getJson(u));
+        return ok(JsonUtil.toJson(u));
     }
 
     /**
@@ -91,7 +91,7 @@ public class UserController extends Controller {
         if (u == null)
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
                     "The user with the email=" + email + " could not be found."));
-        return ok(JsonUtil.getJson(u));
+        return ok(JsonUtil.toJson(u));
     }
 
 

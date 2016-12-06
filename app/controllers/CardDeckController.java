@@ -24,12 +24,12 @@ import java.util.regex.Pattern;
 public class CardDeckController extends Controller {
 
     public Result getCardDecks() {
-        return ok(JsonUtil.getJson(CardDeck.find.all()));
+        return ok(JsonUtil.toJson(CardDeck.find.all()));
     }
 
     public Result getCardDeck(long id) {
         try {
-            return ok(JsonUtil.getJson(CardDeck.find.byId(id)));
+            return ok(JsonUtil.toJson(CardDeck.find.byId(id)));
         } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "CardDeck with the given id does not exist.", id));
         }
@@ -64,7 +64,7 @@ public class CardDeckController extends Controller {
                             Math.min(Integer.parseInt(limitVal), flashCards.size()));
                 }
             }
-            return ok(JsonUtil.getJson(flashCards));
+            return ok(JsonUtil.toJson(flashCards));
         } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "CardDeck with the given id does not exist.", id));
         }

@@ -1,12 +1,9 @@
 package controllers;
 
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import models.CardDeck;
-import models.User;
 import models.UserGroup;
 import play.Logger;
 import play.mvc.*;
@@ -15,7 +12,7 @@ import util.JsonKeys;
 import util.JsonUtil;
 import util.exceptions.InvalidInputException;
 import util.exceptions.ObjectNotFoundException;
-import util.exceptions.PartiallyUpdatedException;
+import util.exceptions.PartiallyModifiedException;
 
 public class UserGroupController extends Controller {
 
@@ -28,12 +25,12 @@ public class UserGroupController extends Controller {
     public Result getUserGroupList() {
 
         Map<String, String[]> urlParams = Controller.request().queryString();
-        return ok(JsonUtil.getJson(UserGroupRepository.getGroups(urlParams)));
+        return ok(JsonUtil.toJson(UserGroupRepository.getGroups(urlParams)));
     }
 
     public Result getDecksFromGroup(Long id) {
         try {
-            return ok(JsonUtil.getJson(UserGroupRepository.getDecks(id)));
+            return ok(JsonUtil.toJson(UserGroupRepository.getDecks(id)));
 
         } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
@@ -43,7 +40,7 @@ public class UserGroupController extends Controller {
 
     public Result getUsersInUserGroup(Long id) {
         try {
-            return ok(JsonUtil.getJson(UserGroupRepository.getUsers(id)));
+            return ok(JsonUtil.toJson(UserGroupRepository.getUsers(id)));
 
         } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
@@ -63,7 +60,7 @@ public class UserGroupController extends Controller {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
                     "The group with the id=" + id + " could not be found."));
 
-        return ok(JsonUtil.getJson(group));
+        return ok(JsonUtil.toJson(group));
     }
 
     /**
@@ -93,7 +90,7 @@ public class UserGroupController extends Controller {
         } catch (InvalidInputException e) {
             return badRequest(JsonUtil
                     .prepareJsonStatus(BAD_REQUEST, e.getMessage()));
-        } catch (PartiallyUpdatedException e) {
+        } catch (PartiallyModifiedException e) {
             return ok(JsonUtil.prepareJsonStatus(OK, e.getMessage()));
         }
         return ok(JsonUtil.prepareJsonStatus(200, "Group has been successfully changed. " + userGroup, id));

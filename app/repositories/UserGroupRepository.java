@@ -7,11 +7,10 @@ import models.User;
 import models.UserGroup;
 import play.Logger;
 import util.JsonKeys;
-import util.JsonUtil;
 import util.RequestKeys;
 import util.exceptions.InvalidInputException;
 import util.exceptions.ObjectNotFoundException;
-import util.exceptions.PartiallyUpdatedException;
+import util.exceptions.PartiallyModifiedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -129,10 +128,10 @@ public class UserGroupRepository {
      * @return updated UserGroup object
      * @throws InvalidInputException
      * @throws NullPointerException
-     * @throws PartiallyUpdatedException
+     * @throws PartiallyModifiedException
      */
     public static UserGroup changeUserGroup(long id, JsonNode json, Map<String, String[]> urlParams, String method)
-            throws InvalidInputException, NullPointerException, PartiallyUpdatedException {
+            throws InvalidInputException, NullPointerException, PartiallyModifiedException {
         String information = "";
 
         ObjectMapper mapper = new ObjectMapper();
@@ -180,9 +179,9 @@ public class UserGroupRepository {
             }
         }
         toUpdate.update();
-        //if we somehow have gotten users that do not exist, we can throw a PartiallyUpdatedException to use in the controller.
+        //if we somehow have gotten users that do not exist, we can throw a PartiallyModifiedException to use in the controller.
         if(information.length()>0){
-            throw new PartiallyUpdatedException("Updated the Group as expected, but some Users passed do not exist. "+information);
+            throw new PartiallyModifiedException("Updated the Group as expected, but some Users passed do not exist. "+information);
         }
         return toUpdate;
 
