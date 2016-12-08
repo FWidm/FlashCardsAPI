@@ -19,8 +19,10 @@
 | -------- | --- | --- | ---- | ----- | ----- |
 | `/cards` | Retrieve a list of all cards that are available. | - | Create a new Flashcard. The body has to contain the question and answer as a whole (without an id, as both can be only part of a card), additionally tags can be either in the form of an id or the complete tag information. | - | - |
 | `/cards/x` | Retrieves a specific card by  id. | Updates one specific card completely, answers and questions do need to be passed as a complete json file (referencing via id does not work), tags can be referenced or put in as complete resource. Can be switched to append the list instead of replacing it via `?append=true`. | - | Updates one specific card partially, answers and questions do need to be passed as a complete json file (referencing via id does not work), tags can be referenced or put in as complete resource. Can be switched to append the list instead of replacing it via `?append=true`. | - |
-| `/cards/x/question` | Retrieves a specific cards question by id. | | | | |
-| `/cards/x/answers` | Retrieves a specific cards answers by id, `size=y` can be used as optional parameter to get a number of answers to display. | | | | | |
+| `/cards/x/question` | Retrieves a specific cards question by card id. | | | | |
+| `/cards/x/answers` | Retrieves a specific cards answers by card id, `size=y` can be used as optional parameter to get a number of answers to display. | | | | | |
+| `/cards/x/author` | Retrieves a specific cards author by card id. | | | | |
+
 ### Ratings
 | Resource | GET | PUT | POST | PATCH | DELETE|
 | -------- | --- | --- | ---- | ----- | ----- |
