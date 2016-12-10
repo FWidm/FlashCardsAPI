@@ -40,6 +40,34 @@ public class HomeController extends Controller {
     }
 
     /**
+     * Accepts a picture as multipart/formdata, saves them in _Docs/img/usr
+     * @return
+     */
+    public Result upload() {
+        Http.MultipartFormData<File> body = request().body().asMultipartFormData();
+        Http.MultipartFormData.FilePart<File> picture = body.getFile("picture");
+        if (picture != null) {
+            String fileName = picture.getFilename();
+            String contentType = picture.getContentType();
+            Logger.debug("file=" + fileName + " | contentType=" + contentType);
+
+            if(contentType.contains("image")) {
+                File file = picture.getFile();
+                File f = new File("_Docs/img/usr/" + fileName);
+
+                try {
+                    Files.write(f.toPath(), Files.readAllBytes(file.toPath()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return ok(f);
+            }
+        }
+        return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Request did not contain a 'picture' key or valid picture."));
+
+    }
+
+    /**
      * Decoes the given Image to a file and saves it to the _Docs/img/usr/ directory.
      * @return
      */
@@ -279,6 +307,8 @@ public class HomeController extends Controller {
         map.put("currentDate",""+new Date());
         return ok(JsonUtil.convertToJsonNode(map));
     }
+
+
 
     public Result testCategories(){
         Category root = new Category("0");

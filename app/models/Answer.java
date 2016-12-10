@@ -63,8 +63,6 @@ public class Answer extends Model {
     private Date lastUpdated;
     @JsonProperty(JsonKeys.RATING)
     private int rating;
-    @ManyToMany
-
 
     @JsonProperty(JsonKeys.ANSWER_CORRECT)
     @Column(name = JsonKeys.ANSWER_CORRECT)
