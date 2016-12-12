@@ -93,23 +93,5 @@ public class JsonUtil {
         return result;
     }
 
-    /**
-     * Retrieves the parent category from the given category. If the id of the parent object cant be found in the database, throw the exception.
-     * @param receivedCategory
-     * @return the category from db or null if null is received
-     * @throws ObjectNotFoundException
-     */
-    public static Category parseParent(Category receivedCategory) throws ObjectNotFoundException {
-        if(receivedCategory.getParent()!=null){
-            Category parent = Category.find.byId(receivedCategory.getParent().getId());
-            Logger.debug("got parent="+parent);
-            if(parent!=null){
-                return parent;
-            }
-            else
-                throw new ObjectNotFoundException("Parent does not exist with the id="+receivedCategory.getParent().getId());
-        }
-        else
-            return null;
-    }
+
 }

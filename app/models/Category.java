@@ -1,9 +1,7 @@
 package models;
 
 import com.avaje.ebean.Model;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.*;
 import play.data.validation.Constraints;
 import util.JsonKeys;
 
@@ -15,6 +13,7 @@ import java.util.List;
  * @author Fabian Widmann
  */
 @JsonPropertyOrder({ JsonKeys.CATEGORY_ID, JsonKeys.CATEGORY_NAME})
+@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property=JsonKeys.CATEGORY_ID)
 @Entity
 public class Category extends Model{
     @Id
@@ -34,7 +33,7 @@ public class Category extends Model{
     @OneToMany(mappedBy = JsonKeys.CARDDECK_CATEGORY,fetch = FetchType.EAGER)
     @JsonProperty(JsonKeys.CATEGORY_DECK)
     @JsonIgnore
-    private List<CardDeck> cardDeckList;
+    private List<CardDeck> cardDecks;
 
     @Column(name = JsonKeys.CATEGORY_PARENT)
     @JsonProperty(JsonKeys.CATEGORY_PARENT)
@@ -53,9 +52,9 @@ public class Category extends Model{
         this.parent = parent;
     }
 
-    public Category(String name, List<CardDeck> cardDeckList, Category parent) {
+    public Category(String name, List<CardDeck> cardDecks, Category parent) {
         this.name = name;
-        this.cardDeckList = cardDeckList;
+        this.cardDecks = cardDecks;
 
         this.parent = parent;
     }
@@ -67,7 +66,7 @@ public class Category extends Model{
     public Category(Category category) {
         this.name = category.getName();
         this.parent=category.getParent();
-        this.cardDeckList=category.getCardDeckList();
+        this.cardDecks =category.getCardDecks();
     }
 
     public long getId() {
@@ -86,13 +85,13 @@ public class Category extends Model{
         this.name = name;
     }
     @JsonIgnore
-    public List<CardDeck> getCardDeckList() {
-        return cardDeckList;
+    public List<CardDeck> getCardDecks() {
+        return cardDecks;
     }
 
-    public void setCardDeckList(List<CardDeck> cardDeckList) {
-        this.cardDeckList = cardDeckList;
-        for (CardDeck deck: cardDeckList) {
+    public void setCardDecks(List<CardDeck> cardDecks) {
+        this.cardDecks = cardDecks;
+        for (CardDeck deck: cardDecks) {
             deck.setCategory(this);
         }
     }
@@ -110,7 +109,7 @@ public class Category extends Model{
         return "Category{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", cardDeckList=" + cardDeckList +
+                ", cardDecks=" + cardDecks +
                 ", parent=" + parent +
                 '}';
     }

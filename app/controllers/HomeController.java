@@ -17,12 +17,8 @@ import util.JsonUtil;
 import views.html.*;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -373,7 +369,7 @@ public class HomeController extends Controller {
         Category thirdLevel = new Category("3", secondLevel);
         thirdLevel.save();
 
-        thirdLevel.setCardDeckList(cardDeckList);
+        thirdLevel.setCardDecks(cardDeckList);
         for (CardDeck deck : cardDeckList) {
             deck.update();
         }
@@ -382,7 +378,7 @@ public class HomeController extends Controller {
         Logger.debug("Root=" + root + "parent=" + root.getParent());
         Logger.debug("1st Level=" + firstLevel + " parent=" + firstLevel.getParent());
         Logger.debug("2nd Level=" + secondLevel + " parent=" + secondLevel.getParent());
-        Logger.debug("3rd Level=" + thirdLevel + " parent=" + thirdLevel.getParent() + "deck#=" + thirdLevel.getCardDeckList().size());
+        Logger.debug("3rd Level=" + thirdLevel + " parent=" + thirdLevel.getParent() + "deck#=" + thirdLevel.getCardDecks().size());
 
 
         return ok(JsonUtil.toJson(thirdLevel));
