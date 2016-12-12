@@ -17,9 +17,11 @@ import util.JsonUtil;
 import views.html.*;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
+import java.nio.file.Path;
 import java.util.*;
 
 import static com.avaje.ebean.Expr.like;
@@ -41,7 +43,7 @@ public class HomeController extends Controller {
     }
 
     /**
-     * Accepts a picture as multipart/formdata, saves them in _Docs/img/usr
+     * Accepts a picture as multipart/formdata, saves them in /var/www/html/img/<year>/<date>/img*.<ext>.
      *
      * @return
      */
@@ -55,26 +57,35 @@ public class HomeController extends Controller {
             Logger.debug("file=" + fileName + " | contentType=" + contentType);
 
             if (contentType.contains("image")) {
-                File file = picture.getFile();
+                File pictureFile = picture.getFile();
                 Calendar c = Calendar.getInstance();
                 int year = c.get(Calendar.YEAR);
                 int month = c.get(Calendar.MONTH);
-                File f = new File("/var/www/html/img/"+year+"/"+month +"/");
-                f.mkdirs();
+                File directoryFile = new File("/var/www/html/img/"+year+"/"+month +"/");
+                directoryFile.mkdirs();
                     try {
-                        f=File.createTempFile("img", "."+fileType, f);
-                        Files.write(f.toPath(), Files.readAllBytes(f.toPath()));
+                        directoryFile=File.createTempFile("img", "."+fileType, directoryFile);
+                        Files.write(directoryFile.toPath(),Files.readAllBytes(pictureFile.toPath()));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    Logger.debug("Filepath:" + f.toPath());
+                    Logger.debug("Filepath:" + directoryFile.toPath());
                 Map<String, Object> toJson = new HashMap<>();
-                toJson.put("location", f.toPath());
+                toJson.put("location", getUrl(directoryFile.toPath()));
                 return ok(JsonUtil.convertToJsonNode(toJson));
             }
         }
         return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Request did not contain a 'picture' key or valid picture."));
 
+    }
+
+    private String getUrl(Path path) {
+        String url =null;
+        url=path.toString();
+        Logger.debug("Path(str)="+url);
+        url=url.replace('\\', '/');
+        int index = url.indexOf("img");
+        return url.substring(index);
     }
 
     private String determineFileType(String fileName) {

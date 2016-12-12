@@ -17,13 +17,13 @@ GET     /testTokens         controllers.HomeController.testTokens
 GET     /testRating         controllers.HomeController.testRating
 GET     /testCardDeck         controllers.HomeController.testCardDeck
 GET     /testCategories     controllers.HomeController.testCategories
-POST     /upload2     controllers.HomeController.upload
 
 GET     /test               controllers.HomeController.test
 GET     /heartbeat          controllers.HomeController.heartbeat
 POST    /auth               controllers.HomeController.auth
 POST    /login              controllers.HomeController.login
-POST    /upload              controllers.HomeController.imageUpload
+#POST    /upload              controllers.HomeController.imageUpload
+POST     /upload     controllers.HomeController.upload
 
 #Users
 GET		/users				controllers.UserController.getUserList
