@@ -78,8 +78,8 @@ public class HomeController extends Controller {
 
     private String determineFileType(String fileName) {
         String[] parts = fileName.split(".");
-        Logger.debug("Found filetype: "+parts[parts.length]);
-        return parts[parts.length];
+        Logger.debug("Found filetype: "+parts[parts.length-1]);
+        return parts[parts.length-1];
     }
 
     /**
