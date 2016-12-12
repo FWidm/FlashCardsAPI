@@ -54,7 +54,6 @@ public class HomeController extends Controller {
             String fileName = picture.getFilename();
             String contentType = picture.getContentType();
             String fileType=determineFileType(fileName);
-            Logger.debug("file=" + fileName + " | contentType=" + contentType);
 
             if (contentType.contains("image")) {
                 File pictureFile = picture.getFile();
@@ -71,7 +70,7 @@ public class HomeController extends Controller {
                     }
                     Logger.debug("Filepath:" + directoryFile.toPath());
                 Map<String, Object> toJson = new HashMap<>();
-                toJson.put("location", getUrl(directoryFile.toPath()));
+                toJson.put("location", getUrl(directoryFile.toPath(),"img"));
                 return ok(JsonUtil.convertToJsonNode(toJson));
             }
         }
@@ -79,18 +78,28 @@ public class HomeController extends Controller {
 
     }
 
-    private String getUrl(Path path) {
+    /**
+     * Strips unneccesary parts of the path and replaces backslashes with slashes.
+     * (e.g: \img\2016\11\x.png -> /img/2016/11/x.png")
+     * @param path
+     * @return path minus everything before lastShowndirectory.
+     */
+    private String getUrl(Path path, String lastShownDirectory) {
         String url =null;
         url=path.toString();
-        Logger.debug("Path(str)="+url);
         url=url.replace('\\', '/');
-        int index = url.indexOf("img");
-        return url.substring(index);
+        int index = url.indexOf(lastShownDirectory);
+        return url.substring(index-1);
     }
 
+    /**
+     * Expects a filename including extension (i.e. abcd.jpeg) and returns the extension after the last dot.
+     * (e.g. "abc.def.gh.ix" returns "ix")
+     * @param fileName
+     * @return substring after the last dot in the filename
+     */
     private String determineFileType(String fileName) {
         String extension = "";
-
         int i = fileName.lastIndexOf('.');
         if (i > 0) {
             extension = fileName.substring(i+1);
