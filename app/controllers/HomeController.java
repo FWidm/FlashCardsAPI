@@ -50,6 +50,7 @@ public class HomeController extends Controller {
         if (picture != null) {
             String fileName = picture.getFilename();
             String contentType = picture.getContentType();
+            String fileType=determineFileType(fileName);
             Logger.debug("file=" + fileName + " | contentType=" + contentType);
 
             if (contentType.contains("image")) {
@@ -57,24 +58,28 @@ public class HomeController extends Controller {
                 Calendar c = Calendar.getInstance();
                 int year = c.get(Calendar.YEAR);
                 int month = c.get(Calendar.MONTH);
-                new File("/var/www/html/img/"+year+"/"+month+"/").mkdirs();
                 File f = new File("/var/www/html/img/"+year+"/"+month +"/"+ fileName);
-
-                try {
-                    Files.write(f.toPath(), Files.readAllBytes(file.toPath()));
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if(f.mkdirs()) {
+                    try {
+                        File.createTempFile("i", "."+fileType, f);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Logger.debug("Filepath:" + f.toPath());
                 }
-                Logger.debug("Filepath:" + f.toPath());
-
                 Map<String, Object> toJson = new HashMap<>();
-                toJson.put("image", f);
                 toJson.put("location", f.toPath());
                 return ok(JsonUtil.convertToJsonNode(toJson));
             }
         }
         return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Request did not contain a 'picture' key or valid picture."));
 
+    }
+
+    private String determineFileType(String fileName) {
+        String[] parts = fileName.split(".");
+        Logger.debug("Found filetype: "+parts[parts.length]);
+        return parts[parts.length];
     }
 
     /**
