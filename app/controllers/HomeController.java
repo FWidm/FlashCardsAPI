@@ -54,7 +54,7 @@ public class HomeController extends Controller {
 
             if (contentType.contains("image")) {
                 File file = picture.getFile();
-                File f = new File("_Docs/img/usr/" + fileName);
+                File f = new File("/var/www/html/img/" + fileName);
 
                 try {
                     Files.write(f.toPath(), Files.readAllBytes(file.toPath()));
