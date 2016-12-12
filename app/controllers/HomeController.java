@@ -73,7 +73,7 @@ public class HomeController extends Controller {
                     Logger.debug("Filepath:" + directoryFile.toPath());
                 Map<String, Object> toJson = new HashMap<>();
                 int i=0;
-                String host=request().host();
+                String host="http://"+request().host();
                 i=host.lastIndexOf(":");
                 host=host.substring(0,i);
                 toJson.put("location", host+getUrl(directoryFile.toPath(),"img"));
