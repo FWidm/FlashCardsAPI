@@ -57,8 +57,8 @@ public class HomeController extends Controller {
                 Calendar c = Calendar.getInstance();
                 int year = c.get(Calendar.YEAR);
                 int month = c.get(Calendar.MONTH);
-                new File("/var/www/html/img/"+year+"/"+month).mkdirs();
-                File f = new File("/var/www/html/img/"+year+"/"+month + fileName);
+                new File("/var/www/html/img/"+year+"/"+month+"/").mkdirs();
+                File f = new File("/var/www/html/img/"+year+"/"+month +"/"+ fileName);
 
                 try {
                     Files.write(f.toPath(), Files.readAllBytes(file.toPath()));
