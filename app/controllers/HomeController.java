@@ -77,6 +77,8 @@ public class HomeController extends Controller {
                 i=host.lastIndexOf(":");
                 host=host.substring(0,i);
                 toJson.put("location", host+getUrl(directoryFile.toPath(),"img"));
+                toJson.put("sentFilename", fileName);
+                toJson.put("Extension", fileType);
 
                 return ok(JsonUtil.convertToJsonNode(toJson));
             }
