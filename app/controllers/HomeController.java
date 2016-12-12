@@ -41,6 +41,7 @@ public class HomeController extends Controller {
 
     /**
      * Accepts a picture as multipart/formdata, saves them in _Docs/img/usr
+     *
      * @return
      */
     public Result upload() {
@@ -51,7 +52,7 @@ public class HomeController extends Controller {
             String contentType = picture.getContentType();
             Logger.debug("file=" + fileName + " | contentType=" + contentType);
 
-            if(contentType.contains("image")) {
+            if (contentType.contains("image")) {
                 File file = picture.getFile();
                 File f = new File("_Docs/img/usr/" + fileName);
 
@@ -60,7 +61,12 @@ public class HomeController extends Controller {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                return ok(f);
+                Logger.debug("Filepath:" + f.toPath());
+
+                Map<String, Object> toJson = new HashMap<>();
+                toJson.put("image", f);
+                toJson.put("location", f.toPath());
+                return ok(JsonUtil.convertToJsonNode(toJson));
             }
         }
         return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Request did not contain a 'picture' key or valid picture."));
@@ -69,6 +75,7 @@ public class HomeController extends Controller {
 
     /**
      * Decoes the given Image to a file and saves it to the _Docs/img/usr/ directory.
+     *
      * @return
      */
     @BodyParser.Of(BodyParser.Json.class)
@@ -79,7 +86,7 @@ public class HomeController extends Controller {
 
             Logger.debug(imageDataBytes);
             byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageDataBytes);
-            File f = new File("_Docs/img/usr/" + new Date().getTime()+ FileTypeChecker.getFileType(json.get("image").asText()));
+            File f = new File("_Docs/img/usr/" + new Date().getTime() + FileTypeChecker.getFileType(json.get("image").asText()));
             try {
                 Files.write(f.toPath(), imageBytes);
             } catch (IOException e) {
@@ -112,7 +119,7 @@ public class HomeController extends Controller {
             Logger.debug("nope card ");
 
 
-        Logger.debug(""+AnswerRating.find.where().eq(JsonKeys.USER_ID, u.getId()).findList());
+        Logger.debug("" + AnswerRating.find.where().eq(JsonKeys.USER_ID, u.getId()).findList());
 //        Rating.find.all().forEach((t)->Logger.debug(t+" class="+t.getClass().getName()));
         User.find.all().forEach((user) -> Logger.debug("\t uid=" + user.getId() + " rating of this user=" + user.getRating() + ": Ratings from this user: " + Rating.find.where().eq(JsonKeys.USER_ID, user.getId()).findList().size()));
         //clean up.
@@ -203,8 +210,8 @@ public class HomeController extends Controller {
 
     public Result testGroups() {
         List<User> l = new ArrayList<User>();
-        l.add(new User("aaa","b"+(int)(Math.random()*100)+"@test.com", "abbbbb", -1));
-        l.add(new User("bbb", "a"+(int)(Math.random()*100)+"@test.com", "baaaaa", -2));
+        l.add(new User("aaa", "b" + (int) (Math.random() * 100) + "@test.com", "abbbbb", -1));
+        l.add(new User("bbb", "a" + (int) (Math.random() * 100) + "@test.com", "baaaaa", -2));
 
         for (User u : l) {
             u.save();
@@ -214,7 +221,7 @@ public class HomeController extends Controller {
         UserGroup g2 = new UserGroup("y", "y", l);
         g1.save();
         g2.save();
-        List<UserGroup> ug=new ArrayList<UserGroup>();
+        List<UserGroup> ug = new ArrayList<UserGroup>();
         ug.add(g1);
         ug.add(g2);
 
@@ -228,8 +235,8 @@ public class HomeController extends Controller {
         Logger.debug("Querying the groups");
         List<User> users = User.find.all();
         // set group
-        for (User u:users) {
-            u.getUserGroups().forEach((group)-> Logger.debug(u.getId()+":"+group));
+        for (User u : users) {
+            u.getUserGroups().forEach((group) -> Logger.debug(u.getId() + ":" + group));
         }
 
         return ok(index.render("Group test done!"));
@@ -261,6 +268,7 @@ public class HomeController extends Controller {
         }
         return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN, "Login failed, check email and password for errors."));
     }
+
     public Result testCardDeck() {
         User tmp = User.find.where().eq("email", "hello1@world.com").findUnique();
         if (tmp == null) {
@@ -270,17 +278,17 @@ public class HomeController extends Controller {
         CardDeck deck = new CardDeck("Deck 1", "This is a test");
         deck.save();
         List<FlashCard> flashCardList = new ArrayList<>();
-        for(int i=0; i<60; i++){
+        for (int i = 0; i < 60; i++) {
             List<String> tags = new ArrayList<>();
-            tags.add("Tag-"+i);
+            tags.add("Tag-" + i);
 
             FlashCard fc = new FlashCard(tmp, false, tags);
             fc.save();
-            Question q = new Question("Question-"+i, tmp);
+            Question q = new Question("Question-" + i, tmp);
             q.save();
             fc.setQuestion(q);
-            for(int j=0; j<20; j++){
-                Answer a = new Answer("Answer-"+i+"|"+j, "none", tmp);
+            for (int j = 0; j < 20; j++) {
+                Answer a = new Answer("Answer-" + i + "|" + j, "none", tmp);
                 a.save();
                 fc.addAnswer(a);
             }
@@ -293,6 +301,7 @@ public class HomeController extends Controller {
 
         return ok(JsonUtil.toJson(CardDeck.find.byId(deck.getId())));
     }
+
     @Security.Authenticated(ActionAuthenticator.class)
     public Result auth() {
         return ok(request().username());
@@ -302,42 +311,41 @@ public class HomeController extends Controller {
         return ok(JsonUtil.prepareJsonStatus(OK, "hello world"));
     }
 
-    public Result heartbeat(){
-        Map<String,Object> map=new HashMap<>();
-        map.put("currentDate",""+new Date());
+    public Result heartbeat() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("currentDate", "" + new Date());
         return ok(JsonUtil.convertToJsonNode(map));
     }
 
 
-
-    public Result testCategories(){
+    public Result testCategories() {
         Category root = new Category("0");
         root.save();
-        Category firstLevel = new Category("1",root);
+        Category firstLevel = new Category("1", root);
         firstLevel.save();
-        Category secondLevel = new Category("2",firstLevel);
+        Category secondLevel = new Category("2", firstLevel);
         secondLevel.save();
 
-        List<CardDeck> cardDeckList = generateDeckList(2,5,5);
-        Category thirdLevel = new Category("3",secondLevel);
+        List<CardDeck> cardDeckList = generateDeckList(2, 5, 5);
+        Category thirdLevel = new Category("3", secondLevel);
         thirdLevel.save();
 
         thirdLevel.setCardDeckList(cardDeckList);
-        for (CardDeck deck:cardDeckList) {
+        for (CardDeck deck : cardDeckList) {
             deck.update();
         }
         thirdLevel.update();
 
-        Logger.debug("Root="+root+ "parent="+ root.getParent());
-        Logger.debug("1st Level="+firstLevel+" parent="+firstLevel.getParent());
-        Logger.debug("2nd Level="+secondLevel+" parent="+secondLevel.getParent());
-        Logger.debug("3rd Level="+thirdLevel+" parent="+thirdLevel.getParent()+ "deck#="+thirdLevel.getCardDeckList().size());
+        Logger.debug("Root=" + root + "parent=" + root.getParent());
+        Logger.debug("1st Level=" + firstLevel + " parent=" + firstLevel.getParent());
+        Logger.debug("2nd Level=" + secondLevel + " parent=" + secondLevel.getParent());
+        Logger.debug("3rd Level=" + thirdLevel + " parent=" + thirdLevel.getParent() + "deck#=" + thirdLevel.getCardDeckList().size());
 
 
         return ok(JsonUtil.toJson(thirdLevel));
     }
 
-    private List<CardDeck> generateDeckList(int noDecks, int noCards, int noAnswers){
+    private List<CardDeck> generateDeckList(int noDecks, int noCards, int noAnswers) {
         List<CardDeck> cardDeckList = new ArrayList<>();
 
         User tmp = User.find.where().eq("email", "hello1@world.com").findUnique();
@@ -346,8 +354,8 @@ public class HomeController extends Controller {
             tmp.save();
         }
         CardDeck deck;
-        for(int x=0; x<noDecks; x++) {
-            deck = new CardDeck("Deck "+x, "This is a test");
+        for (int x = 0; x < noDecks; x++) {
+            deck = new CardDeck("Deck " + x, "This is a test");
             deck.save();
             List<FlashCard> flashCardList = new ArrayList<>();
             for (int i = 0; i < noCards; i++) {
@@ -372,7 +380,7 @@ public class HomeController extends Controller {
             }
             cardDeckList.add(deck);
         }
-        Logger.debug("Finished creating "+cardDeckList.size()+" decks!");
+        Logger.debug("Finished creating " + cardDeckList.size() + " decks!");
         return cardDeckList;
     }
 
