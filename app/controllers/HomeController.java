@@ -19,6 +19,7 @@ import views.html.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.util.*;
 
 import static com.avaje.ebean.Expr.like;
@@ -58,15 +59,15 @@ public class HomeController extends Controller {
                 Calendar c = Calendar.getInstance();
                 int year = c.get(Calendar.YEAR);
                 int month = c.get(Calendar.MONTH);
-                File f = new File("/var/www/html/img/"+year+"/"+month +"/"+ fileName);
-                if(f.mkdirs()) {
+                File f = new File("/var/www/html/img/"+year+"/"+month +"/");
+                f.mkdirs();
                     try {
-                        File.createTempFile("i", "."+fileType, f);
+                        f=File.createTempFile("img", "."+fileType, f);
+                        Files.write(f.toPath(), Files.readAllBytes(f.toPath()));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     Logger.debug("Filepath:" + f.toPath());
-                }
                 Map<String, Object> toJson = new HashMap<>();
                 toJson.put("location", f.toPath());
                 return ok(JsonUtil.convertToJsonNode(toJson));
@@ -77,9 +78,13 @@ public class HomeController extends Controller {
     }
 
     private String determineFileType(String fileName) {
-        String[] parts = fileName.split(".");
-        Logger.debug("Found filetype: "+parts[parts.length-1]);
-        return parts[parts.length-1];
+        String extension = "";
+
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            extension = fileName.substring(i+1);
+        }
+        return extension;
     }
 
     /**
