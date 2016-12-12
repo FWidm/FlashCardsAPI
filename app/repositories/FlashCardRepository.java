@@ -260,10 +260,10 @@ public class FlashCardRepository {
      * A method that allows us to retrieve answers for a specific card under the URI /cards/:id/answers
      *
      * @param id of a card
+     * @param urlParams
      * @return answers of the card including a http result ok OR not found if nothing was found
      */
-    public static List<Answer> getAnswers(long id) throws NullPointerException, ObjectNotFoundException {
-        Map<String, String[]> urlParams = Controller.request().queryString();
+    public static List<Answer> getAnswers(long id, Map<String, String[]> urlParams) throws NullPointerException, ObjectNotFoundException {
         int answersSize = -1;
         String sortBy = "";
         if (urlParams.containsKey(RequestKeys.SIZE)) {
@@ -296,10 +296,10 @@ public class FlashCardRepository {
      * Retreive all Tags or the first n Elements from the Sublist when adding ?size=x to the url, where x must be an integer.
      *
      * @param id of a card
+     * @param urlParams
      * @return list of Tags as json to the caller
      */
-    public static List<Tag> getTags(long id) throws IllegalArgumentException, NullPointerException, ObjectNotFoundException {
-        Map<String, String[]> urlParams = Controller.request().queryString();
+    public static List<Tag> getTags(long id, Map<String, String[]> urlParams) throws IllegalArgumentException, NullPointerException, ObjectNotFoundException {
         int answersSize = -1;
         if (urlParams.containsKey(RequestKeys.SIZE)) {
             try {

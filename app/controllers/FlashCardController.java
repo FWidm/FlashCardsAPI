@@ -11,6 +11,7 @@ import repositories.FlashCardRepository;
 import util.JsonKeys;
 import util.JsonUtil;
 import util.exceptions.InvalidInputException;
+import util.exceptions.ObjectNotFoundException;
 import util.exceptions.ParameterNotSupportedException;
 import util.RequestKeys;
 import util.exceptions.PartiallyModifiedException;
@@ -154,7 +155,7 @@ public class FlashCardController {
     public Result getQuestion(long id) {
         Question ret;
         try {
-            ret = FlashCard.find.byId(id).getQuestion();
+            ret = FlashCardRepository.getQuestion(id);
         } catch (Exception e) {
             System.err.println(e);
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
@@ -171,7 +172,7 @@ public class FlashCardController {
     public Result getAuthor(long id) {
         User ret;
 
-        ret = FlashCard.find.byId(id).getAuthor();
+        ret = FlashCardRepository.getAuthor(id);
         if (ret == null) {
             Logger.debug("Getting author=" + ret);
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
@@ -189,26 +190,9 @@ public class FlashCardController {
      */
     public Result getAnswers(long id) {
         Map<String, String[]> urlParams = Controller.request().queryString();
-        int answersSize = -1;
-        String sortBy = "";
-        if (urlParams.containsKey(RequestKeys.SIZE)) {
-            try {
-                answersSize = Integer.parseInt(urlParams.get(RequestKeys.SIZE)[0]);
-            } catch (NumberFormatException e) {
-                return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
-                        "Parameter size=" + urlParams.get("size")[0] + " could not be parsed to integer."));
-            }
-        }
-        if (urlParams.containsKey(RequestKeys.SORT_BY)) {
-            sortBy = urlParams.get(RequestKeys.SORT_BY)[0];
-            if (JsonKeys.debugging) Logger.debug("sortBy found=" + sortBy);
-        }
-        if (JsonKeys.debugging) Logger.debug("answers size=" + answersSize);
         List<Answer> ret;
         try {
-            // TODO: 27/06/16 handle multichoice etc.
-            ret = Answer.find.where().eq(JsonKeys.ANSWER_CARD_ID, id).orderBy(sortBy).setMaxRows(answersSize).findList();
-
+                ret = FlashCardRepository.getAnswers(id,urlParams);
 
         } catch (Exception e) {
             System.err.println(e);
@@ -225,24 +209,10 @@ public class FlashCardController {
      */
     public Result getTags(long id) {
         Map<String, String[]> urlParams = Controller.request().queryString();
-        int answersSize = -1;
-        if (urlParams.containsKey(RequestKeys.SIZE)) {
-            try {
-                answersSize = Integer.parseInt(urlParams.get(RequestKeys.SIZE)[0]);
-            } catch (NumberFormatException e) {
-                System.err.println(e);
-                return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
-                        "Parameter size=" + urlParams.get("size")[0] + " has to be a valid integer."));
-            }
-        }
-        if (JsonKeys.debugging) Logger.debug("tags size=" + answersSize);
+
         List<Tag> ret;
         try {
-            ret = FlashCard.find.byId(id).getTags();
-            //Return a sublist from 0 to either the size of answers OR the cap we get via parameter.
-            if (answersSize > 0)
-                ret = ret.subList(0, Math.min(answersSize, ret.size()));
-
+            ret = FlashCardRepository.getTags(id,urlParams);
         } catch (Exception e) {
             e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
