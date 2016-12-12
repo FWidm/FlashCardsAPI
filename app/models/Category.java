@@ -13,7 +13,7 @@ import java.util.List;
  * @author Fabian Widmann
  */
 @JsonPropertyOrder({ JsonKeys.CATEGORY_ID, JsonKeys.CATEGORY_NAME})
-@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property=JsonKeys.CATEGORY_ID)
+//@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property=JsonKeys.CATEGORY_ID)
 @Entity
 public class Category extends Model{
     @Id

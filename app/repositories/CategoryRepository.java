@@ -63,6 +63,7 @@ public class CategoryRepository {
     public static List<Category> getChildren(Long id) {
         Category parent = Category.find.byId(id);
         List<Category> children = Category.find.where().eq(JsonKeys.CATEGORY_PARENT, parent).findList();
+        children.forEach(c-> System.out.println("c="+c));
         return children;
     }
 
