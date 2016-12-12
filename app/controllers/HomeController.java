@@ -19,6 +19,8 @@ import views.html.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -70,7 +72,12 @@ public class HomeController extends Controller {
                     }
                     Logger.debug("Filepath:" + directoryFile.toPath());
                 Map<String, Object> toJson = new HashMap<>();
-                toJson.put("location", getUrl(directoryFile.toPath(),"img"));
+                int i=0;
+                String host=request().host();
+                i=host.lastIndexOf(":");
+                host=host.substring(0,i);
+                toJson.put("location", host+getUrl(directoryFile.toPath(),"img"));
+
                 return ok(JsonUtil.convertToJsonNode(toJson));
             }
         }
