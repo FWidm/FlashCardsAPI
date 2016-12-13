@@ -1,5 +1,7 @@
 package util.exceptions;
 
+import java.util.List;
+
 /**
  * @author Jonas Kraus
  * @author Fabian Widmann

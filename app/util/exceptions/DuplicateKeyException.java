@@ -1,5 +1,7 @@
 package util.exceptions;
 
+import java.util.List;
+
 /**
  * @author Jonas Kraus
  * @author Fabian Widmann
@@ -7,11 +9,25 @@ package util.exceptions;
  */
 public class DuplicateKeyException extends Exception {
 
+
+    private long objectId;
+
+
+
+    private List<Object> objects;
+
+    public DuplicateKeyException(String message, List<Object> objects) {
+        super(message);
+        this.objects=objects;
+    }
+
     public long getObjectId() {
         return objectId;
     }
 
-    private long objectId;
+    public List<Object> getObjects() {
+        return objects;
+    }
 
     public DuplicateKeyException()
     {
