@@ -106,5 +106,12 @@ public class JsonKeys {
     public static final String CATEGORY_DECK = "cardDecks";
     public static final String CATEGORY_JSON_ELEMENTS = CATEGORY_NAME+", "+CATEGORY_PARENT+", "+CATEGORY_DECK+" (list containing cardDeckIds)";
 
+    //Media Upload
+    public static final String MEDIA_ID = "mediaId";
+    public static final String MEDIA_TYPE = "mediaType";
+
+
+
+
 
 }

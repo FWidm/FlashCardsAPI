@@ -10,6 +10,7 @@ import play.Logger;
 import play.libs.Json;
 import play.mvc.*;
 
+import repositories.UserRepository;
 import util.ActionAuthenticator;
 import util.FileTypeChecker;
 import util.JsonKeys;
@@ -18,6 +19,8 @@ import views.html.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -45,6 +48,7 @@ public class HomeController extends Controller {
      *
      * @return
      */
+    @Security.Authenticated(ActionAuthenticator.class)
     public Result upload() {
         Http.MultipartFormData<File> body = request().body().asMultipartFormData();
         Http.MultipartFormData.FilePart<File> picture = body.getFile("picture");
@@ -64,19 +68,25 @@ public class HomeController extends Controller {
                         directoryFile=File.createTempFile("img", "."+fileType, directoryFile);
                         Files.write(directoryFile.toPath(),Files.readAllBytes(pictureFile.toPath()));
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        return internalServerError(JsonUtil.prepareJsonStatus(INTERNAL_SERVER_ERROR, "Could not place file on the server"));
                     }
                     Logger.debug("Filepath:" + directoryFile.toPath());
-                Map<String, Object> toJson = new HashMap<>();
+
                 int i=0;
                 String host="http://"+request().host();
                 i=host.lastIndexOf(":");
                 host=host.substring(0,i);
-                toJson.put("location", host+getUrl(directoryFile.toPath(),"img"));
-                toJson.put("sentFilename", fileName);
-                toJson.put("contentType", contentType);
+                String url=host+getUrl(directoryFile.toPath(),"img");
 
-                return ok(JsonUtil.convertToJsonNode(toJson));
+
+                try {
+                    UploadedMedia mediaRecord=new UploadedMedia(new URI(url), UserRepository.findUserByEmail(request().username()),contentType);
+                    Logger.debug("Uploaded file="+mediaRecord);
+                    mediaRecord.save();
+                    return created(JsonUtil.toJson(mediaRecord));
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
             }
         }
         return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Request did not contain a 'picture' key or valid picture."));
@@ -110,31 +120,6 @@ public class HomeController extends Controller {
             extension = fileName.substring(i+1);
         }
         return extension;
-    }
-
-    /**
-     * Decoes the given Image to a file and saves it to the _Docs/img/usr/ directory.
-     *
-     * @return
-     */
-    @BodyParser.Of(BodyParser.Json.class)
-    public Result imageUpload() {
-        JsonNode json = request().body().asJson();
-        if (json.has("image")) {
-            String imageDataBytes = json.get("image").asText().substring(json.get("image").asText().indexOf(",") + 1);
-
-            Logger.debug(imageDataBytes);
-            byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageDataBytes);
-            File f = new File("_Docs/img/usr/" + new Date().getTime() + FileTypeChecker.getFileType(json.get("image").asText()));
-            try {
-                Files.write(f.toPath(), imageBytes);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-//            f.delete();
-            return ok(f);
-        }
-        return notFound();
     }
 
     public Result testRating() {

@@ -6,6 +6,8 @@ import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
 
+import static play.mvc.Http.Status.UNAUTHORIZED;
+
 /**
  * @author Jonas Kraus
  * @author Fabian Widmann
@@ -36,7 +38,7 @@ public class ActionAuthenticator extends Security.Authenticator {
 
     @Override
     public Result onUnauthorized(Http.Context context) {
-        return super.onUnauthorized(context);
+        return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED,"Please provide a valid token via the header field 'Authorization':'Bearer {{token}}' to authenticate before sending requests."));
     }
 
     /**

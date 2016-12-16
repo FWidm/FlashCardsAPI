@@ -82,6 +82,15 @@ create table tag (
   constraint pk_tag primary key (tagId))
 ;
 
+create table uploaded_media (
+  mediaId                   bigint auto_increment not null,
+  mediaURI                  varchar(255),
+  userId                    bigint,
+  media_type                varchar(255),
+  created                   datetime(6) not null,
+  constraint pk_uploaded_media primary key (mediaId))
+;
+
 create table user (
   userId                    bigint auto_increment not null,
   avatar                    longtext,
@@ -140,6 +149,8 @@ alter table rating add constraint fk_rating_ratedAnswer_12 foreign key (answerId
 create index ix_rating_ratedAnswer_12 on rating (answerId);
 alter table rating add constraint fk_rating_ratedFlashCard_13 foreign key (flashcardId) references flashCard (flashcardId) on delete restrict on update restrict;
 create index ix_rating_ratedFlashCard_13 on rating (flashcardId);
+alter table uploaded_media add constraint fk_uploaded_media_author_14 foreign key (userId) references user (userId) on delete restrict on update restrict;
+create index ix_uploaded_media_author_14 on uploaded_media (userId);
 
 
 
@@ -172,6 +183,8 @@ drop table question;
 drop table rating;
 
 drop table tag;
+
+drop table uploaded_media;
 
 drop table user;
 
