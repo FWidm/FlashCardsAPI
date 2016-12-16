@@ -52,6 +52,7 @@ public class AuthToken extends Model {
     public AuthToken(User user) {
         this.user = user;
         //create new tokens while we find that it is already in use. Should not happen theoretically.
+        Logger.debug("Constructor of Authtoken for user="+user);
         do{
             try {
                 token=nextBase64String(32);
