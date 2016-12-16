@@ -71,12 +71,14 @@ public class AuthToken extends Model {
      * @throws UnsupportedEncodingException
      */
     private String nextBase64String(int n) throws UnsupportedEncodingException {
+        Logger.debug("inNextBase64String");
         SecureRandom csprng = new SecureRandom();
         // NIST SP800-90A recommends a seed length of 440 bits (i.e. 55 bytes)
         csprng.setSeed(csprng.generateSeed(55));
         byte[] bytes =new byte[n];
         csprng.nextBytes(bytes);
         byte[] encoded=Base64.getUrlEncoder().encode(bytes);
+        Logger.debug("inNextBase64String bytes="+encoded);
         return new String(encoded,"UTF-8");
     }
 
