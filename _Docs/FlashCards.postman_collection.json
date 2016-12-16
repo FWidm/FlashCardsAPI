@@ -8,7 +8,7 @@
 	},
 	"item": [
 		{
-			"name": "Auth",
+			"name": "Auth/Upload",
 			"description": "",
 			"item": [
 				{
@@ -21,6 +21,19 @@
 								"exec": [
 									"var jsonData = JSON.parse(responseBody);\r",
 									"postman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var uname=Math.random().toString(36).substr(2, 5);\r",
+									"postman.setEnvironmentVariable(\"userEmail\",uname +\"@test.com\")\r",
+									"postman.setEnvironmentVariable(\"userName\",uname);\r",
+									"postman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r",
+									""
 								]
 							}
 						}
@@ -90,6 +103,34 @@
 						"body": {
 							"mode": "raw",
 							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Media to the server (IMG)",
+					"request": {
+						"url": "{{url}}{{port}}/upload",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "picture",
+									"type": "file",
+									"enabled": true,
+									"warning": "",
+									"src": "fragmuttidribbble.png"
+								}
+							]
 						},
 						"description": ""
 					},
@@ -300,10 +341,7 @@
 						"url": "{{url}}{{port}}/cardDecks",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
+						"body": {},
 						"description": ""
 					},
 					"response": []
@@ -326,10 +364,7 @@
 						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
+						"body": {},
 						"description": ""
 					},
 					"response": []
@@ -482,10 +517,7 @@
 						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
+						"body": {},
 						"description": ""
 					},
 					"response": []
@@ -496,10 +528,7 @@
 						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}/cards",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
+						"body": {},
 						"description": ""
 					},
 					"response": []
@@ -510,10 +539,7 @@
 						"url": "{{url}}{{port}}/cardDecks/1/cards?size=1&start=0",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
+						"body": {},
 						"description": ""
 					},
 					"response": []
@@ -524,10 +550,7 @@
 						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}",
 						"method": "DELETE",
 						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
+						"body": {},
 						"description": ""
 					},
 					"response": []
@@ -753,10 +776,7 @@
 						"url": "{{url}}{{port}}/cards/{{cardId1}}/answers?sortBy=rating%20asc",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
+						"body": {},
 						"description": ""
 					},
 					"response": []
@@ -897,10 +917,7 @@
 						"url": "{{url}}{{port}}/categories/{{categoryId}}/children",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
+						"body": {},
 						"description": ""
 					},
 					"response": []
@@ -911,10 +928,7 @@
 						"url": "{{url}}{{port}}/categories/{{categoryId}}",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
+						"body": {},
 						"description": ""
 					},
 					"response": []
@@ -925,10 +939,7 @@
 						"url": "{{url}}{{port}}/categories/{{categoryId}}/decks",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
+						"body": {},
 						"description": ""
 					},
 					"response": []
@@ -1536,10 +1547,7 @@
 						"url": "{{url}}{{port}}/ratings",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
+						"body": {},
 						"description": ""
 					},
 					"response": []
@@ -1550,10 +1558,7 @@
 						"url": "{{url}}{{port}}/ratings?cardId={{cardId1}}",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
+						"body": {},
 						"description": ""
 					},
 					"response": []
@@ -1564,10 +1569,7 @@
 						"url": "{{url}}{{port}}/ratings?answerId={{answerId}}",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
+						"body": {},
 						"description": ""
 					},
 					"response": []
@@ -1578,10 +1580,7 @@
 						"url": "{{url}}{{port}}/ratings?userId={{userId}}",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
+						"body": {},
 						"description": ""
 					},
 					"response": []
@@ -1592,10 +1591,7 @@
 						"url": "{{url}}{{port}}/ratings/{{ratingId}}",
 						"method": "DELETE",
 						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
+						"body": {},
 						"description": ""
 					},
 					"response": []
@@ -1717,10 +1713,7 @@
 						"url": "{{url}}{{port}}/users?email={{userEmail}}",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
+						"body": {},
 						"description": ""
 					},
 					"response": []
@@ -1877,28 +1870,6 @@
 					"response": []
 				}
 			]
-		},
-		{
-			"name": "Upload Media to the server (IMG)",
-			"request": {
-				"url": "{{url}}{{port}}/upload",
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "picture",
-							"type": "file",
-							"enabled": true,
-							"warning": "",
-							"src": "fIrl8mr.jpg"
-						}
-					]
-				},
-				"description": ""
-			},
-			"response": []
 		}
 	]
 }
