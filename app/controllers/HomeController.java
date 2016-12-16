@@ -280,6 +280,7 @@ public class HomeController extends Controller {
             User logInTo = User.find.where().and(like(JsonKeys.USER_EMAIL, email), like(JsonKeys.USER_PASSWORD, pass)).findUnique();
             Logger.debug("Login attempt with email=" + email + " User found=" + logInTo);
             if (logInTo != null) {
+                Logger.debug("logInto != null!");
                 ObjectNode result = Json.newObject();
                 result.put(JsonKeys.STATUS_CODE, OK);
                 result.put(JsonKeys.DESCRIPTION, "Login succeeded.");
