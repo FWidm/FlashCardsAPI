@@ -284,10 +284,14 @@ public class HomeController extends Controller {
                 ObjectNode result = Json.newObject();
                 result.put(JsonKeys.STATUS_CODE, OK);
                 result.put(JsonKeys.DESCRIPTION, "Login succeeded.");
+                Logger.debug("result="+result);
                 AuthToken token = new AuthToken(logInTo);
                 token.save();
+                Logger.debug("Token="+token);
                 logInTo.addAuthToken(token);
+                Logger.debug("Added authtoken to user");
                 result.put(JsonKeys.TOKEN, token.getToken());
+                Logger.debug("finished result node: "+result);
                 return ok(result);
             }
         }
