@@ -77,9 +77,6 @@ public class AuthToken extends Model {
             Logger.debug("Using SHA1PRNG.");
 
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        finally {
             Logger.debug("Falling back to normal SecureRandom.");
             csprng=new SecureRandom();
         }
