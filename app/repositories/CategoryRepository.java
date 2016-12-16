@@ -157,7 +157,10 @@ public class CategoryRepository {
                     if(id!=parentId)
                         category.setParent(parseParent(parentId));
                 }
+                else{
                     category.setParent(null);
+
+                }
             }
 
             // TODO: 10.09.2016 Append mode is currently the std.!
