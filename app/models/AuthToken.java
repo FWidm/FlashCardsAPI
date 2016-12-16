@@ -5,6 +5,7 @@ import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import play.Logger;
 import util.JsonKeys;
 
 import javax.persistence.*;
@@ -54,6 +55,8 @@ public class AuthToken extends Model {
         do{
             try {
                 token=nextBase64String(32);
+                Logger.debug("Authtoken generated: "+token);
+
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
