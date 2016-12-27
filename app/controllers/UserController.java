@@ -140,6 +140,7 @@ public class UserController extends Controller {
                 return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN,
                         "The user could not be created, a user group has to be set via PATCH or PUT. It may not be content of POST."));
             }
+        // TODO: 27.12.2016 Add salt, hash password. 
         return created(JsonUtil.prepareJsonStatus(CREATED, "User has been created.", u.getId()));
     }
 

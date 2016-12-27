@@ -1,4 +1,4 @@
-package models.crypt;
+package util.crypt;
 
 import java.security.SecureRandom;
 import javax.crypto.spec.PBEKeySpec;
@@ -12,7 +12,7 @@ import java.security.spec.InvalidKeySpecException;
  * Author: havoc AT defuse.ca
  * www: http://crackstation.net/hashing-security.htm
  */
-public class HashPasswords
+public class PasswordUtil
 {
 
     /**
@@ -26,7 +26,7 @@ public class HashPasswords
         {
             // Print out 10 hashes
             for(int i = 0; i < 10; i++)
-                System.out.println(HashPasswords.createHash("p\r\nassw0Rd!"));
+                System.out.println(PasswordUtil.createHash("p\r\nassw0Rd!"));
 
             // Test password validation
             boolean failure = false;
