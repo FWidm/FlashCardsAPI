@@ -121,6 +121,7 @@ public class User extends Model {
 	}
 
 	public void setPassword(String password) {
+		//todo: A new random salt must be generated each time a user creates an account or changes their password.
 		this.password = password;
 	}
 
