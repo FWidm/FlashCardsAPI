@@ -40,7 +40,6 @@ public class Answer extends Model {
     @Column(name = JsonKeys.URI)
     private URI uri;
 
-    // TODO: 11/07/16  Ist die Antwort richtig oder falsch?
    @ManyToOne
    @JoinColumn(name=JsonKeys.USER_ID, referencedColumnName=JsonKeys.USER_ID)
    @JsonProperty(JsonKeys.AUTHOR)
