@@ -32,7 +32,7 @@
 									"var uname=Math.random().toString(36).substr(2, 5);\r",
 									"postman.setEnvironmentVariable(\"userEmail\",uname +\"@test.com\")\r",
 									"postman.setEnvironmentVariable(\"userName\",uname);\r",
-									"postman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r",
+									"postman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r",
 									""
 								]
 							}
@@ -50,7 +50,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPass}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
 						},
 						"description": ""
 					},
@@ -82,7 +82,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPass}}\"\n}"
+							"raw": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
 						},
 						"description": ""
 					},
@@ -227,7 +227,8 @@
 								"type": "text/javascript",
 								"exec": [
 									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
-									"postman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r",
+									"postman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r",
+									"postman.setEnvironmentVariable(\"userName\", Math.random().toString(36).substr(2, 5));\r",
 									""
 								]
 							}
@@ -245,7 +246,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPass}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
 						},
 						"description": ""
 					},
@@ -969,7 +970,8 @@
 								"type": "text/javascript",
 								"exec": [
 									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
-									"postman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r",
+									"postman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r",
+									"postman.setEnvironmentVariable(\"userName\", Math.random().toString(36).substr(2, 5));\r",
 									""
 								]
 							}
@@ -987,7 +989,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPass}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
 						},
 						"description": ""
 					},
@@ -1389,7 +1391,7 @@
 								"type": "text/javascript",
 								"exec": [
 									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
-									"postman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r",
+									"postman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r",
 									"postman.setEnvironmentVariable(\"userName\", Math.random().toString(36).substr(2, 5));\r",
 									""
 								]
@@ -1408,7 +1410,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPass}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
 						},
 						"description": ""
 					},
@@ -1646,7 +1648,8 @@
 								"type": "text/javascript",
 								"exec": [
 									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
-									"postman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r",
+									"postman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r",
+									"postman.setEnvironmentVariable(\"userName\", Math.random().toString(36).substr(2, 5));\r",
 									""
 								]
 							}
@@ -1664,7 +1667,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPass}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
 						},
 						"description": ""
 					},
@@ -1754,7 +1757,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPass}}\",\n    \"rating\": \"{{userRating}}\",\n    \"email\": \"{{userEmail}}\",\n    \"groups\": []\n}"
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"rating\": \"{{userRating}}\",\n    \"email\": \"{{userEmail}}\",\n    \"groups\": []\n}"
 						},
 						"description": ""
 					},
