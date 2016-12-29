@@ -48,10 +48,26 @@ public class RatingRepository {
             ratingList = Rating.find.where().eq(util.JsonKeys.RATING_TYPE, RequestKeys.ANSWER_RATING).findList();
             return ratingList;
         }
+        //by uid + rated object id
+        if (urlParams.containsKey(RequestKeys.USER_ID)&&urlParams.containsKey(RequestKeys.FLASHCARD_ID)) {
+            Logger.debug("uid+cardId");
+            Long uid = Long.parseLong(urlParams.get(RequestKeys.USER_ID)[0]);
+            Long id = Long.parseLong(urlParams.get(RequestKeys.FLASHCARD_ID)[0]);
+            ratingList = Rating.find.where().and(eq(JsonKeys.USER_ID, uid), eq(JsonKeys.FLASHCARD_ID, id)).findList();
+            return ratingList;
+        }
+        if (urlParams.containsKey(RequestKeys.USER_ID)&&urlParams.containsKey(RequestKeys.ANSWER_ID)) {
+            Logger.debug("uid+answerId");
+            Long uid = Long.parseLong(urlParams.get(RequestKeys.USER_ID)[0]);
+            Long id = Long.parseLong(urlParams.get(RequestKeys.ANSWER_ID)[0]);
+            ratingList = Rating.find.where().and(eq(JsonKeys.USER_ID, uid), eq(JsonKeys.ANSWER_ID, id)).findList();
+            return ratingList;
+        }
         //by id
         if (urlParams.containsKey(RequestKeys.USER_ID)) {
-            Long id = Long.parseLong(urlParams.get(RequestKeys.USER_ID)[0]);
-            ratingList = Rating.find.where().eq(JsonKeys.USER_ID, id).findList();
+            Logger.debug("uid");
+            Long uid = Long.parseLong(urlParams.get(RequestKeys.USER_ID)[0]);
+            ratingList = Rating.find.where().eq(JsonKeys.USER_ID, uid).findList();
             return ratingList;
         }
         if (urlParams.containsKey(RequestKeys.FLASHCARD_ID)) {

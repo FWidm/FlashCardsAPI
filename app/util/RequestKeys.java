@@ -20,7 +20,7 @@ public class RequestKeys {
     public static final String FLASHCARD_RATING = "cardRating";
 
     public static final String USER_ID = "userId";
-    public static final String FLASHCARD_ID = "cardId";
+    public static final String FLASHCARD_ID = "flashcardId";
     public static final String ANSWER_ID = "answerId";
 
     //category params

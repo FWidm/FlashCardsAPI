@@ -1449,6 +1449,31 @@
 					"response": []
 				},
 				{
+					"name": "get answer id of last created card",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"answerId\", jsonData[0].answerId);\r",
+									"\r",
+									"tests[\"answerId=\"+jsonData[0].answerId] = true;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards/{{cardId1}}/answers",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
 					"name": "Creates a new CardRating",
 					"event": [
 						{
@@ -1557,7 +1582,7 @@
 				{
 					"name": "Retrieve all Ratings for one card",
 					"request": {
-						"url": "{{url}}{{port}}/ratings?cardId={{cardId1}}",
+						"url": "{{url}}{{port}}/ratings?flashcardId={{cardId1}}",
 						"method": "GET",
 						"header": [],
 						"body": {},
@@ -1583,6 +1608,48 @@
 						"method": "GET",
 						"header": [],
 						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve one rating that has a specific user and card",
+					"request": {
+						"url": "{{url}}{{port}}/ratings?userId={{userId}}&flashcardId={{cardId1}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve the rating for one users & answer",
+					"request": {
+						"url": "{{url}}{{port}}/ratings?answerId={{answerId}}&userId={{userId}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Change the modifier of a specific rating to 0",
+					"request": {
+						"url": "{{url}}{{port}}/ratings/{{ratingId}}",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"ratingModifier\": 0\n  }"
+						},
 						"description": ""
 					},
 					"response": []
