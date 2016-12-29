@@ -75,11 +75,13 @@ public class RatingController extends Controller {
     public Result changeRating(Long id){
         JsonNode json=request().body().asJson();
         try {
-            RatingRepository.changeRating(id,json);
+            Rating rating=RatingRepository.changeRating(id,json);
+            return ok(JsonUtil.prepareJsonStatus(OK, "Rating has been changed.",rating.getId()));
+
         } catch (Exception e) {
-            e.printStackTrace();
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage()));
         }
-        return ok();
+
     }
 
     /**

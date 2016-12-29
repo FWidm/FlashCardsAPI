@@ -166,7 +166,7 @@ public class RatingRepository {
                         answerRating.setRatingModifier(ratingModifier);
                         Logger.debug("rating=" + answerRating);
                         answerRating.save();
-                        break;
+                        return answerRating;
                     case "CardRating":
                         Logger.debug("CardRating!");
                         CardRating cardRating = CardRating.find.byId(id);
@@ -174,13 +174,14 @@ public class RatingRepository {
                         cardRating.setRatingModifier(ratingModifier);
                         Logger.debug("rating=" + cardRating);
                         cardRating.save();
-                        break;
+                        return cardRating;
                     default:
                         throw new Exception("This should not happen @ changeRating switch. class is: " + rating.getClass().getSimpleName());
                 }
             }
+            throw new InvalidInputException("No change is needed as the new modifier equals the new one.");
         }
-        return null;
+        throw new InvalidInputException("No 'ratingModifier' key was found, please provide a valid modifier (integer).");
     }
 
     /**
