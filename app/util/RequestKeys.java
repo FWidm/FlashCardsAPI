@@ -25,7 +25,7 @@ public class RequestKeys {
 
     //category params
     public static final String ROOT= "root";
-    public static final String CHILDREN= "children";
+    //public static final String CHILDREN= "children";
 
     public static final String START = "start";
 }
