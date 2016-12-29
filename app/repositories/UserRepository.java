@@ -9,9 +9,12 @@ import play.data.validation.Constraints;
 import util.JsonKeys;
 import util.JsonUtil;
 import util.RequestKeys;
+import util.crypt.PasswordUtil;
 import util.exceptions.InvalidInputException;
 import util.exceptions.ParameterNotSupportedException;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,12 +42,32 @@ public class UserRepository {
         if (json.has(JsonKeys.USER_AVATAR)) {
             tmp.setAvatar(json.get(JsonKeys.USER_AVATAR).asText());
         }
+
+        String password = json.get(JsonKeys.USER_PASSWORD).asText();
+        if (json.has(JsonKeys.USER_PASSWORD) && password.length()>=JsonKeys.USER_PASSWORD_MIN_LENGTH) {
+            try {
+                // format iterations:salt:hash
+                String pwdGen=PasswordUtil.createHash(password);
+                Logger.debug("Password generated from input is: "+pwdGen);
+
+                // TODO: 29.12.2016  save salt
+                Logger.debug("Validation of password and hash returns: "+PasswordUtil.validatePassword(password,pwdGen));
+                tmp.setPassword(pwdGen);
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (InvalidKeySpecException e) {
+                e.printStackTrace();
+            }
+        }
+        else
+            if(json.has(JsonKeys.USER_PASSWORD) && password.length()<JsonKeys.USER_PASSWORD_MIN_LENGTH)
+                throw new InvalidInputException("The specified password is too short it has to be "+JsonKeys.USER_PASSWORD_MIN_LENGTH+" characters long.");
+
         //Checks if the constraints for @email are met via it's isValid method.
         Constraints.EmailValidator emailValidator = new Constraints.EmailValidator();
-        Constraints.MinLengthValidator minLengthValidator = new Constraints.MinLengthValidator();
         if(JsonKeys.debugging)if(JsonKeys.debugging) Logger.debug("json=" + json + " - obj=" + tmp);
-        if (emailValidator.isValid(tmp.getEmail()) && minLengthValidator.isValid(tmp.getName())
-                && minLengthValidator.isValid(tmp.getPassword())) {
+        if (emailValidator.isValid(tmp.getEmail()) && tmp.getName().length()>=JsonKeys.USER_NAME_MIN_LENGTH
+                && tmp.getPassword().length()>=JsonKeys.USER_PASSWORD_MIN_LENGTH) {
             // if this entry with specified email does not exist, create, else
             // throw an error.
             if (User.find.where().eq(JsonKeys.USER_EMAIL, tmp.getEmail()).findUnique() == null) {
@@ -103,9 +126,27 @@ public class UserRepository {
 
         }
         Constraints.MinLengthValidator minLengthValidator = new Constraints.MinLengthValidator();
-        if (json.has(JsonKeys.USER_PASSWORD) && minLengthValidator.isValid(json.get(JsonKeys.USER_PASSWORD).asText())) {
-            u.setPassword(json.get(JsonKeys.USER_PASSWORD).asText());
+        String password = json.get(JsonKeys.USER_PASSWORD).asText();
+        if (json.has(JsonKeys.USER_PASSWORD) && minLengthValidator.isValid(password)){
+
+            try {
+                // format iterations:salt:hash
+                String pwdGen=PasswordUtil.createHash(password);
+                Logger.debug("Password generated from input is: "+pwdGen);
+
+                // TODO: 29.12.2016  save salt
+                Logger.debug("Validation of password and hash returns: "+PasswordUtil.validatePassword(password,pwdGen));
+                u.setPassword(pwdGen);
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (InvalidKeySpecException e) {
+                e.printStackTrace();
+            }
         }
+        else
+        if(json.has(JsonKeys.USER_PASSWORD) && !minLengthValidator.isValid(json.get(JsonKeys.USER_PASSWORD).asText()))
+            throw new InvalidInputException("The specified password is too short it has to be "+JsonKeys.USER_PASSWORD_MIN_LENGTH+" characters long.");
+
         if (json.has(JsonKeys.RATING))
             u.setRating(json.get(JsonKeys.RATING).asInt());
         if (json.has(JsonKeys.USER_NAME) && minLengthValidator.isValid(json.get(JsonKeys.USER_NAME).asText()))

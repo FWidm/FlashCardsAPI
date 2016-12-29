@@ -36,7 +36,7 @@ public class User extends Model {
     @JsonProperty(JsonKeys.USER_NAME)
     private String name;
 
-    @Required @MinLength(3)
+    @Required @MinLength(JsonKeys.USER_PASSWORD_LENGTH)
     @JsonProperty(JsonKeys.USER_PASSWORD)
     @JsonIgnore
     private String password;

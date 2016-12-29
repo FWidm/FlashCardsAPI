@@ -15,6 +15,7 @@ import util.ActionAuthenticator;
 import util.FileTypeChecker;
 import util.JsonKeys;
 import util.JsonUtil;
+import util.crypt.PasswordUtil;
 import views.html.*;
 
 import java.io.File;
@@ -23,6 +24,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
 import static com.avaje.ebean.Expr.like;
@@ -277,10 +280,13 @@ public class HomeController extends Controller {
         if (json.has(JsonKeys.USER_PASSWORD) && json.has(JsonKeys.USER_EMAIL)) {
             String pass = json.get(JsonKeys.USER_PASSWORD).asText();
             String email = json.get(JsonKeys.USER_EMAIL).asText();
-            User logInTo = User.find.where().and(like(JsonKeys.USER_EMAIL, email), like(JsonKeys.USER_PASSWORD, pass)).findUnique();
-            Logger.debug("Login attempt with email=" + email + " User found=" + logInTo);
-            if (logInTo != null) {
-                Logger.debug("logInto != null!");
+
+            //User logInTo = User.find.where().and(like(JsonKeys.USER_EMAIL, email), like(JsonKeys.USER_PASSWORD, pass)).findUnique();
+            User logInTo=User.find.where().like(JsonKeys.USER_EMAIL, email).findUnique();
+            try {
+
+            Logger.debug("Login attempt with email=" + email + " User found=" + logInTo+" valid? "+PasswordUtil.validatePassword(pass,logInTo.getPassword()));
+            if (logInTo != null  && PasswordUtil.validatePassword(pass,logInTo.getPassword())) {
                 ObjectNode result = Json.newObject();
                 result.put(JsonKeys.STATUS_CODE, OK);
                 result.put(JsonKeys.DESCRIPTION, "Login succeeded.");
@@ -293,6 +299,12 @@ public class HomeController extends Controller {
                 result.put(JsonKeys.TOKEN, token.getToken());
                 Logger.debug("finished result node: "+result);
                 return ok(result);
+            }
+
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (InvalidKeySpecException e) {
+                e.printStackTrace();
             }
         }
         return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN, "Login failed, check email and password for errors."));

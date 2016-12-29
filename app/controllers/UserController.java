@@ -130,6 +130,13 @@ public class UserController extends Controller {
                                 BAD_REQUEST,
                                 e.getMessage()));
             }
+            catch (NumberFormatException e){
+                e.printStackTrace();
+                return internalServerError(JsonUtil
+                        .prepareJsonStatus(
+                                INTERNAL_SERVER_ERROR,
+                                "Error in PasswordUtil."));
+            }
             catch (IllegalArgumentException e) {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
@@ -137,6 +144,7 @@ public class UserController extends Controller {
                                 "Body did contain elements that are not allowed/expected. A user can contain: " + JsonKeys.USER_JSON_ELEMENTS));
             }
             catch (Exception e){
+                e.printStackTrace();
                 return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN,
                         "The user could not be created, a user group has to be set via PATCH or PUT. It may not be content of POST."));
             }

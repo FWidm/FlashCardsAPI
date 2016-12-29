@@ -52,6 +52,8 @@ public class JsonKeys {
     public static final String USER_PASSWORD = "password";
     public static final String USER_EMAIL = "email";
     public static final String USER_GROUPS = "groups";
+    public static final int USER_PASSWORD_MIN_LENGTH=5;
+    public static final int USER_NAME_MIN_LENGTH=5;
     public static final String USER_JSON_ELEMENTS = USER_NAME + ", " + USER_EMAIL + ", " + USER_PASSWORD + ", " + USER_GROUPS;
     //Tag
     public static final String TAG_ID = "tagId";

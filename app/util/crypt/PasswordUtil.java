@@ -208,12 +208,6 @@ public class PasswordUtil
             return hex;
     }
 
-    public static boolean validatePasswordFiller(String password,
-                                                 String password2) {
-        // TODO Auto-generated method stub
-        return true;
-    }
-
 
 
 }
