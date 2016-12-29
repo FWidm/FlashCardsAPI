@@ -40,6 +40,7 @@ public class AnswerRating extends Rating{
         return ratedAnswer;
     }
 
+
     /**
      * Checks if a combination of user and answer is already in the database.
      * @return false if no such combination exists.
@@ -61,7 +62,7 @@ public class AnswerRating extends Rating{
     /**
      * Changes the rating to either add or substract the ratingmodifier. Updates the answer object to save those changes.
      */
-    private void compensate(){
+    public void compensate(){
 //        System.out.println("Compensating rating of answer="+ ratedAnswer.getId()+": "+ratedAnswer.getRating()+" to: "+(ratedAnswer.getRating()-ratingModifier));
         ratedAnswer.updateRating(-1*ratingModifier);
         ratedAnswer.update();

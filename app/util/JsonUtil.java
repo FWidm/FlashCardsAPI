@@ -41,7 +41,7 @@ public class JsonUtil {
     public static ObjectNode prepareJsonStatus(int statuscode,
                                                String description) {
         ObjectNode result = Json.newObject();
-        result.put("statuscode", statuscode);
+        result.put(JsonKeys.STATUS_CODE, statuscode);
         result.put("description", description);
         return result;
     }
@@ -56,7 +56,7 @@ public class JsonUtil {
      */
     public static ObjectNode prepareJsonStatus(int statuscode, String description, Long id) {
         ObjectNode result = Json.newObject();
-        result.put("statuscode", statuscode);
+        result.put(JsonKeys.STATUS_CODE, statuscode);
         result.put("description", description);
         result.put("id", id);
         return result;

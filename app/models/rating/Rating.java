@@ -46,5 +46,7 @@ public abstract class Rating extends Model {
         return ratingModifier;
     }
 
-
+    public void setRatingModifier(int ratingModifier) {
+        this.ratingModifier = ratingModifier;
+    }
 }

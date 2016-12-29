@@ -63,6 +63,7 @@ PUT     /cards/:id          controllers.FlashCardController.updateFlashCard(id:L
 GET     /ratings            controllers.RatingController.getRatingList
 GET     /ratings/:id        controllers.RatingController.getRating(id:Long)
 POST    /ratings            controllers.RatingController.addRating
+PATCH    /ratings/:id         controllers.RatingController.changeRating(id:Long)
 DELETE  /ratings/:id        controllers.RatingController.deleteRating(id:Long)
 
 #CardDecks

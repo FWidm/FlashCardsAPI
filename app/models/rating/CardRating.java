@@ -4,6 +4,7 @@ import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import models.FlashCard;
 import models.User;
+import play.Logger;
 import util.JsonKeys;
 import util.RequestKeys;
 
@@ -46,6 +47,7 @@ public class CardRating extends Rating{
      */
     public void apply(){
 //        System.out.println("Modifying rating of ratedFlashCard="+ ratedFlashCard.getId()+": "+ratedFlashCard.getRating()+" to: "+(ratedFlashCard.getRating()+ratingModifier));
+        Logger.debug("Modifying by "+(ratingModifier));
         ratedFlashCard.updateRating(ratingModifier);
         ratedFlashCard.update();
     }
@@ -53,8 +55,9 @@ public class CardRating extends Rating{
     /**
      * Changes the rating to either add or substract the ratingmodifier. Updates the answer object to save those changes.
      */
-    private void compensate(){
+    public void compensate(){
 //        System.out.println("Compensating rating of answer="+ ratedFlashCard.getId()+": "+ratedFlashCard.getRating()+" to: "+(ratedFlashCard.getRating()-ratingModifier));
+        Logger.debug("Compensating by "+(-1*ratingModifier));
         ratedFlashCard.updateRating(-1*ratingModifier);
         ratedFlashCard.update();
     }

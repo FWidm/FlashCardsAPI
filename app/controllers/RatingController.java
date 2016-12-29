@@ -66,7 +66,20 @@ public class RatingController extends Controller {
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,e.getMessage(),e.getObjectId()));
         } catch (InvalidInputException e) {
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,e.getMessage()));
+        } catch (ObjectNotFoundException e) {
+            //Duplicate keys
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,e.getMessage()));
         }
+    }
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result changeRating(Long id){
+        JsonNode json=request().body().asJson();
+        try {
+            RatingRepository.changeRating(id,json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ok();
     }
 
     /**

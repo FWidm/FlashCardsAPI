@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import play.Logger;
 import play.data.validation.Constraints.*;
 import util.JsonKeys;
 
@@ -32,11 +33,11 @@ public class User extends Model {
 	@JsonProperty(JsonKeys.USER_AVATAR)
 	private String avatar;
 
-	@Required @MinLength(3)
+	@Required @MinLength(JsonKeys.USER_NAME_MIN_LENGTH)
     @JsonProperty(JsonKeys.USER_NAME)
     private String name;
 
-    @Required @MinLength(JsonKeys.USER_PASSWORD_LENGTH)
+    @Required @MinLength(JsonKeys.USER_PASSWORD_MIN_LENGTH)
     @JsonProperty(JsonKeys.USER_PASSWORD)
     @JsonIgnore
     private String password;
@@ -215,7 +216,7 @@ public class User extends Model {
 	 * @param ratingModifier
 	 */
 	public void updateRating(int ratingModifier){
-		System.out.println(new Date()+ " Modifying rating from="+rating+" by modifier="+ratingModifier+" to="+(rating+ratingModifier));
+		Logger.debug("Userid="+id+" | "+new Date()+ " Modifying rating from="+rating+" by modifier="+ratingModifier+" to="+(rating+ratingModifier));
 		this.rating+=ratingModifier;
 		this.update();
 	}
