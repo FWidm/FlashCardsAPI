@@ -102,7 +102,6 @@ public class FlashCardRepository {
                         "new cards, please provide a complete question object with the following components: " + JsonKeys.QUESTION_JSON_ELEMENTS);
             } else {
                 try {
-                    if (JsonKeys.debugging) Logger.debug("HELLO!");
                     Question q = Question.parseQuestion(json.get(JsonKeys.FLASHCARD_QUESTION));
                     q.save();
                     requestObject.setQuestion(q);
@@ -453,6 +452,15 @@ public class FlashCardRepository {
         }
         if (node.has(JsonKeys.RATING)) {
             answer.setRating(node.get(JsonKeys.RATING).asInt());
+        }
+        if(node.has(JsonKeys.ANSWER_HINT)){
+            answer.setHintText(node.get(JsonKeys.ANSWER_HINT).asText());
+        }
+        if(node.has(JsonKeys.ANSWER_CORRECT)){
+            answer.setCorrect(node.get(JsonKeys.ANSWER_CORRECT).asBoolean());
+        }
+        else{
+
         }
         return answer;
     }
