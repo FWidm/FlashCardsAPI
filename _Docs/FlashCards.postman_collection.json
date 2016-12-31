@@ -612,7 +612,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hintasfdqwrgwwbrgeqqbreasbasbfabfs\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        },\n        \"answerCorrect\": true\n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
 						},
 						"description": "Inserts a question to the db instead of using one already created."
 					},
