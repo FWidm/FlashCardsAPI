@@ -156,6 +156,8 @@ public class FlashCardRepository {
         ObjectMapper mapper = new ObjectMapper();
         boolean appendMode = false;
         int answersSize = -1;
+        Question oldQuestion = null;
+        List<Answer> oldAnswerList=null;
 
         if (urlParams.containsKey(RequestKeys.APPEND)) {
             appendMode = Boolean.parseBoolean(urlParams.get(RequestKeys.APPEND)[0]);
@@ -177,6 +179,7 @@ public class FlashCardRepository {
 
         if (json.has(JsonKeys.FLASHCARD_ANSWERS)) {
             if (appendMode) {
+                oldAnswerList=FlashCard.find.byId(id).getAnswers();
                 List<Answer> mergedAnswers = new ArrayList<>();
                 mergedAnswers.addAll(toUpdate.getAnswers());
                 mergedAnswers.addAll(retrieveAnswers(json));
@@ -195,7 +198,12 @@ public class FlashCardRepository {
                 try {
                     Question q = Question.parseQuestion(json.get(JsonKeys.FLASHCARD_QUESTION));
                     q.save();
+                    oldQuestion = toUpdate.getQuestion();
+                    Logger.debug("Deleted oldQuestion: "+oldQuestion);
                     toUpdate.setQuestion(q);
+
+
+
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
@@ -230,7 +238,19 @@ public class FlashCardRepository {
         }
 
         toUpdate.update();
-        if (JsonKeys.debugging) Logger.debug("updated");
+        //delete old/replaced objects if no appendmode is enabled
+        if(oldQuestion!=null)
+            oldQuestion.delete();
+        if(oldAnswerList!=null) {
+            Logger.debug("oldList=" + oldAnswerList);
+            for(Answer answer: oldAnswerList){
+                Logger.debug("delete answer with id="+answer.getId());
+                answer.delete();
+            }
+        }
+
+        if (JsonKeys.debugging)
+            Logger.debug("updated");
 
         return toUpdate;
     }
