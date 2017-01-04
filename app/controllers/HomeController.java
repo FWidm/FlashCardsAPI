@@ -42,7 +42,6 @@ public class HomeController extends Controller {
     public Result index() {
         java.io.File file = new java.io.File("_Docs/img/flash_icon.png");
         Logger.debug(file.getAbsolutePath());
-
         return ok(file);
     }
 

@@ -6,6 +6,9 @@ package util;
  *         on 11/07/16.
  */
 public class RequestKeys {
+    public static final String ASC="ASC";
+    public static final String DESC="DESC";
+
     public static final String TOKEN_HEADER = "Authorization";
 
     public static final String EMAIL="email";
@@ -14,6 +17,8 @@ public class RequestKeys {
     public static final String APPEND = "append";
     public static final String REDIRECT ="redirect";
     public static final String SORT_BY="sortBy";
+    //used to pre-filter tags
+    public static final String STARTS_WITH="startsWith";
     public static final String EMPTY= "empty";
 
     public static final String ANSWER_RATING = "answerRating";
@@ -25,7 +30,8 @@ public class RequestKeys {
 
     //category params
     public static final String ROOT= "root";
-    //public static final String CHILDREN= "children";
+    //tag - sort by usage
+    public static final String USAGE_COUNT= "usageCount";
 
     public static final String START = "start";
 }

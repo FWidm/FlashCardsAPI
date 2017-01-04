@@ -3,14 +3,10 @@ package models;
 import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import play.data.validation.Constraints;
 import util.JsonKeys;
 
 import javax.persistence.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,7 +15,7 @@ import java.util.List;
  *         on 27/06/16.
  */
 @Entity
-public class Tag extends Model {
+public class Tag extends Model implements Comparable<Tag>{
     @Id @GeneratedValue
     @Column(name = JsonKeys.TAG_ID)
     @JsonProperty(JsonKeys.TAG_ID)
@@ -34,6 +30,11 @@ public class Tag extends Model {
     @JsonIgnore
     private List<FlashCard> cards;
 
+
+
+    @Transient //not persistent.
+    private int usageCount;
+
     public static Model.Finder<Long, Tag> find = new Model.Finder<Long, Tag>(Tag.class);
 
 
@@ -46,6 +47,11 @@ public class Tag extends Model {
         this.cards = cards;
     }
 
+    public Tag(String name, List<FlashCard> cards, int usageCount) {
+        this.name = name;
+        this.cards = cards;
+        this.usageCount = usageCount;
+    }
 
     public long getId() {
         return id;
@@ -90,12 +96,39 @@ public class Tag extends Model {
             this.update();
         }
     }
+
+    public int getUsageCount() {
+        return usageCount;
+    }
+
+
+    public void updateUsageCount() {
+        usageCount =Tag.find.byId(id).getCards().size();
+    }
+
+
+
     @Override
     public String toString() {
         return "Tag{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", cards=" + cards +
+                ", usageCount='"+ usageCount +"'"+
                 '}';
+    }
+
+
+    @Override
+    public int compareTo(Tag tag) {
+        /*
+         * If the Integer is equal to the argument then 0 is returned.
+         If the Integer is less than the argument then -1 is returned.
+         If the Integer is greater than the argument then 1 is returned.
+         */
+        if(this.usageCount >tag.usageCount)
+            return -1;
+        if(this.usageCount ==tag.usageCount)
+            return 0;
+        return 1;
     }
 }

@@ -84,3 +84,8 @@ GET     /categories/:id/decks       controllers.CategoryController.getCategoryCa
 POST    /categories         controllers.CategoryController.addCategory
 PATCH   /categories/:id     controllers.CategoryController.updateCategory(id:Long)
 PUT     /categories/:id     controllers.CategoryController.updateCategory(id:Long)
+
+#Tags
+GET     /tags               controllers.TagController.getTags
+GET     /tags/:id           controllers.TagController.getTag(id:Long)
+GET     /tags/:id/cards     controllers.TagController.getAttachedCards(id:Long)

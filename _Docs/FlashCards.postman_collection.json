@@ -612,7 +612,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hintasfdqwrgwwbrgeqqbreasbasbfabfs\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        },\n        \"answerCorrect\": true\n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hintasfdqwrgwwbrgeqqbreasbasbfabfs\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        },\n        \"answerCorrect\": true\n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":1\n    },\n    {\n      \"tagName\": \"halp\"\n    }]\n  }"
 						},
 						"description": "Inserts a question to the db instead of using one already created."
 					},
@@ -734,7 +734,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"rating\": 0,\n    \"question\": {\n      \"question\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer1\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      },\n      {\n        \"answerText\": \"answer2\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      },\n      {\n        \"answerText\": \"answer3\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": true\n  }"
+							"raw": "{\n\"rating\": 0,\n    \"question\": {\n      \"question\": \"hello world!2\",\n      \"mediaURI\": \"www.google.de2\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer1\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      },\n      {\n        \"answerText\": \"answer2\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      },\n      {\n        \"answerText\": \"answer3\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": true\n  }"
 						},
 						"description": "Inserts a question to the db instead of using one already created."
 					},
@@ -1659,6 +1659,67 @@
 					"request": {
 						"url": "{{url}}{{port}}/ratings/{{ratingId}}",
 						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tags",
+			"description": "",
+			"item": [
+				{
+					"name": "Get Tags sorted by usageCount (supports ASC/DESC)",
+					"request": {
+						"url": "{{url}}{{port}}/tags?sortBy=usageCount%20asc",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Tags",
+					"request": {
+						"url": "{{url}}{{port}}/tags",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Tags starting with \"h\"",
+					"request": {
+						"url": "{{url}}{{port}}/tags?startsWith=h",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get all cards attached to a specific tag",
+					"request": {
+						"url": "{{url}}{{port}}/tags/1/cards",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get one tag by id",
+					"request": {
+						"url": "{{url}}{{port}}/tags/1",
+						"method": "GET",
 						"header": [],
 						"body": {},
 						"description": ""
