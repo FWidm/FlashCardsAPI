@@ -55,4 +55,5 @@ public class TagController extends Controller {
         }
     }
 
+    // TODO: 05.01.2017 Search for tag array 
 }

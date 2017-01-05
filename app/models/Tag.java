@@ -33,6 +33,7 @@ public class Tag extends Model implements Comparable<Tag>{
 
 
     @Transient //not persistent.
+    @JsonIgnore
     private int usageCount;
 
     public static Model.Finder<Long, Tag> find = new Model.Finder<Long, Tag>(Tag.class);
@@ -97,6 +98,7 @@ public class Tag extends Model implements Comparable<Tag>{
         }
     }
 
+    @JsonIgnore
     public int getUsageCount() {
         return usageCount;
     }

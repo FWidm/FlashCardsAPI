@@ -166,8 +166,10 @@ public class CardDeckRepository {
                     if (appendMode) {
                         cardList.addAll(deck.getCards());
                         cardList.addAll(parseCards(requestObject));
+
                     } else {
                         cardList = parseCards(requestObject);
+                        // TODO: 05.01.2017 delete replaced cards
                     }
 
                     boolean canSetCards = true;
@@ -182,6 +184,7 @@ public class CardDeckRepository {
                     }
 
                     if (canSetCards || redirectMode) {
+                        // TODO: 05.01.2017 Test redirect
                         deck.setCards(cardList);
                         deck.update();
                         deck.getCards().forEach(card -> card.setDeck(deck));
