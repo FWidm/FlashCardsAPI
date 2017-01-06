@@ -58,7 +58,17 @@ public class UserController extends Controller {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no user with the specified id exists.", id));
         }
         catch (InvalidInputException e) {
-            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,e.getMessage()));
+            e.printStackTrace();
+            if(JsonKeys.debugging){
+                return badRequest(JsonUtil
+                        .prepareJsonStatus(
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));
+            }
+            else {
+                return badRequest(JsonUtil
+                        .prepareJsonStatus(
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+            }
         }
         return ok(JsonUtil.prepareJsonStatus(OK, "User has been changed.", id));
 

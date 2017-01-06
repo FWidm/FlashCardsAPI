@@ -164,7 +164,17 @@ public class FlashCardController {
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "An answerId is not accepted while creating new cards, " +
                     "please provide a complete list of answers object with the following components: " + JsonKeys.QUESTION_JSON_ELEMENTS));
         } catch (InvalidInputException e) {
-            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage()));
+            e.printStackTrace();
+            if(JsonKeys.debugging && !e.getCause().getMessage().contains("Body did contain")){
+                return badRequest(JsonUtil
+                        .prepareJsonStatus(
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));
+            }
+            else {
+                return badRequest(JsonUtil
+                        .prepareJsonStatus(
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+            }
         }
     }
 

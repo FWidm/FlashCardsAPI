@@ -88,9 +88,16 @@ public class CategoryController extends Controller {
             return created(JsonUtil.prepareJsonStatus(CREATED,"Category has been created!",addCategory.getId()));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
-            return badRequest(JsonUtil
-                    .prepareJsonStatus(
-                            BAD_REQUEST, "Body did contain elements that are not allowed/expected. A category can contain: " + JsonKeys.CATEGORY_JSON_ELEMENTS));
+            if(JsonKeys.debugging){
+                return badRequest(JsonUtil
+                        .prepareJsonStatus(
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));
+            }
+            else {
+                return badRequest(JsonUtil
+                        .prepareJsonStatus(
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+            }
         } catch (ObjectNotFoundException e) {
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage()));
         } catch (PartiallyModifiedException e) {
@@ -108,9 +115,16 @@ public class CategoryController extends Controller {
             return ok(JsonUtil.prepareJsonStatus(OK, "Category has been updated.", updateCategory.getId()));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
-            return badRequest(JsonUtil
-                    .prepareJsonStatus(
-                            BAD_REQUEST, "Body did contain elements that are not allowed/expected. A category can contain: " + JsonKeys.CATEGORY_JSON_ELEMENTS));
+            if(JsonKeys.debugging){
+                return badRequest(JsonUtil
+                        .prepareJsonStatus(
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));
+            }
+            else {
+                return badRequest(JsonUtil
+                        .prepareJsonStatus(
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+            }
         } catch (ObjectNotFoundException e) {
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage()));
         } catch (InvalidInputException e) {
