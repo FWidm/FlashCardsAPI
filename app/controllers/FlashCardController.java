@@ -94,14 +94,29 @@ public class FlashCardController {
             return created(JsonUtil.prepareJsonStatus(CREATED, "FlashCard has been created!", addedCard.getId()));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
-            return badRequest(JsonUtil
-                    .prepareJsonStatus(
-                            BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+            if(JsonKeys.debugging){
+                return badRequest(JsonUtil
+                        .prepareJsonStatus(
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));
+            }
+            else {
+                return badRequest(JsonUtil
+                        .prepareJsonStatus(
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+            }
+
         } catch (ParameterNotSupportedException e) {
             e.printStackTrace();
-            return badRequest(JsonUtil
-                    .prepareJsonStatus(
-                            BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+            if(JsonKeys.debugging){
+                return badRequest(JsonUtil
+                        .prepareJsonStatus(
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));
+            }
+            else {
+                return badRequest(JsonUtil
+                        .prepareJsonStatus(
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+            }
         } catch (InvalidInputException e) {
             e.printStackTrace();
             return badRequest(JsonUtil
@@ -135,9 +150,16 @@ public class FlashCardController {
         } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         } catch (IllegalArgumentException e){
-            return badRequest(JsonUtil
-                    .prepareJsonStatus(
-                            BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+            if(JsonKeys.debugging){
+                return badRequest(JsonUtil
+                        .prepareJsonStatus(
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));
+            }
+            else {
+                return badRequest(JsonUtil
+                        .prepareJsonStatus(
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+            }
         } catch (ParameterNotSupportedException e) {
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "An answerId is not accepted while creating new cards, " +
                     "please provide a complete list of answers object with the following components: " + JsonKeys.QUESTION_JSON_ELEMENTS));
