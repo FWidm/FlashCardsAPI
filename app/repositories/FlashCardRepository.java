@@ -2,14 +2,9 @@ package repositories;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.typesafe.config.ConfigException;
 import models.*;
 import play.Logger;
-import play.mvc.BodyParser;
-import play.mvc.Controller;
-import play.mvc.Result;
 import util.JsonKeys;
-import util.JsonUtil;
 import util.RequestKeys;
 import util.exceptions.InvalidInputException;
 import util.exceptions.ObjectNotFoundException;
@@ -23,10 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import static play.mvc.Controller.request;
-import static play.mvc.Http.Status.BAD_REQUEST;
-import static play.mvc.Http.Status.NOT_FOUND;
-import static play.mvc.Http.Status.OK;
-import static play.mvc.Results.*;
 
 /**
  * @author Jonas Kraus
@@ -118,7 +109,8 @@ public class FlashCardRepository {
 
         if (json.has(JsonKeys.FLASHCARD_TAGS)) {
 
-            List<Tag> tags = retrieveTags(json);
+            List<Tag> tags = TagRepository.retrieveOrCreateTags(json);
+            // TODO: 07.01.2017 revisit this process
             if (tags.contains(null)) {
                 if (JsonKeys.debugging) Logger.debug(">> null!");
                 information += " One or more tag ids where invalid!";
@@ -220,16 +212,16 @@ public class FlashCardRepository {
             if (appendMode) {
                 List<Tag> mergedTags = new ArrayList<>();
                 mergedTags.addAll(toUpdate.getTags());
-                for (Tag t : retrieveTags(json)) {
+                for (Tag t : TagRepository.retrieveOrCreateTags(json)) {
                     if (!mergedTags.contains(t)) {
                         mergedTags.add(t);
                     }
                 }
-//                    mergedTags.addAll(JsonUtil.retrieveTags(json));
+//                    mergedTags.addAll(JsonUtil.retrieveOrCreateTags(json));
                 toUpdate.setTags(mergedTags);
                 if (JsonKeys.debugging) Logger.debug("append: " + mergedTags);
             } else {
-                toUpdate.setTags(retrieveTags(json));
+                toUpdate.setTags(TagRepository.retrieveOrCreateTags(json));
             }
         }
 
@@ -343,71 +335,9 @@ public class FlashCardRepository {
         return tagList;
     }
 
-    /**
-     * Reads all tags either via their id, or creates a new tag when it does not exist at the moment.
-     *
-     * @param json the root json object
-     * @return a list of tags
-     */
-    private static List<Tag> retrieveTags(JsonNode json) {
-        List<Tag> tags = new ArrayList<>();
-        //get the specific nods in the json
-        JsonNode tagNode = json.findValue(JsonKeys.FLASHCARD_TAGS);
-        // Loop through all objects in the values associated with the
-        // "users" key.
-        for (JsonNode node : tagNode) {
-            // when a user id is found we will get the object and add them to the userList.
-            System.out.println("Node=" + node);
-            if (node.has(JsonKeys.TAG_ID)) {
-                Tag found = Tag.find.byId(node.get(JsonKeys.TAG_ID).asLong());
-                // TODO: 10.08.2016 notify user about wrong tag/tag not existing?
-                if (found != null) {
-                    System.out.println(">> tag: " + found);
-                    tags.add(found);
-                } else tags.add(null);
 
 
-            } else {
-                try {
-                    Tag tmpT = parseTag(node);
-                    Tag lookupTag = Tag.find.where().eq(JsonKeys.TAG_NAME, tmpT.getName()).findUnique();
-                    //check if the tag is unique
-                    if (lookupTag == null) {
-                        tmpT.save();
-                        System.out.println(">> tag: " + tmpT);
-                        //save our new tag so that no foreign constraint fails
-                        //((`flashcards`.`card_tag`, CONSTRAINT `fk_card_tag_tag_02` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tagId`))]]
-                        tags.add(tmpT);
-                    } else {
-                        tags.add(lookupTag);
-                    }
 
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return tags;
-    }
-
-    /**
-     * Parses a question from the given JsonNode node.
-     *
-     * @param node the json node to parse
-     * @return a question object containing the information
-     * @throws URISyntaxException
-     */
-    private static Tag parseTag(JsonNode node) throws URISyntaxException {
-        User author = null;
-        String tagText = null;
-
-        if (node.has(JsonKeys.TAG_NAME)) {
-            tagText = node.get(JsonKeys.TAG_NAME).asText();
-        }
-        Tag tag = new Tag(tagText);
-
-        return tag;
-    }
 
     /**
      * Reads all answers either via their id, or creates a new answer when it does not exist at the moment.

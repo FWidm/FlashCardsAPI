@@ -32,6 +32,8 @@ public class RequestKeys {
     public static final String ROOT= "root";
     //tag - sort by usage
     public static final String USAGE_COUNT= "usageCount";
+    public static final String GET_BY_NAME="name";
+    public static final String GET_BY_ID="id";
 
     public static final String START = "start";
 }

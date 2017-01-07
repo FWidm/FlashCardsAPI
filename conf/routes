@@ -87,5 +87,6 @@ PUT     /categories/:id     controllers.CategoryController.updateCategory(id:Lon
 
 #Tags
 GET     /tags               controllers.TagController.getTags
+GET     /tags/cards         controllers.TagController.getAttachedCardsByTags
 GET     /tags/:id           controllers.TagController.getTag(id:Long)
 GET     /tags/:id/cards     controllers.TagController.getAttachedCards(id:Long)

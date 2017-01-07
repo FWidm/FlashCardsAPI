@@ -1,12 +1,20 @@
 package repositories;
 
+import com.avaje.ebean.ExpressionList;
+import com.avaje.ebean.RawSql;
+import com.fasterxml.jackson.databind.JsonNode;
+import models.Answer;
 import models.FlashCard;
 import models.Tag;
+import models.User;
 import play.Logger;
+import play.api.mvc.Flash;
+import play.api.routing.Router;
 import util.JsonKeys;
 import util.RequestKeys;
 import util.UrlParamHelper;
 
+import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -45,7 +53,7 @@ public class TagRepository {
             requestInformation = UrlParamHelper.getValue(RequestKeys.STARTS_WITH);
             Logger.debug("startswith=" + requestInformation);
             //match everything starting with the requestinformation -> searching for he* should return hell,help, ...
-            tagList = Tag.find.where().like(JsonKeys.TAG_NAME, requestInformation+"%").findList();
+            tagList = Tag.find.where().like(JsonKeys.TAG_NAME, requestInformation + "%").findList();
             return tagList;
         }
         return Tag.find.all();
@@ -53,15 +61,123 @@ public class TagRepository {
 
     /**
      * Return all attached cards of a specific tag by tag id.
+     *
      * @param id of a tag
      * @return a list of FlashCards
      */
-    public static List<FlashCard> getAttachedCards(long id){
-        List<FlashCard> attachedCardList=Tag.find.byId(id).getCards();
+    public static List<FlashCard> getAttachedCards(long id) {
+        List<FlashCard> attachedCardList = Tag.find.byId(id).getCards();
         return attachedCardList;
     }
 
-    public static Tag getTag(long id){
+    /**
+     * Return one Tag object by id.
+     *
+     * @param id of the Tag
+     * @return Tag object
+     */
+    public static Tag getTag(long id) {
         return Tag.find.byId(id);
+    }
+
+    public static List<FlashCard> getCardByTagArray(List<Long> ids, List<String> names) {
+        List<FlashCard> cardList = new ArrayList<>();
+        List<Tag> tagList = retrieveTags(ids, names);
+
+        Logger.debug("Tags found=" + tagList);
+        cardList=tagList.get(0).getCards();
+        for (int i = 1; i < tagList.size(); i++) {
+            List<FlashCard> retrievedCardList=tagList.get(i).getCards();
+            cardList.retainAll(retrievedCardList); // keeps only values that are both in cardList AND retrievedCardlist
+        }
+        return cardList;
+    }
+
+    /**
+     * Parses a question from the given JsonNode node.
+     *
+     * @param node the json node to parse
+     * @return a question object containing the information
+     * @throws URISyntaxException
+     */
+    public static Tag parseTag(JsonNode node) throws URISyntaxException {
+        User author = null;
+        String tagText = null;
+
+        if (node.has(JsonKeys.TAG_NAME)) {
+            tagText = node.get(JsonKeys.TAG_NAME).asText();
+        }
+        Tag tag = new Tag(tagText);
+
+        return tag;
+    }
+
+    /**
+     * Reads all tags in the given json - either via their id, or creates a new tag when it does not exist at the moment.
+     *
+     * @param json the root json object
+     * @return a list of tags
+     */
+    public static List<Tag> retrieveOrCreateTags(JsonNode json) {
+        List<Tag> tags = new ArrayList<>();
+        //get the specific nods in the json
+        JsonNode tagNode = json.findValue(JsonKeys.FLASHCARD_TAGS);
+        // Loop through all objects in the values associated with the
+        // "users" key.
+        for (JsonNode node : tagNode) {
+            // when a user id is found we will get the object and add them to the userList.
+            System.out.println("Node=" + node);
+            if (node.has(JsonKeys.TAG_ID)) {
+                Tag found = Tag.find.byId(node.get(JsonKeys.TAG_ID).asLong());
+                if (found != null) {
+                    System.out.println(">> tag: " + found);
+                    tags.add(found);
+                } else tags.add(null);
+
+
+            } else {
+                try {
+                    Tag tmpT = TagRepository.parseTag(node);
+                    Tag lookupTag = Tag.find.where().eq(JsonKeys.TAG_NAME, tmpT.getName()).findUnique();
+                    //check if the tag is unique
+                    if (lookupTag == null) {
+                        tmpT.save();
+                        System.out.println(">> tag: " + tmpT);
+                        //save our new tag so that no foreign constraint fails
+                        //((`flashcards`.`card_tag`, CONSTRAINT `fk_card_tag_tag_02` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tagId`))]]
+                        tags.add(tmpT);
+                    } else {
+                        tags.add(lookupTag);
+                    }
+
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return tags;
+    }
+
+    /**
+     * Retrieves a list of tags by iterating over the provided ids and names and retrieving the single expected Tags
+     *
+     * @param ids
+     * @param names
+     * @return
+     */
+    public static List<Tag> retrieveTags(List<Long> ids, List<String> names) {
+        List<Tag> tags = new ArrayList<>();
+        Tag tmpTag;
+        for (Long id : ids) {
+            tmpTag = Tag.find.byId(id);
+            if (tmpTag != null)
+                tags.add(tmpTag);
+        }
+        for (String tagName : names) {
+            tmpTag = Tag.find.where().eq(JsonKeys.TAG_NAME, tagName).findUnique();
+            if (tmpTag != null)
+                tags.add(tmpTag);
+        }
+        return tags;
     }
 }

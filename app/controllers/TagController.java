@@ -3,6 +3,7 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import models.Tag;
 import models.rating.Rating;
+import play.Logger;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -14,6 +15,8 @@ import util.exceptions.DuplicateKeyException;
 import util.exceptions.InvalidInputException;
 import util.exceptions.ObjectNotFoundException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -25,35 +28,71 @@ import java.util.Map;
 public class TagController extends Controller {
     /**
      * Returns a json list of all tags
+     *
      * @return ok - contains a list of tags or an empty list
      */
     public Result getTags() {
-        List<Tag> tagList= TagRepository.getTags();
+        List<Tag> tagList = TagRepository.getTags();
         return ok(JsonUtil.toJson(tagList));
     }
 
     /**
      * Returns either one tag
+     *
      * @param id
      * @return ok - and the card or notFound if the object with the given id does not exist
      */
     public Result getTag(Long id) {
-        try{
-            Tag tag= TagRepository.getTag(id);
+        try {
+            Tag tag = TagRepository.getTag(id);
             return ok(JsonUtil.toJson(tag));
 
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no tag with id=" + id + " exists."));
         }
     }
 
-    public Result getAttachedCards(Long id){
-        try{
+    public Result getAttachedCards(Long id) {
+        try {
             return ok(JsonUtil.toJson(TagRepository.getAttachedCards(id)));
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no tag with id=" + id + " exists."));
         }
     }
 
-    // TODO: 05.01.2017 Search for tag array 
+    /**
+     * @return
+     */
+    public Result getAttachedCardsByTags() {
+        List<Long> ids = new ArrayList<>();
+        List<String> names = new ArrayList<>();
+        try{
+        Controller.request().queryString().forEach(
+                (String key, String[] values) -> {
+                    Logger.debug("k=" + key + " v=" + Arrays.toString(values));
+                    if (key.toLowerCase().contains(RequestKeys.GET_BY_ID)) {
+                        for (String value : values) {
+                            ids.add(Long.parseLong(value));
+                        }
+                    }
+                    if (key.toLowerCase().contains(RequestKeys.GET_BY_NAME)) {
+                        for (String value : values) {
+                            names.add(value);
+                        }
+                    }
+                });
+        Logger.debug("names.size="+names.size()+" || ids.size="+ids.size());
+        if (ids.size() == 0 && names.size() == 0)
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
+                    "This method does only work when ids and/or names of tags are passed via URL parameters '"
+                            + RequestKeys.GET_BY_ID + "' or '" + RequestKeys.GET_BY_NAME + "' example: 'tags//cards?id=1&id=2&id=3...'"));
+
+        return ok(JsonUtil.toJson(TagRepository.getCardByTagArray(ids, names)));
+        } catch (NumberFormatException e){
+            e.printStackTrace();
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
+                    "This method does only work when ids and/or names of tags are passed via URL parameters '"
+                            + RequestKeys.GET_BY_ID + "' or '" + RequestKeys.GET_BY_NAME + "' example: 'tags//cards?id=1&id=2&id=3...'"));
+        }
+    }
 }
