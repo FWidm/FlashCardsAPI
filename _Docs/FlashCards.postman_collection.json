@@ -1725,6 +1725,28 @@
 						"description": ""
 					},
 					"response": []
+				},
+				{
+					"name": "Get all Cards that have the given tags (id)",
+					"request": {
+						"url": "{{url}}{{port}}/tags/cards?id=2&id=1",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Cards that have the given tags (name)",
+					"request": {
+						"url": "{{url}}{{port}}/tags/cards?name=testTag&name=halp",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
 				}
 			]
 		},
