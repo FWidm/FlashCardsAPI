@@ -11,10 +11,7 @@ import play.libs.Json;
 import play.mvc.*;
 
 import repositories.UserRepository;
-import util.ActionAuthenticator;
-import util.FileTypeChecker;
-import util.JsonKeys;
-import util.JsonUtil;
+import util.*;
 import util.crypt.PasswordUtil;
 import views.html.*;
 
@@ -42,6 +39,10 @@ public class HomeController extends Controller {
     public Result index() {
         java.io.File file = new java.io.File("_Docs/img/flash_icon.png");
         Logger.debug(file.getAbsolutePath());
+/*        User x = new User("HELLO","w1@amazon.com","xyz",0);
+        x.save();
+        Logger.debug(String.valueOf(x.checkRights(UserOperations.EDIT_CARD,y)));
+        x.delete();*/
         return ok(file);
     }
 

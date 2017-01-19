@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import play.Logger;
 import play.data.validation.Constraints.*;
 import util.JsonKeys;
+import util.UserOperations;
 
 import javax.persistence.*;
 /**
@@ -90,6 +91,122 @@ public class User extends Model {
 		this.password=u.getPassword();
 		this.rating=u.getRating();
 		authTokenList=new ArrayList<>();
+	}
+
+	// TODO: 19.01.2017 write the whole method when we decided what has to be done, also adapt values
+
+	/**
+	 * Checks whether the current user has the rights to perform the operation we want to check. If an object is passed
+	 * we can check if the user is in any way an owner and has rights regardless of his rating.
+	 * @param userOperation
+	 * @param manipulated
+	 * @return
+	 */
+	public boolean checkRights(UserOperations userOperation, Object manipulated){
+		final int RATING_CREATE_CATEGORY=1000;
+		final int RATING_DELETE_CATEGORY=1000;
+		final int RATING_EDIT_CATEGORY=1000;
+
+		final int RATING_DELETE_CARD=100;
+		final int RATING_EDIT_CARD=100;
+
+		final int RATING_DELETE_ANSWER=100;
+		final int RATING_EDIT_ANSWER=100;
+
+		final int RATING_DELETE_DECK=100;
+		final int RATING_EDIT_DECK=100;
+
+		switch(userOperation){
+			//category
+			case CREATE_CATEGORY:{
+				if(rating>RATING_CREATE_CATEGORY){
+					return true;
+				}
+				return false;
+			}
+			case DELETE_CATEGORY:{
+				if(rating>RATING_DELETE_CATEGORY){
+					return true;
+				}
+				return false;
+			}
+			case EDIT_CATEGORY:{
+				if(rating>RATING_EDIT_CATEGORY){
+					return true;
+				}
+				return false;
+			}
+			//cards
+			case DELETE_CARD:{
+				if(manipulated!=null && manipulated.getClass()==FlashCard.class){
+					FlashCard card=(FlashCard)manipulated;
+					//can delete own cards OR any cards when this user's rating is over a specific value
+					if(card.getAuthor()==this || rating>RATING_DELETE_CARD){
+						return true;
+					}
+				}
+				return false;
+			}
+			case EDIT_CARD:{
+				if(manipulated!=null && manipulated.getClass()==FlashCard.class){
+					FlashCard card=(FlashCard)manipulated;
+					//can edit own cards OR any cards when this user's rating is over a specific value
+					if(card.getAuthor()==this || rating>RATING_EDIT_CARD){
+						return true;
+					}
+				}
+				return false;
+			}
+			//answers
+			case DELETE_ANSWER:{
+				if(manipulated!=null && manipulated.getClass()==Answer.class){
+					Answer answer = (Answer)manipulated;
+
+					//can delete own cards OR any cards when this user's rating is over a specific value
+					if(answer.getAuthor()==this || rating>RATING_DELETE_ANSWER){
+						return true;
+					}
+				}
+				return false;
+			}
+			case EDIT_ANSWER:{
+				if(manipulated!=null && manipulated.getClass()==Answer.class){
+					Answer answer = (Answer)manipulated;
+					//can edit own cards OR any cards when this user's rating is over a specific value
+					if(answer.getAuthor()==this || rating>RATING_EDIT_ANSWER){
+						return true;
+					}
+				}
+				return false;
+			}
+			//deck - check users usergroups
+			case DELETE_DECK:{
+				if(manipulated!=null && manipulated.getClass()==CardDeck.class){
+					CardDeck deck = (CardDeck)manipulated;
+					UserGroup group = deck.getUserGroup();
+
+					//can delete own cards OR any cards when this user's rating is over a specific value
+					if(rating>RATING_DELETE_DECK || (group!=null && group.getUsers().contains(this))){
+						return true;
+					}
+				}
+				return false;
+			}
+			case EDIT_DECK:{
+				if(manipulated!=null && manipulated.getClass()==CardDeck.class){
+					CardDeck deck = (CardDeck)manipulated;
+					UserGroup group = deck.getUserGroup();
+
+					//can delete own cards OR any cards when this user's rating is over a specific value
+
+					if(rating>RATING_EDIT_DECK || (group!=null && group.getUsers().contains(this))){
+						return true;
+					}
+				}
+				return false;
+			}
+		}
+		return false;
 	}
 
 	public Long getId() {
