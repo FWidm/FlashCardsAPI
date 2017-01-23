@@ -54,13 +54,13 @@ public class Question extends Model {
      * @return a question object containing the information
      * @throws URISyntaxException
      */
-    public static Question parseQuestion(JsonNode node) throws URISyntaxException {
-        User author=null;
+    public static Question parseQuestion(User author, JsonNode node) throws URISyntaxException {
         String questionText=null;
         if(node.has(JsonKeys.AUTHOR)){
             if(node.get(JsonKeys.AUTHOR).has(JsonKeys.USER_ID)){
                 long uid=node.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong();
-                author=User.find.byId(uid);
+                if(author==null)
+                    author=User.find.byId(uid);
                 System.out.println("Search for user with id="+uid+" details="+author);
             }
         }

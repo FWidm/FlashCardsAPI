@@ -7,7 +7,9 @@ import play.Logger;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Security;
 import repositories.FlashCardRepository;
+import util.ActionAuthenticator;
 import util.JsonKeys;
 import util.JsonUtil;
 import util.exceptions.InvalidInputException;
@@ -86,11 +88,13 @@ public class FlashCardController {
      *
      * @return HTTPResult
      */
+    @Security.Authenticated(ActionAuthenticator.class)
     @BodyParser.Of(BodyParser.Json.class)
     public Result addFlashCard() {
         JsonNode json = request().body().asJson();
+        Logger.debug("Current user="+request().username());
         try {
-            FlashCard addedCard = FlashCardRepository.addFlashCard(json);
+            FlashCard addedCard = FlashCardRepository.addFlashCard(request().username(),json);
             return created(JsonUtil.prepareJsonStatus(CREATED, "FlashCard has been created!", addedCard.getId()));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
@@ -139,13 +143,15 @@ public class FlashCardController {
      *
      * @return httpResult
      */
+    @Security.Authenticated(ActionAuthenticator.class)
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateFlashCard(long id) {
         JsonNode json = request().body().asJson();
         Map<String, String[]> urlParams = Controller.request().queryString();
+        Logger.debug("Current user="+request().username());
 
         try {
-            FlashCard updatedCard = FlashCardRepository.updateFlashCard(id,json,urlParams);
+            FlashCard updatedCard = FlashCardRepository.updateFlashCard(id,request().username(),json,urlParams);
             return ok(JsonUtil.prepareJsonStatus(OK, "FlashCard has been updated!",updatedCard.getId()));
         } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
@@ -153,12 +159,12 @@ public class FlashCardController {
             if(JsonKeys.debugging){
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));
+                                BAD_REQUEST, e.getMessage()+" | cause: "+e.getCause()));
             }
             else {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+                                BAD_REQUEST, e.getMessage()));
             }
         } catch (ParameterNotSupportedException e) {
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "An answerId is not accepted while creating new cards, " +

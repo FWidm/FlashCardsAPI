@@ -6,6 +6,7 @@ import models.*;
 import play.Logger;
 import util.JsonKeys;
 import util.RequestKeys;
+import util.UserOperations;
 import util.exceptions.InvalidInputException;
 import util.exceptions.ObjectNotFoundException;
 import util.exceptions.ParameterNotSupportedException;
@@ -65,10 +66,12 @@ public class FlashCardRepository {
      *
      * @return Card
      */
-    public static FlashCard addFlashCard(JsonNode json) throws InvalidInputException, ParameterNotSupportedException, PartiallyModifiedException {
+    public static FlashCard addFlashCard(String email, JsonNode json) throws InvalidInputException, ParameterNotSupportedException, PartiallyModifiedException {
         ObjectMapper mapper = new ObjectMapper();
         FlashCard requestObject = mapper.convertValue(json, FlashCard.class);
         String information = "";
+        User author = User.find.where().eq(JsonKeys.USER_EMAIL,email).findUnique();
+        requestObject.setAuthor(author);
         //We expect just id's to set answers/questions/authors - we then check the db for the id's and retrieve all values
         // we nee ourselves.
         if (json.has(JsonKeys.FLASHCARD_ANSWERS)) {
@@ -83,7 +86,7 @@ public class FlashCardRepository {
                             + JsonKeys.ANSWER_JSON_ELEMENTS);
                 }
             }
-            requestObject.setAnswers(retrieveAnswers(json));
+            requestObject.setAnswers(retrieveAnswers(author,json));
         }
 
         if (json.has(JsonKeys.FLASHCARD_QUESTION)) {
@@ -93,18 +96,13 @@ public class FlashCardRepository {
                         "new cards, please provide a complete question object with the following components: " + JsonKeys.QUESTION_JSON_ELEMENTS);
             } else {
                 try {
-                    Question q = Question.parseQuestion(json.get(JsonKeys.FLASHCARD_QUESTION));
+                    Question q = Question.parseQuestion(author,json.get(JsonKeys.FLASHCARD_QUESTION));
                     q.save();
                     requestObject.setQuestion(q);
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
             }
-        }
-
-        if (json.has(JsonKeys.AUTHOR)) {
-            User author = User.find.byId(json.get(JsonKeys.AUTHOR).get(JsonKeys.USER_ID).asLong());
-            requestObject.setAuthor(author);
         }
 
         if (json.has(JsonKeys.FLASHCARD_TAGS)) {
@@ -144,12 +142,13 @@ public class FlashCardRepository {
      *
      * @return httpResult
      */
-    public static FlashCard updateFlashCard(long id, JsonNode json, Map<String,String[]> urlParams) throws InvalidInputException, ParameterNotSupportedException, NullPointerException {
+    public static FlashCard updateFlashCard(long id,String email, JsonNode json, Map<String,String[]> urlParams) throws InvalidInputException, ParameterNotSupportedException, NullPointerException {
         ObjectMapper mapper = new ObjectMapper();
         boolean appendMode = false;
         int answersSize = -1;
         Question oldQuestion = null;
         List<Answer> oldAnswerList=null;
+        User author = User.find.where().eq(JsonKeys.USER_EMAIL,email).findUnique();
 
         if (urlParams.containsKey(RequestKeys.APPEND)) {
             appendMode = Boolean.parseBoolean(urlParams.get(RequestKeys.APPEND)[0]);
@@ -157,6 +156,10 @@ public class FlashCardRepository {
         if (JsonKeys.debugging) Logger.debug("Appending mode enabled? " + appendMode);
 
         FlashCard toUpdate = FlashCard.find.byId(id);
+        User requestOwner=User.find.where().eq(JsonKeys.USER_EMAIL,email).findUnique();
+
+        if(!requestOwner.checkRights(UserOperations.EDIT_CARD,toUpdate))
+            throw new IllegalArgumentException("The logged in user does not have the rights to edit this card.");
 
         if (request().method().equals("PUT") && (!json.has(JsonKeys.FLASHCARD_ANSWERS) || !json.has(JsonKeys.FLASHCARD_QUESTION)
                 || !json.has(JsonKeys.AUTHOR) || !json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE) || !json.has(JsonKeys.FLASHCARD_TAGS))) {
@@ -170,14 +173,17 @@ public class FlashCardRepository {
 
 
         if (json.has(JsonKeys.FLASHCARD_ANSWERS)) {
+            oldAnswerList=FlashCard.find.byId(id).getAnswers();
+
             if (appendMode) {
-                oldAnswerList=FlashCard.find.byId(id).getAnswers();
                 List<Answer> mergedAnswers = new ArrayList<>();
+
                 mergedAnswers.addAll(toUpdate.getAnswers());
-                mergedAnswers.addAll(retrieveAnswers(json));
+                mergedAnswers.addAll(retrieveAnswers(author,json));
+
                 toUpdate.setAnswers(mergedAnswers);
             } else {
-                toUpdate.setAnswers(retrieveAnswers(json));
+                toUpdate.setAnswers(retrieveAnswers(author,json));
             }
         }
 
@@ -188,7 +194,7 @@ public class FlashCardRepository {
                         + JsonKeys.QUESTION_JSON_ELEMENTS);
             } else {
                 try {
-                    Question q = Question.parseQuestion(json.get(JsonKeys.FLASHCARD_QUESTION));
+                    Question q = Question.parseQuestion(null,json.get(JsonKeys.FLASHCARD_QUESTION));
                     q.save();
                     oldQuestion = toUpdate.getQuestion();
                     Logger.debug("Deleted oldQuestion: "+oldQuestion);
@@ -204,7 +210,7 @@ public class FlashCardRepository {
 
         if (json.has(JsonKeys.AUTHOR)) {
             User u = mapper.convertValue(json.findValue(JsonKeys.AUTHOR), User.class);
-            User author = User.find.byId(u.getId());
+            author = User.find.byId(u.getId());
             toUpdate.setAuthor(author);
         }
 
@@ -233,7 +239,7 @@ public class FlashCardRepository {
         //delete old/replaced objects if no appendmode is enabled
         if(oldQuestion!=null)
             oldQuestion.delete();
-        if(oldAnswerList!=null) {
+        if(oldAnswerList!=null && !appendMode) {
             Logger.debug("oldList=" + oldAnswerList);
             for(Answer answer: oldAnswerList){
                 Logger.debug("delete answer with id="+answer.getId());
@@ -336,16 +342,15 @@ public class FlashCardRepository {
     }
 
 
-
-
-
     /**
-     * Reads all answers either via their id, or creates a new answer when it does not exist at the moment.
-     *
-     * @param json the root json object
-     * @return a list of answers
+     * Retrieve all answers, passes the author as argument if the author is responsible for all created answers.
+     * If no Author is specified (Null) we will parse the authors from the sent json.
+     * @param author
+     * @param json
+     * @return
+     * @throws ParameterNotSupportedException
      */
-    private static List<Answer> retrieveAnswers(JsonNode json) throws ParameterNotSupportedException {
+    private static List<Answer> retrieveAnswers(User author, JsonNode json) throws ParameterNotSupportedException {
         List<Answer> answers = new ArrayList<>();
 
         //get the specific nods in the json
@@ -361,6 +366,10 @@ public class FlashCardRepository {
             } else {
                 try {
                     Answer tmpA = parseAnswer(node);
+                    if(author!=null) {
+                        tmpA.setAuthor(author);
+                        System.out.println(">> set author!");
+                    }
                     System.out.println(">> answer: " + tmpA);
                     answers.add(tmpA);
                 } catch (URISyntaxException e) {
