@@ -154,6 +154,7 @@ public class FlashCardController {
             FlashCard updatedCard = FlashCardRepository.updateFlashCard(id,request().username(),json,urlParams);
             return ok(JsonUtil.prepareJsonStatus(OK, "FlashCard has been updated!",updatedCard.getId()));
         } catch (NullPointerException e) {
+            e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         } catch (IllegalArgumentException e){
             if(JsonKeys.debugging){
@@ -171,7 +172,7 @@ public class FlashCardController {
                     "please provide a complete list of answers object with the following components: " + JsonKeys.QUESTION_JSON_ELEMENTS));
         } catch (InvalidInputException e) {
             e.printStackTrace();
-            if(JsonKeys.debugging && !e.getCause().getMessage().contains("Body did contain")){
+            if(JsonKeys.debugging /*&& !e.getCause().getMessage().contains("Body did contain")*/){
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
                                 BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));

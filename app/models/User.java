@@ -274,7 +274,7 @@ public class User extends Model {
 	 * @param manipulated
 	 * @return
 	 */
-	public boolean checkRights(UserOperations userOperation, Object manipulated){
+	public boolean hasRight(UserOperations userOperation, Object manipulated){
 		Logger.debug("Checking "+email+": for ("+userOperation+"|"+manipulated+")");
 		final int RATING_CREATE_CATEGORY=1000;
 		final int RATING_DELETE_CATEGORY=1000;
@@ -320,7 +320,7 @@ public class User extends Model {
 				}
 				return false;
 			}
-			case EDIT_CARD:{
+			case EDIT_CARD_QUESTION:{
 				if(manipulated!=null && manipulated.getClass()==FlashCard.class){
 					FlashCard card=(FlashCard)manipulated;
 					//can edit own cards OR any cards when this user's rating is over a specific value
