@@ -313,6 +313,8 @@ public class User extends Model {
 			case DELETE_CARD:{
 				if(manipulated!=null && manipulated.getClass()==FlashCard.class){
 					FlashCard card=(FlashCard)manipulated;
+					Logger.debug("isAuthor="+(card.getAuthor()==this)+" | has Rating? "+(rating>=RATING_DELETE_CARD));
+
 					//can delete own cards OR any cards when this user's rating is over a specific value
 					if(card.getAuthor()==this || rating>=RATING_DELETE_CARD){
 						return true;
@@ -377,6 +379,15 @@ public class User extends Model {
 					}
 				}
 				return false;
+			}
+			case EDIT_USER:{
+				if(manipulated!=null && manipulated.getClass()==User.class){
+					User user = (User)manipulated;
+					if(this.equals(user))
+						return true;
+					return false;
+				}
+
 			}
 		}
 		return false;

@@ -49,13 +49,19 @@ public class FlashCardRepository {
     /**
      * Deletes the specific Flashcard including questions and answers.
      *
+     *
+     * @param email
      * @param id of a card
      * @return deleted card object
      */
-    public static FlashCard deleteFlashCard(long id) throws NullPointerException {
+    public static FlashCard deleteFlashCard(String email, long id) throws NullPointerException, IllegalArgumentException {
+        User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
 
         FlashCard card = FlashCard.find.byId(id);
-        card.delete();
+        if(author.hasRight(UserOperations.DELETE_CARD,card))
+            card.delete();
+        else
+            throw new IllegalArgumentException("This user is not authorized to delete this card.");
 
         return card;
     }

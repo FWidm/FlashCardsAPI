@@ -559,7 +559,7 @@
 			]
 		},
 		{
-			"name": "Cards",
+			"name": "Cards (edited)",
 			"description": "",
 			"item": [
 				{
@@ -735,6 +735,11 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
 							}
 						],
 						"body": {
@@ -759,12 +764,17 @@
 						}
 					],
 					"request": {
-						"url": "{{url}}{{port}}/cards/{{cardId1}}?append=true",
+						"url": "{{url}}{{port}}/cards/{{cardId1}}?append=false",
 						"method": "PUT",
 						"header": [
 							{
 								"key": "Content-Type",
 								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
 								"description": ""
 							}
 						],
@@ -796,6 +806,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
 								"description": ""
 							}
 						],

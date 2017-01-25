@@ -70,15 +70,20 @@ public class FlashCardController {
      * @param id of a card
      * @return HTTPResult
      */
+    @Security.Authenticated(ActionAuthenticator.class)
     public Result deleteFlashCard(long id) {
+        Logger.debug("Current user="+request().username());
         try {
-            FlashCard deleted = FlashCardRepository.deleteFlashCard(id);
+            FlashCard deleted = FlashCardRepository.deleteFlashCard(request().username(),id);
 
             return ok(JsonUtil.prepareJsonStatus(OK, "The card with the id=" + deleted.getId()
                     + " has been deleted. This includes questions and answers. All Tags for this card were disconnected and persist."));
         } catch (NullPointerException e) {
             System.err.println(e.getMessage());
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
+        }catch (IllegalArgumentException e){
+            return badRequest(JsonUtil
+                    .prepareJsonStatus(BAD_REQUEST, e.getMessage()));
         }
     }
 
@@ -210,12 +215,11 @@ public class FlashCardController {
      */
     public Result getAuthor(long id) {
         User ret;
-
-        ret = FlashCardRepository.getAuthor(id);
-        if (ret == null) {
-            Logger.debug("Getting author=" + ret);
+        try {
+            ret = FlashCardRepository.getAuthor(id);
+        }catch (NullPointerException e){
+            //e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
-
         }
 
         return ok(JsonUtil.toJson(ret));
