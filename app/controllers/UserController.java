@@ -55,24 +55,25 @@ public class UserController extends Controller {
             Map<String, String[]> urlParams = Controller.request().queryString();
             String updateMethod = request().method();
 
-            User u = UserRepository.changeUser(id, json, urlParams, updateMethod);
+            User u = UserRepository.changeUser(id, request().username(), json, urlParams, updateMethod);
 
         } catch (NullPointerException e) {
             e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no user with the specified id exists.", id));
-        }
-        catch (InvalidInputException e) {
+        } catch (InvalidInputException e) {
             e.printStackTrace();
-            if(JsonKeys.debugging){
+            if (JsonKeys.debugging) {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));
-            }
-            else {
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS + " | cause: " + e.getCause()));
+            } else {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
                                 BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
             }
+        } catch (NotAuthorizedException e) {
+            e.printStackTrace();
+            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, "This user is not authorized to modify the specified user.",id));
         }
         return ok(JsonUtil.prepareJsonStatus(OK, "User has been changed.", id));
 
@@ -89,7 +90,7 @@ public class UserController extends Controller {
         if (u == null)
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no user with the specified id exists.", id));
 
-        if(JsonKeys.debugging)if(JsonKeys.debugging)Logger.debug(u + "| USER_NAME Key=" + JsonKeys.USER_NAME);
+        if (JsonKeys.debugging) if (JsonKeys.debugging) Logger.debug(u + "| USER_NAME Key=" + JsonKeys.USER_NAME);
         return ok(JsonUtil.toJson(u));
     }
 
@@ -124,7 +125,7 @@ public class UserController extends Controller {
         } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, user does not exist.", id));
         } catch (NotAuthorizedException e) {
-            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, "This user is not authorized to delete the specified user.",id));
+            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, "This user is not authorized to delete the specified user.", id));
         }
     }
 
@@ -138,33 +139,29 @@ public class UserController extends Controller {
     public Result addUser() {
         JsonNode json = request().body().asJson();
         User u;
-            try{
-                u=UserRepository.createUser(json);
-            }
-            catch (InvalidInputException e){
-                return badRequest(JsonUtil
-                        .prepareJsonStatus(
-                                BAD_REQUEST,
-                                e.getMessage()));
-            }
-            catch (NumberFormatException e){
-                e.printStackTrace();
-                return internalServerError(JsonUtil
-                        .prepareJsonStatus(
-                                INTERNAL_SERVER_ERROR,
-                                "Error in PasswordUtil."));
-            }
-            catch (IllegalArgumentException e) {
-                return badRequest(JsonUtil
-                        .prepareJsonStatus(
-                                BAD_REQUEST,
-                                "Body did contain elements that are not allowed/expected. A user can contain: " + JsonKeys.USER_JSON_ELEMENTS));
-            }
-            catch (Exception e){
-                e.printStackTrace();
-                return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN,
-                        "The user could not be created, a user group has to be set via PATCH or PUT. It may not be content of POST."));
-            }
+        try {
+            u = UserRepository.createUser(json);
+        } catch (InvalidInputException e) {
+            return badRequest(JsonUtil
+                    .prepareJsonStatus(
+                            BAD_REQUEST,
+                            e.getMessage()));
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return internalServerError(JsonUtil
+                    .prepareJsonStatus(
+                            INTERNAL_SERVER_ERROR,
+                            "Error in PasswordUtil."));
+        } catch (IllegalArgumentException e) {
+            return badRequest(JsonUtil
+                    .prepareJsonStatus(
+                            BAD_REQUEST,
+                            "Body did contain elements that are not allowed/expected. A user can contain: " + JsonKeys.USER_JSON_ELEMENTS));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN,
+                    "The user could not be created, a user group has to be set via PATCH or PUT. It may not be content of POST."));
+        }
         // TODO: 27.12.2016 Add salt, hash password. 
         return created(JsonUtil.prepareJsonStatus(CREATED, "User has been created.", u.getId()));
     }

@@ -266,6 +266,7 @@ public class User extends Model {
             q.update();
         }
 
+        //delete all existing tokens before deleting
         List<AuthToken> tokens = AuthToken.find.where().eq(JsonKeys.TOKEN_USER, id).findList();
         Logger.debug("Tokens:");
         tokens.forEach(token -> {
