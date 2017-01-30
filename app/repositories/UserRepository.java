@@ -130,8 +130,10 @@ public class UserRepository {
 
         }
         Constraints.MinLengthValidator minLengthValidator = new Constraints.MinLengthValidator();
-        String password = json.get(JsonKeys.USER_PASSWORD).asText(); // TODO: 30/01/17 nullpointer 
-        if (json.has(JsonKeys.USER_PASSWORD) && minLengthValidator.isValid(password)) {
+
+        if (json.has(JsonKeys.USER_PASSWORD) && minLengthValidator.isValid(json.get(JsonKeys.USER_PASSWORD).asText())) {
+            String password = json.get(JsonKeys.USER_PASSWORD).asText();
+            Logger.debug("Pass="+password);
 
             try {
                 // format iterations:salt:hash
