@@ -51,7 +51,7 @@
 for more working routing look at the [routes](conf/routes).
 
 ## German Tutorial/Insights
-If you're interested in reading about the things we use, there is a dev log file that describes problems and other topics we came across in German: [here]((https://github.com/FWidm/FlashCardsAPI/blob/master/_Docs/PlayDokuFabian.md)).
+If you're interested in reading about the things we use, there is a dev log file that describes problems and other topics we came across in German: [here](https://github.com/FWidm/FlashCardsAPI/blob/master/_Docs/PlayDokuFabian.md).
 
 
 ## Example Calls
