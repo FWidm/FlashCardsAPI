@@ -82,7 +82,7 @@ public class FlashCardController {
             return badRequest(JsonUtil
                     .prepareJsonStatus(BAD_REQUEST, e.getMessage()));
         } catch (NotAuthorizedException e) {
-            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, "This user is not authorized to delete the specified card.",id));
+            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage(), id));
         }
     }
 
@@ -183,7 +183,7 @@ public class FlashCardController {
                                 BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
             }
         } catch (NotAuthorizedException e) {
-            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, "This user is not authorized to modify the specified card.",id));
+            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage(), id));
         }
     }
 

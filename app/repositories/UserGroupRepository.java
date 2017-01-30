@@ -8,7 +8,9 @@ import models.UserGroup;
 import play.Logger;
 import util.JsonKeys;
 import util.RequestKeys;
+import util.UserOperations;
 import util.exceptions.InvalidInputException;
+import util.exceptions.NotAuthorizedException;
 import util.exceptions.ObjectNotFoundException;
 import util.exceptions.PartiallyModifiedException;
 
@@ -23,23 +25,26 @@ import java.util.Map;
 public class UserGroupRepository {
     /**
      * Retrieve all Users from one group.
+     *
      * @param id
      * @return list of Users
      */
-    public static List<User>  getUsers(Long id)throws NullPointerException{
-        List<User> users=UserGroup.find.byId(id).getUsers();
-        return  users;
+    public static List<User> getUsers(Long id) throws NullPointerException {
+        List<User> users = UserGroup.find.byId(id).getUsers();
+        return users;
     }
 
     /**
      * Retrieve all Carddecks from one group.
+     *
      * @param id
      * @return list of CardDecks
      */
-    public static List<CardDeck>  getDecks(Long id) throws NullPointerException{
-        List<CardDeck> decks=UserGroup.find.byId(id).getDecks();
-        return  decks;
+    public static List<CardDeck> getDecks(Long id) throws NullPointerException {
+        List<CardDeck> decks = UserGroup.find.byId(id).getDecks();
+        return decks;
     }
+
     /**
      * Returns all models of type group, this method will return a filtered list if the RequestKeys.EMPTY url parameter is sent with value true or false.
      *
@@ -66,6 +71,7 @@ public class UserGroupRepository {
 
     /**
      * Returns the user grip with a given ID
+     *
      * @param id
      * @return
      */
@@ -75,64 +81,72 @@ public class UserGroupRepository {
 
     /**
      * Adds a new UserGroup. Can throw an exception when users should be added that either do not exist or have no id in their json.
+     *
      * @param json
      * @return
      * @throws ObjectNotFoundException
      * @throws IllegalArgumentException
      */
     public static UserGroup addUserGroup(JsonNode json) throws ObjectNotFoundException, IllegalArgumentException {
-            ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper();
 
-            UserGroup requestGroup = mapper.convertValue(json, UserGroup.class);
-            //we do not want the app to send complete users, thus the mapper cant create the list from itself.
-            List<User> userList;
-            UserGroup group = new UserGroup(requestGroup);
-            if (json.has(JsonKeys.GROUP_USERS)) {
-                //create a new list of users
-                userList = new ArrayList<>();
-                //get the specific nods in the json
-                JsonNode users = json.findValue(JsonKeys.GROUP_USERS);
-                if (users != null) {
-                    if (JsonKeys.debugging) Logger.debug("Users=" + users);
+        UserGroup requestGroup = mapper.convertValue(json, UserGroup.class);
+        //we do not want the app to send complete users, thus the mapper cant create the list from itself.
+        List<User> userList;
+        UserGroup group = new UserGroup(requestGroup);
+        if (json.has(JsonKeys.GROUP_USERS)) {
+            //create a new list of users
+            userList = new ArrayList<>();
+            //get the specific nods in the json
+            JsonNode users = json.findValue(JsonKeys.GROUP_USERS);
+            if (users != null) {
+                if (JsonKeys.debugging) Logger.debug("Users=" + users);
 
-                    // Loop through all objects in the values associated with the
-                    // JsonKeys.GROUP_USERS key.
-                    for (JsonNode n : users) {
-                        if (n.has(JsonKeys.USER_ID)) {
-                            User u = User.find.byId(n.get(JsonKeys.USER_ID).asLong());
-                            if (u != null)
-                                userList.add(u);
-                            else
-                                throw new ObjectNotFoundException("User does not exist: ",n.get(JsonKeys.USER_ID).asLong());
-                        } else
-                            throw new ObjectNotFoundException("One user that was specified did not contain an id.");
-                    }
-                    //set the list for the group created from the content of the json body
-                    if (JsonKeys.debugging) Logger.debug("Adding users to the group: " + userList);
-                    group.setUsers(userList);
-
+                // Loop through all objects in the values associated with the
+                // JsonKeys.GROUP_USERS key.
+                for (JsonNode n : users) {
+                    if (n.has(JsonKeys.USER_ID)) {
+                        User u = User.find.byId(n.get(JsonKeys.USER_ID).asLong());
+                        if (u != null)
+                            userList.add(u);
+                        else
+                            throw new ObjectNotFoundException("User does not exist: ", n.get(JsonKeys.USER_ID).asLong());
+                    } else
+                        throw new ObjectNotFoundException("One user that was specified did not contain an id.");
                 }
-            }
-            group.save();
-            if (JsonKeys.debugging) Logger.debug("group=" + group);
+                //set the list for the group created from the content of the json body
+                if (JsonKeys.debugging) Logger.debug("Adding users to the group: " + userList);
+                group.setUsers(userList);
 
-            return group;
+            }
+        }
+        group.save();
+        if (JsonKeys.debugging) Logger.debug("group=" + group);
+
+        return group;
     }
 
     /**
      * Updates a Usergroup depending on the method used and the contents of the json. Returns the updated resource.
+     *
      * @param id
-     * @param json
+     * @param email
+     *@param json
      * @param urlParams
-     * @param method
-     * @return updated UserGroup object
+     * @param method    @return updated UserGroup object
      * @throws InvalidInputException
      * @throws NullPointerException
      * @throws PartiallyModifiedException
      */
-    public static UserGroup changeUserGroup(long id, JsonNode json, Map<String, String[]> urlParams, String method)
-            throws InvalidInputException, NullPointerException, PartiallyModifiedException {
+    public static UserGroup changeUserGroup(long id, String email, JsonNode json, Map<String, String[]> urlParams, String method)
+            throws InvalidInputException, NullPointerException, PartiallyModifiedException, NotAuthorizedException {
         String information = "";
+
+        User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
+        // get the specific user we want to edit
+        UserGroup toUpdate = UserGroup.find.byId(id);
+        if(!author.hasRight(UserOperations.EDIT_GROUP,toUpdate))
+            throw new NotAuthorizedException("This user is not authorized to modify the group with this id.");
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -142,7 +156,6 @@ public class UserGroupRepository {
                     "description and a user group (array of users or null). An attribute was missing.");
         }
         UserGroup requestGroup = mapper.convertValue(json, UserGroup.class);
-        UserGroup toUpdate = UserGroup.find.byId(id);
 
         if (JsonKeys.debugging) Logger.debug("Update group with details: " + requestGroup
                 + "\n JSON Size=" + json.size());
@@ -167,7 +180,7 @@ public class UserGroupRepository {
             for (JsonNode n : users) {
                 // when a user id is found we will get the object and
                 // update the usergroup.
-                if (n.has(JsonKeys.USER_ID) && User.find.byId(n.get(JsonKeys.USER_ID).asLong())!=null) {
+                if (n.has(JsonKeys.USER_ID) && User.find.byId(n.get(JsonKeys.USER_ID).asLong()) != null) {
                     User u = User.find.byId(n.get(JsonKeys.USER_ID).asLong());
                     //u.setUserGroups(toUpdate);
                     u.update();
@@ -180,8 +193,8 @@ public class UserGroupRepository {
         }
         toUpdate.update();
         //if we somehow have gotten users that do not exist, we can throw a PartiallyModifiedException to use in the controller.
-        if(information.length()>0){
-            throw new PartiallyModifiedException("Updated the Group as expected, but some Users passed do not exist. "+information);
+        if (information.length() > 0) {
+            throw new PartiallyModifiedException("Updated the Group as expected, but some Users passed do not exist. " + information);
         }
         return toUpdate;
 
@@ -219,17 +232,24 @@ public class UserGroupRepository {
 
     /**
      * Deletes a UserGroup by it's id.
+     *
      * @param id
+     * @param email
      * @throws NullPointerException
      */
-    public static void deleteUserGroup(long id) throws NullPointerException {
+    public static void deleteUserGroup(long id, String email) throws NullPointerException, NotAuthorizedException {
+        User user = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         UserGroup group = UserGroup.find.byId(id);
-        group.update();
-        group.delete();
+
+        if (user.hasRight(UserOperations.DELETE_GROUP, group)) {
+            group.update();
+            group.delete();
+        } else throw new NotAuthorizedException("This user is not authorized to delete the group with this id.");
     }
 
     /**
      * Create a new UserGroup with the given name and description.
+     *
      * @param json
      * @return the usergroup from the json node
      */

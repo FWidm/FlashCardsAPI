@@ -311,6 +311,9 @@ public class User extends Model {
 
         final int RATING_EDIT_USER = 1000;
 
+		final int RATING_EDIT_GROUP = 1000;
+		final int RATING_DELETE_GROUP = 1000;
+
         switch (userOperation) {
             //category
             case CREATE_CATEGORY: {
@@ -358,7 +361,6 @@ public class User extends Model {
             case DELETE_ANSWER: {
                 if (manipulated != null && manipulated.getClass() == Answer.class) {
                     Answer answer = (Answer) manipulated;
-
                     //can delete own cards OR any cards when this user's rating is over a specific value
                     if (answer.getAuthor() == this || rating >= RATING_DELETE_ANSWER) {
                         return true;
@@ -418,6 +420,24 @@ public class User extends Model {
                 }
                 return false;
             }
+			case EDIT_GROUP:{
+				if(manipulated!=null && manipulated.getClass()==UserGroup.class){
+					UserGroup group = (UserGroup) manipulated;
+					if(group.getUsers().contains(this) || rating>RATING_EDIT_GROUP){
+						return true;
+					}
+				}
+				return false;
+			}
+			case DELETE_GROUP:{
+				if(manipulated!=null && manipulated.getClass()==UserGroup.class){
+					UserGroup group = (UserGroup) manipulated;
+					if(group.getUsers().contains(this) || rating>RATING_DELETE_GROUP){
+						return true;
+					}
+				}
+				return false;
+			}
         }
         return false;
     }

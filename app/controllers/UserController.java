@@ -73,7 +73,7 @@ public class UserController extends Controller {
             }
         } catch (NotAuthorizedException e) {
             e.printStackTrace();
-            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, "This user is not authorized to modify the specified user.",id));
+            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage(), id));
         }
         return ok(JsonUtil.prepareJsonStatus(OK, "User has been changed.", id));
 
@@ -125,7 +125,7 @@ public class UserController extends Controller {
         } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, user does not exist.", id));
         } catch (NotAuthorizedException e) {
-            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, "This user is not authorized to delete the specified user.", id));
+            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage(), id));
         }
     }
 

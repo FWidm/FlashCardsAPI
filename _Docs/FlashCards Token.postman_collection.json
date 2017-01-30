@@ -968,7 +968,7 @@
 			]
 		},
 		{
-			"name": "Groups",
+			"name": "Groups (edited)",
 			"description": "",
 			"item": [
 				{
@@ -1050,6 +1050,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
 								"description": ""
 							}
 						],
@@ -1298,31 +1303,6 @@
 					"response": []
 				},
 				{
-					"name": "Delete user with id {{userId}}",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"tests[\"Status code is 200\"] = responseCode.code === 200;"
-								]
-							}
-						}
-					],
-					"request": {
-						"url": "{{url}}{{port}}/users/{{userId}}",
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
 					"name": "Retrieve all users in one group",
 					"event": [
 						{
@@ -1337,7 +1317,7 @@
 						}
 					],
 					"request": {
-						"url": "{{url}}{{port}}/groups/{{groupId}}/decksd",
+						"url": "{{url}}{{port}}/groups/{{groupId}}/users",
 						"method": "GET",
 						"header": [
 							{
@@ -1369,7 +1349,7 @@
 						}
 					],
 					"request": {
-						"url": "{{url}}{{port}}/groups/{{groupId}}/users",
+						"url": "{{url}}{{port}}/groups/{{groupId}}/decks",
 						"method": "GET",
 						"header": [
 							{
@@ -1771,7 +1751,7 @@
 			]
 		},
 		{
-			"name": "Users",
+			"name": "Users (edited)",
 			"description": "",
 			"item": [
 				{
@@ -1923,6 +1903,11 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
 							}
 						],
 						"body": {
@@ -1964,6 +1949,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
 								"description": ""
 							}
 						],
@@ -2007,6 +1997,11 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
 							}
 						],
 						"body": {
@@ -2033,7 +2028,13 @@
 					"request": {
 						"url": "{{url}}{{port}}/users/{{userId}}",
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": ""
