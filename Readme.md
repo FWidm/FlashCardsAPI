@@ -1,5 +1,12 @@
 # FlashCards RESTful API
 ![FlashCards Logo](_Docs/img/flash_icon_250.png)
+
+## TODO
+- Implement Token invalidation after time
+- Implement auth for nearly all Update/Delete operations
+- Test Production build
+- Implement Backend for challenge/leaderbords
+
 ## Methods
 ### Users
 | Resource | GET | PUT | POST | PATCH | DELETE|

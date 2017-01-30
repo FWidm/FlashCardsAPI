@@ -19,7 +19,7 @@ create table answer (
 
 create table authToken (
   tokenId                   bigint auto_increment not null,
-  userId                    bigint,
+  tokenUserId               bigint,
   token                     varchar(255),
   created                   datetime(6) not null,
   constraint uq_authToken_token unique (token),
@@ -127,8 +127,8 @@ alter table answer add constraint fk_answer_author_1 foreign key (userId) refere
 create index ix_answer_author_1 on answer (userId);
 alter table answer add constraint fk_answer_card_2 foreign key (cardId) references flashCard (flashcardId) on delete restrict on update restrict;
 create index ix_answer_card_2 on answer (cardId);
-alter table authToken add constraint fk_authToken_user_3 foreign key (userId) references user (userId) on delete restrict on update restrict;
-create index ix_authToken_user_3 on authToken (userId);
+alter table authToken add constraint fk_authToken_user_3 foreign key (tokenUserId) references user (userId) on delete restrict on update restrict;
+create index ix_authToken_user_3 on authToken (tokenUserId);
 alter table cardDeck add constraint fk_cardDeck_userGroup_4 foreign key (userGroup) references userGroup (groupId) on delete restrict on update restrict;
 create index ix_cardDeck_userGroup_4 on cardDeck (userGroup);
 alter table cardDeck add constraint fk_cardDeck_category_5 foreign key (category) references category (categoryId) on delete restrict on update restrict;

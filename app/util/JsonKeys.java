@@ -83,7 +83,7 @@ public class JsonKeys {
 
     //Token
     public static final String TOKEN_ID = "tokenId";
-    public static final String TOKEN_USER = "tokenUser";
+    public static final String TOKEN_USER = "tokenUserId";
 
     //Rating
     public static final String RATING_MODIFIER="ratingModifier";

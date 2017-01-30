@@ -9,8 +9,10 @@ import play.data.validation.Constraints;
 import util.JsonKeys;
 import util.JsonUtil;
 import util.RequestKeys;
+import util.UserOperations;
 import util.crypt.PasswordUtil;
 import util.exceptions.InvalidInputException;
+import util.exceptions.NotAuthorizedException;
 import util.exceptions.ParameterNotSupportedException;
 
 import java.security.NoSuchAlgorithmException;
@@ -180,11 +182,16 @@ public class UserRepository {
     }
 
     /**
-     * Deletes a User object from the database.
+     * Deletes a User object from the database if the user has the rights to do this.
      * @param id
+     * @param email
      */
-    public static void deleteUserById(Long id) {
-        User.find.ref(id).delete();
+    public static void deleteUserById(Long id, String email) throws NotAuthorizedException {
+        User u=User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
+        if(u.hasRight(UserOperations.DELETE_USER, u))
+            User.find.ref(id).delete();
+        else
+            throw new NotAuthorizedException("This user is not authorized to delete the user with this id.");
     }
 
     /**

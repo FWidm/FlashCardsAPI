@@ -5,7 +5,9 @@ import java.util.Map;
 
 import models.*;
 import play.Logger;
+import play.mvc.Security;
 import repositories.UserRepository;
+import util.ActionAuthenticator;
 import util.JsonKeys;
 import util.JsonUtil;
 import play.mvc.BodyParser;
@@ -14,6 +16,7 @@ import play.mvc.Result;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import util.exceptions.InvalidInputException;
+import util.exceptions.NotAuthorizedException;
 
 public class UserController extends Controller {
 
@@ -44,6 +47,7 @@ public class UserController extends Controller {
      *
      * @return HTTP Status ok when everything works out or badRequest if not.
      */
+    @Security.Authenticated(ActionAuthenticator.class)
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateUser(Long id) {
         try {
@@ -111,13 +115,16 @@ public class UserController extends Controller {
      * @param id
      * @return OK
      */
+    @Security.Authenticated(ActionAuthenticator.class)
     public Result deleteUser(Long id) {
         try {
-            UserRepository.deleteUserById(id);
+            UserRepository.deleteUserById(id, request().username());
 
             return ok(JsonUtil.prepareJsonStatus(OK, "The user has been deleted. All produced content now will be unlinked from this account (author set to null).", id));
         } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, user does not exist.", id));
+        } catch (NotAuthorizedException e) {
+            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, "This user is not authorized to delete the specified user.",id));
         }
     }
 

@@ -7,10 +7,7 @@ import play.Logger;
 import util.JsonKeys;
 import util.RequestKeys;
 import util.UserOperations;
-import util.exceptions.InvalidInputException;
-import util.exceptions.ObjectNotFoundException;
-import util.exceptions.ParameterNotSupportedException;
-import util.exceptions.PartiallyModifiedException;
+import util.exceptions.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -49,19 +46,18 @@ public class FlashCardRepository {
     /**
      * Deletes the specific Flashcard including questions and answers.
      *
-     *
      * @param email
-     * @param id of a card
+     * @param id    of a card
      * @return deleted card object
      */
-    public static FlashCard deleteFlashCard(String email, long id) throws NullPointerException, IllegalArgumentException {
+    public static FlashCard deleteFlashCard(String email, long id) throws NullPointerException, IllegalArgumentException, NotAuthorizedException {
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
 
         FlashCard card = FlashCard.find.byId(id);
-        if(author.hasRight(UserOperations.DELETE_CARD,card))
+        if (author.hasRight(UserOperations.DELETE_CARD, card))
             card.delete();
         else
-            throw new IllegalArgumentException("This user is not authorized to delete this card.");
+            throw new NotAuthorizedException("This user is not authorized to delete this card.");
 
         return card;
     }
@@ -148,7 +144,7 @@ public class FlashCardRepository {
      *
      * @return httpResult
      */
-    public static FlashCard updateFlashCard(long id, String email, JsonNode json, Map<String, String[]> urlParams) throws InvalidInputException, ParameterNotSupportedException, NullPointerException {
+    public static FlashCard updateFlashCard(long id, String email, JsonNode json, Map<String, String[]> urlParams) throws InvalidInputException, ParameterNotSupportedException, NullPointerException, NotAuthorizedException {
         ObjectMapper mapper = new ObjectMapper();
         boolean appendMode = false;
         int answersSize = -1;
@@ -178,7 +174,7 @@ public class FlashCardRepository {
 
         if (json.has(JsonKeys.FLASHCARD_ANSWERS)) {
             oldAnswerList = FlashCard.find.byId(id).getAnswers();
-            oldAnswerList.forEach(a->Logger.debug("old: "+a));
+            oldAnswerList.forEach(a -> Logger.debug("old: " + a));
             if (appendMode) {
                 List<Answer> mergedAnswers = new ArrayList<>();
 
@@ -186,14 +182,13 @@ public class FlashCardRepository {
                 mergedAnswers.addAll(retrieveAnswers(author, json));
 
                 toUpdate.setAnswers(mergedAnswers);
-            } else if (requestOwner.hasRight(UserOperations.EDIT_CARD_QUESTION, toUpdate)){
-                List<Answer> newAnswers=retrieveAnswers(author, json);
-                newAnswers.forEach(a->Logger.debug("new: "+a));
+            } else if (requestOwner.hasRight(UserOperations.EDIT_CARD_QUESTION, toUpdate)) {
+                List<Answer> newAnswers = retrieveAnswers(author, json);
+                newAnswers.forEach(a -> Logger.debug("new: " + a));
 
                 toUpdate.setAnswers(newAnswers);
-            }
-            else
-                throw new IllegalArgumentException("This user is not authorized to edit the card of another user. He may only append tags or answers.");
+            } else
+                throw new NotAuthorizedException("This user is not authorized to delete this card.");
 
         }
 
@@ -224,7 +219,8 @@ public class FlashCardRepository {
             author = User.find.byId(u.getId());
             toUpdate.setAuthor(author);
         } else
-            throw new InvalidInputException("This user is not authorized to edit the card of another user. He may only append tags or answers.");
+            throw new NotAuthorizedException("This user is not authorized to delete this card.");
+
 
         if (json.has(JsonKeys.FLASHCARD_TAGS)) {
             if (appendMode) {
@@ -241,8 +237,7 @@ public class FlashCardRepository {
             } else if (requestOwner.hasRight(UserOperations.EDIT_CARD_QUESTION, toUpdate)) {
                 toUpdate.setTags(TagRepository.retrieveOrCreateTags(json));
             } else
-                throw new IllegalArgumentException("This user is not authorized to edit the card of another user. He may only append tags or answers.");
-
+                throw new NotAuthorizedException("This user is not authorized to delete this card.");
         }
 
         if (json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)) {
@@ -395,7 +390,7 @@ public class FlashCardRepository {
                 }
             }
         }
-        Logger.debug("Found "+answers.size()+" new answers!");
+        Logger.debug("Found " + answers.size() + " new answers!");
         return answers;
     }
 

@@ -31,7 +31,7 @@ public class AuthToken extends Model {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = JsonKeys.USER_ID)
+    @JoinColumn(name = JsonKeys.TOKEN_USER)
     @JsonProperty(JsonKeys.TOKEN_USER)
     User user;
     @JsonProperty(JsonKeys.TOKEN)

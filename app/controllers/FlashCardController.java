@@ -12,11 +12,8 @@ import repositories.FlashCardRepository;
 import util.ActionAuthenticator;
 import util.JsonKeys;
 import util.JsonUtil;
-import util.exceptions.InvalidInputException;
-import util.exceptions.ObjectNotFoundException;
-import util.exceptions.ParameterNotSupportedException;
+import util.exceptions.*;
 import util.RequestKeys;
-import util.exceptions.PartiallyModifiedException;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -72,18 +69,20 @@ public class FlashCardController {
      */
     @Security.Authenticated(ActionAuthenticator.class)
     public Result deleteFlashCard(long id) {
-        Logger.debug("Current user="+request().username());
+        Logger.debug("Current user=" + request().username());
         try {
-            FlashCard deleted = FlashCardRepository.deleteFlashCard(request().username(),id);
+            FlashCard deleted = FlashCardRepository.deleteFlashCard(request().username(), id);
 
             return ok(JsonUtil.prepareJsonStatus(OK, "The card with the id=" + deleted.getId()
                     + " has been deleted. This includes questions and answers. All Tags for this card were disconnected and persist."));
         } catch (NullPointerException e) {
             System.err.println(e.getMessage());
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return badRequest(JsonUtil
                     .prepareJsonStatus(BAD_REQUEST, e.getMessage()));
+        } catch (NotAuthorizedException e) {
+            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, "This user is not authorized to delete the specified card.",id));
         }
     }
 
@@ -97,18 +96,17 @@ public class FlashCardController {
     @BodyParser.Of(BodyParser.Json.class)
     public Result addFlashCard() {
         JsonNode json = request().body().asJson();
-        Logger.debug("Current user="+request().username());
+        Logger.debug("Current user=" + request().username());
         try {
-            FlashCard addedCard = FlashCardRepository.addFlashCard(request().username(),json);
+            FlashCard addedCard = FlashCardRepository.addFlashCard(request().username(), json);
             return created(JsonUtil.prepareJsonStatus(CREATED, "FlashCard has been created!", addedCard.getId()));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
-            if(JsonKeys.debugging){
+            if (JsonKeys.debugging) {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));
-            }
-            else {
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS + " | cause: " + e.getCause()));
+            } else {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
                                 BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
@@ -116,12 +114,11 @@ public class FlashCardController {
 
         } catch (ParameterNotSupportedException e) {
             e.printStackTrace();
-            if(JsonKeys.debugging){
+            if (JsonKeys.debugging) {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));
-            }
-            else {
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS + " | cause: " + e.getCause()));
+            } else {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
                                 BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
@@ -132,7 +129,7 @@ public class FlashCardController {
                     .prepareJsonStatus(BAD_REQUEST, e.getMessage()));
         } catch (PartiallyModifiedException e) {
             return created(JsonUtil
-                    .prepareJsonStatus(CREATED, e.getMessage(),e.getObjectId()));
+                    .prepareJsonStatus(CREATED, e.getMessage(), e.getObjectId()));
         }
     }
 
@@ -153,21 +150,20 @@ public class FlashCardController {
     public Result updateFlashCard(long id) {
         JsonNode json = request().body().asJson();
         Map<String, String[]> urlParams = Controller.request().queryString();
-        Logger.debug("Current user="+request().username());
+        Logger.debug("Current user=" + request().username());
 
         try {
-            FlashCard updatedCard = FlashCardRepository.updateFlashCard(id,request().username(),json,urlParams);
-            return ok(JsonUtil.prepareJsonStatus(OK, "FlashCard has been updated!",updatedCard.getId()));
+            FlashCard updatedCard = FlashCardRepository.updateFlashCard(id, request().username(), json, urlParams);
+            return ok(JsonUtil.prepareJsonStatus(OK, "FlashCard has been updated!", updatedCard.getId()));
         } catch (NullPointerException e) {
             e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
-        } catch (IllegalArgumentException e){
-            if(JsonKeys.debugging){
+        } catch (IllegalArgumentException e) {
+            if (JsonKeys.debugging) {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, e.getMessage()+" | cause: "+e.getCause()));
-            }
-            else {
+                                BAD_REQUEST, e.getMessage() + " | cause: " + e.getCause()));
+            } else {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
                                 BAD_REQUEST, e.getMessage()));
@@ -177,16 +173,17 @@ public class FlashCardController {
                     "please provide a complete list of answers object with the following components: " + JsonKeys.QUESTION_JSON_ELEMENTS));
         } catch (InvalidInputException e) {
             e.printStackTrace();
-            if(JsonKeys.debugging /*&& !e.getCause().getMessage().contains("Body did contain")*/){
+            if (JsonKeys.debugging /*&& !e.getCause().getMessage().contains("Body did contain")*/) {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));
-            }
-            else {
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS + " | cause: " + e.getCause()));
+            } else {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
                                 BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
             }
+        } catch (NotAuthorizedException e) {
+            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, "This user is not authorized to modify the specified card.",id));
         }
     }
 
@@ -201,7 +198,8 @@ public class FlashCardController {
         try {
             ret = FlashCardRepository.getQuestion(id);
         } catch (Exception e) {
-            System.err.println(e);
+            //System.err.println(e);
+            e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         }
         return ok(JsonUtil.toJson(ret));
@@ -217,7 +215,7 @@ public class FlashCardController {
         User ret;
         try {
             ret = FlashCardRepository.getAuthor(id);
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             //e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         }
@@ -235,7 +233,7 @@ public class FlashCardController {
         Map<String, String[]> urlParams = Controller.request().queryString();
         List<Answer> ret;
         try {
-                ret = FlashCardRepository.getAnswers(id,urlParams);
+            ret = FlashCardRepository.getAnswers(id, urlParams);
 
         } catch (Exception e) {
             System.err.println(e);
@@ -255,7 +253,7 @@ public class FlashCardController {
 
         List<Tag> ret;
         try {
-            ret = FlashCardRepository.getTags(id,urlParams);
+            ret = FlashCardRepository.getTags(id, urlParams);
         } catch (Exception e) {
             e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
