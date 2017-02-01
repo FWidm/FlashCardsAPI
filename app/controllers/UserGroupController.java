@@ -25,7 +25,12 @@ public class UserGroupController extends Controller {
     public Result getUserGroupList() {
 
         Map<String, String[]> urlParams = Controller.request().queryString();
-        return ok(JsonUtil.toJson(UserGroupRepository.getGroups(urlParams)));
+        try{
+            return ok(JsonUtil.toJson(UserGroupRepository.getGroups(urlParams)));
+
+        }catch (NumberFormatException e){
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Error while parsing the specified numbers, please recheck your request."));
+        }
     }
 
     public Result getDecksFromGroup(Long id) {
