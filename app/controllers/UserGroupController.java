@@ -31,6 +31,10 @@ public class UserGroupController extends Controller {
         }catch (NumberFormatException e){
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Error while parsing the specified numbers, please recheck your request."));
         }
+        catch (NullPointerException e){
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
+                    "Filtering by unkown user failed, re-check your request params."));
+        }
     }
 
     public Result getDecksFromGroup(Long id) {
