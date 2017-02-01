@@ -131,7 +131,7 @@ public class UserGroupRepository {
      *
      * @param id
      * @param email
-     *@param json
+     * @param json
      * @param urlParams
      * @param method    @return updated UserGroup object
      * @throws InvalidInputException
@@ -144,8 +144,8 @@ public class UserGroupRepository {
 
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         // get the specific user we want to edit
-        UserGroup toUpdate = UserGroup.find.byId(id);
-        if(!author.hasRight(UserOperations.EDIT_GROUP,toUpdate))
+        UserGroup groupToUpdate = UserGroup.find.byId(id);
+        if (!author.hasRight(UserOperations.EDIT_GROUP, groupToUpdate))
             throw new NotAuthorizedException("This user is not authorized to modify the group with this id.");
 
         ObjectMapper mapper = new ObjectMapper();
@@ -165,38 +165,43 @@ public class UserGroupRepository {
 
         // check for new values
         if (json.has(JsonKeys.GROUP_NAME)) {
-            toUpdate.setName(requestGroup.getName());
+            groupToUpdate.setName(requestGroup.getName());
         }
         if (json.has(JsonKeys.GROUP_DESCRIPTION)) {
-            toUpdate.setDescription(requestGroup.getDescription());
+            groupToUpdate.setDescription(requestGroup.getDescription());
         }
         if (json.has(JsonKeys.GROUP_USERS)) {
             JsonNode users = json.findValue(JsonKeys.GROUP_USERS);
 
             if (JsonKeys.debugging) Logger.debug("Users=" + users + " isArray? "
                     + users.isArray());
-            // Loop through all objects in the values associated with the
-            // JsonKeys.GROUP_USERS key.
-            for (JsonNode n : users) {
-                // when a user id is found we will get the object and
-                // update the usergroup.
-                if (n.has(JsonKeys.USER_ID) && User.find.byId(n.get(JsonKeys.USER_ID).asLong()) != null) {
-                    User u = User.find.byId(n.get(JsonKeys.USER_ID).asLong());
-                    //u.setUserGroups(toUpdate);
-                    u.update();
-                } else {
-                    information += "No ID found or does not exist in json=" + n
-                            + ". ";
-                }
 
+            if (users == null || users.size()==0) {
+                // TODO: 01/02/17 decide on what to do when an authorized user sends null. Should we remove the user?
+            } else {
+                // Loop through all objects in the values associated with the
+                // JsonKeys.GROUP_USERS key.
+                for (JsonNode node : users) {
+                    // when a user id is found we will get the object and
+                    // update the usergroup.
+                    if (node.has(JsonKeys.USER_ID) && User.find.byId(node.get(JsonKeys.USER_ID).asLong()) != null) {
+                        User u = User.find.byId(node.get(JsonKeys.USER_ID).asLong());
+                        u.addUserGroup(groupToUpdate);
+                        groupToUpdate.addUser(u);
+                    } else {
+                        information += "No ID found or does not exist in json=" + node
+                                + ". ";
+                    }
+
+                }
             }
         }
-        toUpdate.update();
+        groupToUpdate.update();
         //if we somehow have gotten users that do not exist, we can throw a PartiallyModifiedException to use in the controller.
         if (information.length() > 0) {
             throw new PartiallyModifiedException("Updated the Group as expected, but some Users passed do not exist. " + information);
         }
-        return toUpdate;
+        return groupToUpdate;
 
     }
 

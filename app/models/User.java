@@ -423,6 +423,8 @@ public class User extends Model {
 			case EDIT_GROUP:{
 				if(manipulated!=null && manipulated.getClass()==UserGroup.class){
 					UserGroup group = (UserGroup) manipulated;
+                    Logger.debug("First condition: "+group.getUsers().contains(this) + " | second condition: "+(rating>RATING_EDIT_GROUP));
+                    group.getUsers().forEach(u->Logger.debug("u="+u));
 					if(group.getUsers().contains(this) || rating>RATING_EDIT_GROUP){
 						return true;
 					}
@@ -440,5 +442,12 @@ public class User extends Model {
 			}
         }
         return false;
+    }
+
+    public void addUserGroup(UserGroup newGroup) {
+        if(!userGroups.contains(newGroup)){
+            userGroups.add(newGroup);
+            this.save();
+        }
     }
 }

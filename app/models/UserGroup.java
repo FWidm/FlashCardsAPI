@@ -105,7 +105,6 @@ public class UserGroup extends Model {
 	public void addUser(User user) {
 		if (!users.contains(user)) {
 			users.add(user);
-//			user.setUserGroups(this);
 			this.save();
 		}
 	}
