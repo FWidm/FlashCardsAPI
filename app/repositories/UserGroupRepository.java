@@ -8,6 +8,7 @@ import models.UserGroup;
 import play.Logger;
 import util.JsonKeys;
 import util.RequestKeys;
+import util.UrlParamHelper;
 import util.UserOperations;
 import util.exceptions.InvalidInputException;
 import util.exceptions.NotAuthorizedException;
@@ -17,7 +18,6 @@ import util.exceptions.PartiallyModifiedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 
 
 /**
@@ -67,6 +67,15 @@ public class UserGroupRepository {
             } else {
                 return UserGroup.find.where().isNotNull(JsonKeys.GROUP_USERS).findList();
             }
+        }
+        if (UrlParamHelper.checkForKey(RequestKeys.USER_ID)) {
+                User user = User.find.byId(Long.parseLong(UrlParamHelper.getValue(RequestKeys.USER_ID)));
+            return user.getUserGroups();
+        }
+        if (UrlParamHelper.checkForKey(RequestKeys.EMAIL)) {
+            User user = UserRepository.findUserByEmail(UrlParamHelper.getValue(RequestKeys.EMAIL));
+
+            return user.getUserGroups();
         }
         return UserGroup.find.all();
     }
@@ -143,7 +152,7 @@ public class UserGroupRepository {
     public static UserGroup changeUserGroup(long id, String email, JsonNode json, Map<String, String[]> urlParams, String method)
             throws InvalidInputException, NullPointerException, PartiallyModifiedException, NotAuthorizedException {
         String information = "";
-        boolean appendMode=false;
+        boolean appendMode = false;
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         // get the specific user we want to edit
         UserGroup groupToUpdate = UserGroup.find.byId(id);
@@ -181,12 +190,12 @@ public class UserGroupRepository {
             if (JsonKeys.debugging) Logger.debug("Users=" + users + " isArray? "
                     + users.isArray());
 
-            if (users == null || users.size()==0) {
+            if (users == null || users.size() == 0) {
                 // TODO: 01/02/17 decide on what to do when an authorized user sends null. Should we remove the user?
             } else {
                 // Loop through all objects in the values associated with the
                 // JsonKeys.GROUP_USERS key.
-                if(appendMode){
+                if (appendMode) {
                     for (JsonNode node : users) {
                         // when a user id is found we will get the object and
                         // update the usergroup.
@@ -200,8 +209,7 @@ public class UserGroupRepository {
                         }
 
                     }
-                }
-                else {
+                } else {
                     throw new InvalidInputException("Users can only be appended in groups. Replacing a whole group is not supported. You can unsubscribe yourself only.");
                     //groupToUpdate.setUsers(UserRepository.retrieveUsers(users));
                 }
@@ -215,7 +223,6 @@ public class UserGroupRepository {
         return groupToUpdate;
 
     }
-
 
 
     /**
@@ -284,4 +291,16 @@ public class UserGroupRepository {
         UserGroup group = new UserGroup(name, description, null);
         return group;
     }
+
+    public static boolean unSubscribe(long id, String email) {
+        UserGroup group = UserGroup.find.byId(id);
+        User user = UserRepository.findUserByEmail(email);
+
+        if (group.getUsers().contains(user)) {
+            group.removeUser(user);
+            return true;
+        }
+        return false;
+    }
+
 }

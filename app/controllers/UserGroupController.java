@@ -27,7 +27,12 @@ public class UserGroupController extends Controller {
     public Result getUserGroupList() {
 
         Map<String, String[]> urlParams = Controller.request().queryString();
-        return ok(JsonUtil.toJson(UserGroupRepository.getGroups(urlParams)));
+        try{
+            return ok(JsonUtil.toJson(UserGroupRepository.getGroups(urlParams)));
+
+        }catch (NumberFormatException e){
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Error while parsing the specified numbers, please recheck your request."));
+        }
     }
 
     public Result getDecksFromGroup(Long id) {
@@ -145,12 +150,12 @@ public class UserGroupController extends Controller {
 
     }
 
-    /**
+/*    *//**
      * Grabs the group by its id, deletes the reference to this group from all members and updates them and then deletes the group.
      *
      * @param id of a user
      * @return ok when deletion is successful, notFound if the user does not exist.
-     */
+     *//*
     @Security.Authenticated(ActionAuthenticator.class)
     public Result deleteUserGroup(long id) {
         try {
@@ -162,5 +167,25 @@ public class UserGroupController extends Controller {
         } catch (NotAuthorizedException e) {
             return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage(), id));
         }
+    }   */
+
+    /*
+     * @param id of a user
+     * @return ok when deletion is successful, notFound if the user does not exist.
+     */
+    @Security.Authenticated(ActionAuthenticator.class)
+    public Result unSubscribe(long id) {
+        try {
+            boolean isUnsubscribed = UserGroupRepository.unSubscribe(id, request().username());
+            if(isUnsubscribed)
+                return ok(JsonUtil.prepareJsonStatus(OK, "User unsubscribed from the group.",id));
+            else
+                return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "User is no member of this group.",id));
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Group with the id could not be found", id));
+        }
     }
+
+
 }
