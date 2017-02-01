@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
+
 /**
  * @author Jonas Kraus
  * @author Fabian Widmann
@@ -141,20 +143,23 @@ public class UserGroupRepository {
     public static UserGroup changeUserGroup(long id, String email, JsonNode json, Map<String, String[]> urlParams, String method)
             throws InvalidInputException, NullPointerException, PartiallyModifiedException, NotAuthorizedException {
         String information = "";
-
+        boolean appendMode=false;
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         // get the specific user we want to edit
         UserGroup groupToUpdate = UserGroup.find.byId(id);
         if (!author.hasRight(UserOperations.EDIT_GROUP, groupToUpdate))
             throw new NotAuthorizedException("This user is not authorized to modify the group with this id.");
 
-        ObjectMapper mapper = new ObjectMapper();
-
         //Check whether the request was a put and if it was check if a param is missing, if that is the case --> bad req.
         if (method.equals("PUT") && (!json.has(JsonKeys.GROUP_NAME) || !json.has(JsonKeys.GROUP_DESCRIPTION) || !json.has(JsonKeys.GROUP_USERS))) {
-            throw new InvalidInputException("The Update method needs all details of the group, such as name, " +
-                    "description and a user group (array of users or null). An attribute was missing.");
+            throw new InvalidInputException("Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS);
         }
+
+        if (urlParams.containsKey(RequestKeys.APPEND)) {
+            appendMode = Boolean.parseBoolean(urlParams.get(RequestKeys.APPEND)[0]);
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
         UserGroup requestGroup = mapper.convertValue(json, UserGroup.class);
 
         if (JsonKeys.debugging) Logger.debug("Update group with details: " + requestGroup
@@ -181,18 +186,24 @@ public class UserGroupRepository {
             } else {
                 // Loop through all objects in the values associated with the
                 // JsonKeys.GROUP_USERS key.
-                for (JsonNode node : users) {
-                    // when a user id is found we will get the object and
-                    // update the usergroup.
-                    if (node.has(JsonKeys.USER_ID) && User.find.byId(node.get(JsonKeys.USER_ID).asLong()) != null) {
-                        User u = User.find.byId(node.get(JsonKeys.USER_ID).asLong());
-                        u.addUserGroup(groupToUpdate);
-                        groupToUpdate.addUser(u);
-                    } else {
-                        information += "No ID found or does not exist in json=" + node
-                                + ". ";
-                    }
+                if(appendMode){
+                    for (JsonNode node : users) {
+                        // when a user id is found we will get the object and
+                        // update the usergroup.
+                        if (node.has(JsonKeys.USER_ID) && User.find.byId(node.get(JsonKeys.USER_ID).asLong()) != null) {
+                            User u = User.find.byId(node.get(JsonKeys.USER_ID).asLong());
+//                        u.addUserGroup(groupToUpdate);
+                            groupToUpdate.addUser(u);
+                        } else {
+                            information += "No ID found or does not exist in json=" + node
+                                    + ". ";
+                        }
 
+                    }
+                }
+                else {
+                    throw new InvalidInputException("Users can only be appended in groups. Replacing a whole group is not supported. You can unsubscribe yourself only.");
+                    //groupToUpdate.setUsers(UserRepository.retrieveUsers(users));
                 }
             }
         }
@@ -204,6 +215,8 @@ public class UserGroupRepository {
         return groupToUpdate;
 
     }
+
+
 
     /**
      * Parses the given json to gain access to the given Usergroups.

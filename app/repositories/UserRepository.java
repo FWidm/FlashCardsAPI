@@ -238,4 +238,24 @@ public class UserRepository {
             return User.find.all();
         }
     }
+    public static List<User> retrieveUsers(JsonNode nodes) {
+        List<User> userList=new ArrayList<>();
+        for (JsonNode node:nodes){
+            User tmpUser=parseUser(node);
+            if(tmpUser!=null)
+                userList.add(tmpUser);
+        }
+        return userList;
+    }
+
+
+    public static User parseUser(JsonNode node) {
+        User u = null;
+        if(node.has(JsonKeys.USER_ID))
+            u=User.find.byId(node.get(JsonKeys.USER_ID).asLong());
+
+        if(node.has(JsonKeys.USER_EMAIL))
+            u=UserRepository.findUserByEmail(node.get(JsonKeys.USER_EMAIL).asText());
+        return u;
+    }
 }
