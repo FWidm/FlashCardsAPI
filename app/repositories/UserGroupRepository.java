@@ -149,16 +149,22 @@ public class UserGroupRepository {
     public static UserGroup changeUserGroup(long id, JsonNode json, Map<String, String[]> urlParams, String method)
             throws InvalidInputException, NullPointerException, PartiallyModifiedException {
         String information = "";
+        boolean appendMode = false;
+        // get the specific user we want to edit
+        UserGroup groupToUpdate = UserGroup.find.byId(id);
 
-        ObjectMapper mapper = new ObjectMapper();
 
         //Check whether the request was a put and if it was check if a param is missing, if that is the case --> bad req.
         if (method.equals("PUT") && (!json.has(JsonKeys.GROUP_NAME) || !json.has(JsonKeys.GROUP_DESCRIPTION) || !json.has(JsonKeys.GROUP_USERS))) {
-            throw new InvalidInputException("The Update method needs all details of the group, such as name, " +
-                    "description and a user group (array of users or null). An attribute was missing.");
+            throw new InvalidInputException("Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS);
         }
+
+        if (urlParams.containsKey(RequestKeys.APPEND)) {
+            appendMode = Boolean.parseBoolean(urlParams.get(RequestKeys.APPEND)[0]);
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
         UserGroup requestGroup = mapper.convertValue(json, UserGroup.class);
-        UserGroup toUpdate = UserGroup.find.byId(id);
 
         if (JsonKeys.debugging) Logger.debug("Update group with details: " + requestGroup
                 + "\n JSON Size=" + json.size());
@@ -168,38 +174,48 @@ public class UserGroupRepository {
 
         // check for new values
         if (json.has(JsonKeys.GROUP_NAME)) {
-            toUpdate.setName(requestGroup.getName());
+            groupToUpdate.setName(requestGroup.getName());
         }
         if (json.has(JsonKeys.GROUP_DESCRIPTION)) {
-            toUpdate.setDescription(requestGroup.getDescription());
+            groupToUpdate.setDescription(requestGroup.getDescription());
         }
         if (json.has(JsonKeys.GROUP_USERS)) {
             JsonNode users = json.findValue(JsonKeys.GROUP_USERS);
 
             if (JsonKeys.debugging) Logger.debug("Users=" + users + " isArray? "
                     + users.isArray());
-            // Loop through all objects in the values associated with the
-            // JsonKeys.GROUP_USERS key.
-            for (JsonNode n : users) {
-                // when a user id is found we will get the object and
-                // update the usergroup.
-                if (n.has(JsonKeys.USER_ID) && User.find.byId(n.get(JsonKeys.USER_ID).asLong()) != null) {
-                    User u = User.find.byId(n.get(JsonKeys.USER_ID).asLong());
-                    //u.setUserGroups(toUpdate);
-                    u.update();
-                } else {
-                    information += "No ID found or does not exist in json=" + n
-                            + ". ";
-                }
 
+            if (users == null || users.size() == 0) {
+                // TODO: 01/02/17 decide on what to do when an authorized user sends null. Should we remove the user?
+            } else {
+                // Loop through all objects in the values associated with the
+                // JsonKeys.GROUP_USERS key.
+                if (appendMode) {
+                    for (JsonNode node : users) {
+                        // when a user id is found we will get the object and
+                        // update the usergroup.
+                        if (node.has(JsonKeys.USER_ID) && User.find.byId(node.get(JsonKeys.USER_ID).asLong()) != null) {
+                            User u = User.find.byId(node.get(JsonKeys.USER_ID).asLong());
+//                        u.addUserGroup(groupToUpdate);
+                            groupToUpdate.addUser(u);
+                        } else {
+                            information += "No ID found or does not exist in json=" + node
+                                    + ". ";
+                        }
+
+                    }
+                } else {
+                    throw new InvalidInputException("Users can only be appended in groups. Replacing a whole group is not supported. You can unsubscribe yourself only.");
+                    //groupToUpdate.setUsers(UserRepository.retrieveUsers(users));
+                }
             }
         }
-        toUpdate.update();
+        groupToUpdate.update();
         //if we somehow have gotten users that do not exist, we can throw a PartiallyModifiedException to use in the controller.
         if (information.length() > 0) {
             throw new PartiallyModifiedException("Updated the Group as expected, but some Users passed do not exist. " + information);
         }
-        return toUpdate;
+        return groupToUpdate;
 
     }
 
