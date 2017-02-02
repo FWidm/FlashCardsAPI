@@ -61,7 +61,14 @@ public class CardDeckController extends Controller {
 
     @Security.Authenticated(ActionAuthenticator.class)
     public Result deleteCardDeck(long id) {
-       CardDeck cardDeck=CardDeckRepository.deleteCardDeck(id);
+        try{
+            CardDeck cardDeck=CardDeckRepository.deleteCardDeck(id,request().username());
+
+        } catch (NotAuthorizedException e) {
+            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage(),id));
+        }catch (NullPointerException e){
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "CardDeck with the given id does not exist.", id));
+        }
         return noContent();
     }
 

@@ -65,10 +65,16 @@ public class CardDeckRepository {
         return flashCards;
     }
 
-    public static CardDeck deleteCardDeck(long id) {
-        CardDeck deleted = CardDeck.find.byId(id);
-        deleted.delete();
-        return deleted;
+    public static CardDeck deleteCardDeck(long id, String email) throws NotAuthorizedException {
+        User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
+        CardDeck deck = CardDeck.find.byId(id);
+        if(deck==null)
+            throw new NullPointerException();
+        if (!author.hasRight(UserOperations.EDIT_DECK, deck))
+            throw new NotAuthorizedException("This user is not authorized to delete the deck with this id.");
+            deck.delete();
+
+        return deck;
     }
 
     @BodyParser.Of(BodyParser.Json.class)
