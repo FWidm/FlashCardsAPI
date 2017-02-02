@@ -7,10 +7,12 @@ import play.Logger;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Security;
 import repositories.CardDeckRepository;
 import util.*;
 import util.exceptions.DuplicateKeyException;
 import util.exceptions.InvalidInputException;
+import util.exceptions.NotAuthorizedException;
 import util.exceptions.ObjectNotFoundException;
 
 import java.util.ArrayList;
@@ -57,11 +59,20 @@ public class CardDeckController extends Controller {
         }
     }
 
+    @Security.Authenticated(ActionAuthenticator.class)
     public Result deleteCardDeck(long id) {
        CardDeck cardDeck=CardDeckRepository.deleteCardDeck(id);
         return noContent();
     }
 
+    /**
+     * Calls the repository method to add a new deck, needs the caller to be authenticated via the token.
+     * @return  OK if everything works,
+     *          BAD_REQUEST if we run into an error,
+     *          NOT_FOUND if child elements are specified that couldn't be found
+     *          UNAUTHORIZED if the user does not have the rights to add a deck
+     */
+    @Security.Authenticated(ActionAuthenticator.class)
     @BodyParser.Of(BodyParser.Json.class)
     public Result addCardDeck() {
         JsonNode json = request().body().asJson();
@@ -95,17 +106,20 @@ public class CardDeckController extends Controller {
                         .prepareJsonStatus(
                                 BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
             }
+        } catch (NotAuthorizedException e) {
+            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage()));
         }
 
     }
 
+    @Security.Authenticated(ActionAuthenticator.class)
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateCardDeck(long id) {
         JsonNode json = request().body().asJson();
         try {
-            CardDeck deck = CardDeckRepository.updateCardDeck(id,json,request().method());
+            CardDeck deck = CardDeckRepository.updateCardDeck(id,request().username(),json,request().method());
 
-            return ok(JsonUtil.prepareJsonStatus(OK, "Carddeck has been created!", deck.getId()));
+            return ok(JsonUtil.prepareJsonStatus(OK, "Carddeck has been updated!", deck.getId()));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             Pattern p = Pattern.compile("\\\"(.*?)\\\"");
@@ -132,6 +146,8 @@ public class CardDeckController extends Controller {
             }
         } catch (ObjectNotFoundException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, e.getMessage()));
+        } catch (NotAuthorizedException e) {
+            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage()));
         }
     }
 

@@ -139,7 +139,7 @@
 			]
 		},
 		{
-			"name": "CardDeck",
+			"name": "CardDeck (edited)",
 			"description": "",
 			"item": [
 				{
@@ -164,6 +164,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
 								"description": ""
 							}
 						],
@@ -197,6 +202,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
 								"description": ""
 							}
 						],
@@ -285,6 +295,11 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
 							}
 						],
 						"body": {
@@ -325,6 +340,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
 								"description": ""
 							}
 						],
@@ -392,6 +412,11 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
 							}
 						],
 						"body": {
@@ -426,6 +451,11 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
 							}
 						],
 						"body": {
@@ -458,6 +488,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
 								"description": ""
 							}
 						],
@@ -501,6 +536,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
 								"description": ""
 							}
 						],
@@ -550,7 +590,13 @@
 					"request": {
 						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}",
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
 						"body": {},
 						"description": ""
 					},

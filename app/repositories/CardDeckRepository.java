@@ -4,19 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import models.CardDeck;
 import models.FlashCard;
+import models.User;
 import models.UserGroup;
 import play.Logger;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
-import util.JsonKeys;
-import util.JsonUtil;
-import util.RequestKeys;
-import util.UrlParamHelper;
-import util.exceptions.DuplicateKeyException;
-import util.exceptions.InvalidInputException;
-import util.exceptions.ObjectNotFoundException;
-import util.exceptions.PartiallyModifiedException;
+import util.*;
+import util.exceptions.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -77,9 +72,9 @@ public class CardDeckRepository {
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public static CardDeck addCardDeck(JsonNode json) throws InvalidInputException, DuplicateKeyException {
-        ObjectMapper mapper = new ObjectMapper();
+    public static CardDeck addCardDeck(JsonNode json) throws InvalidInputException, DuplicateKeyException, NotAuthorizedException {
 
+        ObjectMapper mapper = new ObjectMapper();
         CardDeck requestObject = mapper.convertValue(json, CardDeck.class);
 
         //retrieve the correct cards list by either parsing the id and getting the correct card or the attributes to a new card.
@@ -118,8 +113,12 @@ public class CardDeckRepository {
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public static CardDeck updateCardDeck(long id, JsonNode json, String method) throws InvalidInputException, ObjectNotFoundException, DuplicateKeyException {
-        ObjectMapper mapper = new ObjectMapper();
+    public static CardDeck updateCardDeck(long id, String email, JsonNode json, String method) throws InvalidInputException, ObjectNotFoundException, DuplicateKeyException, NotAuthorizedException {
+        User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
+        CardDeck deck = CardDeck.find.byId(id);
+        if (!author.hasRight(UserOperations.EDIT_DECK, deck))
+            throw new NotAuthorizedException("This user is not authorized to modify the deck with this id.");
+
         boolean appendMode = false;
         //be able to move cards from deck a to b
         boolean redirectMode = false;
@@ -134,71 +133,71 @@ public class CardDeckRepository {
         if (JsonKeys.debugging)
             Logger.debug("Appending mode enabled? " + appendMode + " redirect the cards from other decks? " + redirectMode);
 
-            CardDeck toUpdate = CardDeck.find.byId(id);
-            if (method.equals("PUT") && (!json.has(JsonKeys.CARDDECK_NAME) || !json.has(JsonKeys.CARDDECK_CARDS)
-                    || !json.has(JsonKeys.CARDDECK_DESCRIPTION) || !json.has(JsonKeys.CARDDECK_GROUP))) {
-                if (JsonKeys.debugging)
-                    Logger.debug(!json.has(JsonKeys.CARDDECK_NAME) + " " + !json.has(JsonKeys.CARDDECK_CARDS)
-                            + " " + !json.has(JsonKeys.CARDDECK_DESCRIPTION));
-                throw new InvalidInputException("The Update method needs all details of the carddeck: " + JsonKeys.CARDDECK_JSON_ELEMENTS);
+        CardDeck toUpdate = CardDeck.find.byId(id);
+        if (method.equals("PUT") && (!json.has(JsonKeys.CARDDECK_NAME) || !json.has(JsonKeys.CARDDECK_CARDS)
+                || !json.has(JsonKeys.CARDDECK_DESCRIPTION) || !json.has(JsonKeys.CARDDECK_GROUP))) {
+            if (JsonKeys.debugging)
+                Logger.debug(!json.has(JsonKeys.CARDDECK_NAME) + " " + !json.has(JsonKeys.CARDDECK_CARDS)
+                        + " " + !json.has(JsonKeys.CARDDECK_DESCRIPTION));
+            throw new InvalidInputException("The Update method needs all details of the carddeck: " + JsonKeys.CARDDECK_JSON_ELEMENTS);
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        CardDeck requestObject = mapper.convertValue(json, CardDeck.class);
+
+
+        if (requestObject.getName() != null) {
+            deck.setName(requestObject.getName());
+        }
+        if (requestObject.getDescription() != null) {
+            deck.setDescription(requestObject.getDescription());
+        }
+        if (requestObject.getUserGroup() != null) {
+            UserGroup userGroup = UserGroup.find.byId(requestObject.getUserGroup().getId());
+            if (userGroup != null) {
+                deck.setUserGroup(userGroup);
+            } else {
+                throw new ObjectNotFoundException("Request contained a group id that does not exist.", requestObject.getUserGroup().getId());
+            }
+        }
+        //retrieve the correct cards list by either parsing the id and getting the correct card or the attributes to a new card.
+        if (json.has(JsonKeys.CARDDECK_CARDS)) {
+            List<FlashCard> cardList = new ArrayList<>();
+            if (appendMode) {
+                cardList.addAll(deck.getCards());
+                cardList.addAll(parseCards(requestObject));
+
+            } else {
+                cardList = parseCards(requestObject);
+                // TODO: 05.01.2017 delete replaced cards
             }
 
-            CardDeck requestObject = mapper.convertValue(json, CardDeck.class);
-            CardDeck deck = CardDeck.find.byId(id);
-
-            if (requestObject.getName() != null) {
-                deck.setName(requestObject.getName());
-            }
-            if (requestObject.getDescription() != null) {
-                deck.setDescription(requestObject.getDescription());
-            }
-            if (requestObject.getUserGroup() != null) {
-                UserGroup userGroup = UserGroup.find.byId(requestObject.getUserGroup().getId());
-                if (userGroup != null) {
-                    deck.setUserGroup(userGroup);
-                } else {
-                    throw new ObjectNotFoundException("Request contained a group id that does not exist.", requestObject.getUserGroup().getId());
+            boolean canSetCards = true;
+            List<Object> cardIds = new ArrayList<>(cardList.size());
+            for (FlashCard c : cardList) {
+//                    Logger.debug(c.getId() + "|" + c.getDeck());
+                if (c.getDeck() != null && c.getDeck().getId() != id) {
+                    canSetCards = false;
+                    Logger.debug("Card has a deck already, id=" + c.getId());
+                    cardIds.add(c.getId());
                 }
             }
-            //retrieve the correct cards list by either parsing the id and getting the correct card or the attributes to a new card.
-            if (json.has(JsonKeys.CARDDECK_CARDS)) {
-                    List<FlashCard> cardList = new ArrayList<>();
-                    if (appendMode) {
-                        cardList.addAll(deck.getCards());
-                        cardList.addAll(parseCards(requestObject));
 
-                    } else {
-                        cardList = parseCards(requestObject);
-                        // TODO: 05.01.2017 delete replaced cards
-                    }
-
-                    boolean canSetCards = true;
-                    List<Object> cardIds = new ArrayList<>(cardList.size());
-                    for (FlashCard c : cardList) {
-//                    Logger.debug(c.getId() + "|" + c.getDeck());
-                        if (c.getDeck() != null && c.getDeck().getId() != id) {
-                            canSetCards = false;
-                            Logger.debug("Card has a deck already, id=" + c.getId());
-                            cardIds.add(c.getId());
-                        }
-                    }
-
-                    if (canSetCards || redirectMode) {
-                        // TODO: 05.01.2017 Test redirect
-                        deck.setCards(cardList);
-                        deck.update();
-                        deck.getCards().forEach(card -> card.setDeck(deck));
-                    } else {
-                        // TODO: 17.08.2016 Rewrite this to have a better structure in the output {"statuscode":400,"description":"...","cards":[14,15]}
-                        throw new DuplicateKeyException("Could not create deck with given cards, some of them already are in a deck.", cardIds);
-                    }
+            if (canSetCards || redirectMode) {
+                // TODO: 05.01.2017 Test redirect
+                deck.setCards(cardList);
+                deck.update();
+                deck.getCards().forEach(card -> card.setDeck(deck));
+            } else {
+                // TODO: 17.08.2016 Rewrite this to have a better structure in the output {"statuscode":400,"description":"...","cards":[14,15]}
+                throw new DuplicateKeyException("Could not create deck with given cards, some of them already are in a deck.", cardIds);
             }
-            deck.update();
+        }
+        deck.update();
 
-            return deck;
+        return deck;
     }
 
-    private static  List<FlashCard> parseCards(CardDeck requestObject) throws NullPointerException {
+    private static List<FlashCard> parseCards(CardDeck requestObject) throws NullPointerException {
         List<FlashCard> cardList = new ArrayList<>();
 //        Logger.debug("Got cardlist=" + requestObject.getCards());
 

@@ -395,7 +395,7 @@ public class User extends Model {
                 if (manipulated != null && manipulated.getClass() == CardDeck.class) {
                     CardDeck deck = (CardDeck) manipulated;
                     UserGroup group = deck.getUserGroup();
-
+                    Logger.debug("group: "+group.getUsers());
                     //can delete own cards OR any cards when this user's rating is over a specific value
 
                     if (rating >= RATING_EDIT_DECK || (group != null && group.getUsers().contains(this))) {
