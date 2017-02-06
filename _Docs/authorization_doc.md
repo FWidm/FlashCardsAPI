@@ -3,11 +3,13 @@
 
 Operations are noted in two ways. First one is `*` which is short hand for a call on all entities `GET /users`. Second one is `/x` it is short hand for `GET /users/x` where x is an id and describes getting ONE specific entity.
 ___
+
 ## Progress
 - Finished
   - User
   - Flashcards (Answer, Tag, Question)
 ___
+
 ## Table
 | Operation | Users | FlashCards | Answers | Questions | Tags | UserGroups | CardDecks | Categories | Ratings |
 | --------- | ----- | ---------- | ------- | --------- | ---- | ---------- | --------- | ---------- | ------ |

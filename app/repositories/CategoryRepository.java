@@ -4,12 +4,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import models.CardDeck;
 import models.Category;
+import models.User;
+import models.UserGroup;
 import play.Logger;
 import play.mvc.BodyParser;
 import util.JsonKeys;
 import util.RequestKeys;
 import util.UrlParamHelper;
+import util.UserOperations;
 import util.exceptions.InvalidInputException;
+import util.exceptions.NotAuthorizedException;
 import util.exceptions.ObjectNotFoundException;
 import util.exceptions.PartiallyModifiedException;
 
@@ -63,7 +67,7 @@ public class CategoryRepository {
     public static List<Category> getChildren(Long id) {
         Category parent = Category.find.byId(id);
         List<Category> children = Category.find.where().eq(JsonKeys.CATEGORY_PARENT, parent).findList();
-        children.forEach(c-> System.out.println("c="+c));
+        children.forEach(c -> System.out.println("c=" + c));
         return children;
     }
 
@@ -86,7 +90,7 @@ public class CategoryRepository {
         }
         //retrieve the parent by id
         if (json.has(JsonKeys.CATEGORY_PARENT) && json.get(JsonKeys.CATEGORY_PARENT).has(JsonKeys.CATEGORY_ID)) {
-            Long parentId=json.get(JsonKeys.CATEGORY_PARENT).get(JsonKeys.CATEGORY_ID).asLong();
+            Long parentId = json.get(JsonKeys.CATEGORY_PARENT).get(JsonKeys.CATEGORY_ID).asLong();
             category.setParent(parseParent(parentId));
         }
 
@@ -131,81 +135,97 @@ public class CategoryRepository {
     }
 
 
+    /**
+     * Updates the category specified by the first parameter. Email is needed to check if the user has the rights to perform the action.
+     * Json contains all the changes we want to make. Method is there to check if PUT/PATCH is required.
+     *
+     * @param id
+     * @param email
+     * @param json
+     * @param method
+     * @return
+     * @throws InvalidInputException
+     * @throws ObjectNotFoundException
+     * @throws PartiallyModifiedException
+     */
     @BodyParser.Of(BodyParser.Json.class)
-    public static Category updateCategory(Long id, JsonNode json, String method) throws InvalidInputException, ObjectNotFoundException, PartiallyModifiedException {
-            String information = "";
-            boolean append = UrlParamHelper.checkBool(RequestKeys.APPEND);
-            Logger.debug("Appending? " + append);
-            ObjectMapper mapper = new ObjectMapper();
+    public static Category updateCategory(Long id, String email, JsonNode json, String method) throws InvalidInputException, ObjectNotFoundException, PartiallyModifiedException, NotAuthorizedException {
+        String information = "";
+        boolean append = UrlParamHelper.checkBool(RequestKeys.APPEND);
+        Logger.debug("Appending? " + append);
+        ObjectMapper mapper = new ObjectMapper();
 
-            Category receivedCategory = mapper.convertValue(json, Category.class);
-            Category category = Category.find.byId(id);
+        Category receivedCategory = mapper.convertValue(json, Category.class);
+        Category category = Category.find.byId(id);
+        User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
+        // get the specific user we want to edit
+        if (!author.hasRight(UserOperations.EDIT_GROUP, category))
+            throw new NotAuthorizedException("This user is not authorized to modify the category with this id.");
 
-            //Check whether the request was a put and if it was check if a param is missing, if that is the case --> bad req.
-            if (method.equals("PUT") && (!json.has(JsonKeys.CATEGORY_NAME) || !json.has(JsonKeys.CATEGORY_DECK) || !json.has(JsonKeys.CATEGORY_PARENT))) {
-                throw new InvalidInputException("The Update method needs all details of the category, such as name, " +
-                                "an array of carddeck (ids) and a parent (null or id of another category).");
+        //Check whether the request was a put and if it was check if a param is missing, if that is the case --> bad req.
+        if (method.equals("PUT") && (!json.has(JsonKeys.CATEGORY_NAME) || !json.has(JsonKeys.CATEGORY_DECK) || !json.has(JsonKeys.CATEGORY_PARENT))) {
+            throw new InvalidInputException("The Update method needs all details of the category, such as name, " +
+                    "an array of carddeck (ids) and a parent (null or id of another category).");
+        }
+        if (json.has(JsonKeys.CATEGORY_NAME)) {
+            category.setName(receivedCategory.getName());
+        }
+
+        //retrieve the parent by id
+        if (json.has(JsonKeys.CATEGORY_PARENT)) {
+            if (json.get(JsonKeys.CATEGORY_PARENT).has(JsonKeys.CATEGORY_ID)) {
+                Long parentId = json.get(JsonKeys.CATEGORY_PARENT).get(JsonKeys.CATEGORY_ID).asLong();
+                if (id != parentId)
+                    category.setParent(parseParent(parentId));
+            } else {
+                category.setParent(null);
+
             }
-            if (json.has(JsonKeys.CATEGORY_NAME)) {
-                category.setName(receivedCategory.getName());
-            }
+        }
 
-            //retrieve the parent by id
-            if (json.has(JsonKeys.CATEGORY_PARENT)) {
-                if(json.get(JsonKeys.CATEGORY_PARENT).has(JsonKeys.CATEGORY_ID)){
-                    Long parentId=json.get(JsonKeys.CATEGORY_PARENT).get(JsonKeys.CATEGORY_ID).asLong();
-                    if(id!=parentId)
-                        category.setParent(parseParent(parentId));
+        // TODO: 10.09.2016 Append mode is currently the std.!
+        if (json.has(JsonKeys.CATEGORY_DECK)) {
+            //handle cardDeck list
+            List<CardDeck> cardDeckList = new ArrayList<>();
+            if (!append) {
+                for (CardDeck cardDeck :
+                        category.getCardDecks()) {
+                    cardDeck.setCategory(null);
+                    cardDeck.update();
                 }
-                else{
-                    category.setParent(null);
-
-                }
             }
+            if (receivedCategory.getCardDecks() != null) {
+                for (CardDeck cardDeck : receivedCategory.getCardDecks()) {
+                    CardDeck tmp = CardDeck.find.byId(cardDeck.getId());
+                    //add it to the list if it isn't already in and isn't null
 
-            // TODO: 10.09.2016 Append mode is currently the std.!
-            if (json.has(JsonKeys.CATEGORY_DECK)) {
-                //handle cardDeck list
-                List<CardDeck> cardDeckList = new ArrayList<>();
-                if (!append) {
-                    for (CardDeck cardDeck :
-                            category.getCardDecks()) {
-                        cardDeck.setCategory(null);
+                    if (!cardDeckList.contains(tmp) && tmp != null && tmp.getCategory() == null) {
+                        cardDeckList.add(cardDeck);
+                        cardDeck.setCategory(category);
                         cardDeck.update();
                     }
-                }
-                if (receivedCategory.getCardDecks() != null) {
-                    for (CardDeck cardDeck : receivedCategory.getCardDecks()) {
-                        CardDeck tmp = CardDeck.find.byId(cardDeck.getId());
-                        //add it to the list if it isn't already in and isn't null
-
-                        if (!cardDeckList.contains(tmp) && tmp != null && tmp.getCategory() == null) {
-                            cardDeckList.add(cardDeck);
-                            cardDeck.setCategory(category);
-                            cardDeck.update();
-                        }
-                        //if it is null we can't handle the request, thus we send a notFound to the user
-                        else if (tmp == null) {
-                            throw new ObjectNotFoundException("One cardDeck could not be found.", cardDeck.getId());
-                        }
-                        //if it is just a duplicate, add it to the information flag we add onto the reply for the user to read.
-                        else if (cardDeckList.contains(tmp))
-                            information += " Error adding cardDeck" + cardDeck.getId() + ", it was sent more than once.";
-                        else if (tmp.getCategory() != null) {
-                            information += " Error adding cardDeck" + cardDeck.getId() + ", it already has a parent.";
-                        }
+                    //if it is null we can't handle the request, thus we send a notFound to the user
+                    else if (tmp == null) {
+                        throw new ObjectNotFoundException("One cardDeck could not be found.", cardDeck.getId());
                     }
-                    category.getCardDecks();
-                    Logger.debug("deckList=" + cardDeckList + " category list=" + category.getCardDecks());
+                    //if it is just a duplicate, add it to the information flag we add onto the reply for the user to read.
+                    else if (cardDeckList.contains(tmp))
+                        information += " Error adding cardDeck" + cardDeck.getId() + ", it was sent more than once.";
+                    else if (tmp.getCategory() != null) {
+                        information += " Error adding cardDeck" + cardDeck.getId() + ", it already has a parent.";
+                    }
                 }
+                category.getCardDecks();
+                Logger.debug("deckList=" + cardDeckList + " category list=" + category.getCardDecks());
             }
+        }
 
-            category.update();
+        category.update();
 
-            if (information != "") {
-                throw new PartiallyModifiedException("Category has been updated! Additional information: " + information, category.getId());
-            }
-            return category;
+        if (information != "") {
+            throw new PartiallyModifiedException("Category has been updated! Additional information: " + information, category.getId());
+        }
+        return category;
     }
 
 /*    public static Result deleteCategory(Long id){
@@ -220,21 +240,20 @@ public class CategoryRepository {
 
     /**
      * Retrieves the parent category from the given category. If the id of the parent object cant be found in the database, throw the exception.
+     *
      * @param id of the parent
      * @return the category from db or null if null is received
      * @throws ObjectNotFoundException
      */
     public static Category parseParent(Long id) throws ObjectNotFoundException {
-        if(id>0){
+        if (id > 0) {
             Category parent = Category.find.byId(id);
-            Logger.debug("got parent="+parent);
-            if(parent!=null){
+            Logger.debug("got parent=" + parent);
+            if (parent != null) {
                 return parent;
-            }
-            else
-                throw new ObjectNotFoundException("Parent does not exist with the id="+id);
-        }
-        else
+            } else
+                throw new ObjectNotFoundException("Parent does not exist with the id=" + id);
+        } else
             return null;
     }
 }
