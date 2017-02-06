@@ -130,7 +130,8 @@ public class TagRepository {
                 Tag found = Tag.find.byId(node.get(JsonKeys.TAG_ID).asLong());
                 if (found != null) {
                     System.out.println(">> tag: " + found);
-                    tags.add(found);
+                    if (!tags.contains(found))
+                        tags.add(found);
                 } else tags.add(null);
 
 
@@ -145,7 +146,12 @@ public class TagRepository {
                     //((`flashcards`.`card_tag`, CONSTRAINT `fk_card_tag_tag_02` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tagId`))]]
                     tags.add(tmpT);
                 } else {
-                    tags.add(lookupTag);
+                    //check if tag name does not lead to the same tag being added twice. This would lead to a primary key constraint error.
+                    boolean idExists = tags.stream()
+                            .anyMatch(t -> t.getId()==lookupTag.getId());
+                    //Logger.debug("TAGREPO ID="+tmpT.getId()+" EXISTS? "+idExists);
+                    if(!idExists)
+                        tags.add(tmpT);
                 }
 
             }

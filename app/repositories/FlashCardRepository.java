@@ -125,6 +125,7 @@ public class FlashCardRepository {
         }
         FlashCard card = new FlashCard(requestObject);
         if (JsonKeys.debugging) Logger.debug("Tags=" + card.getTags().size());
+        //Logger.debug(""+card);
         card.save();
         if (information != "") {
             throw new PartiallyModifiedException("FlashCard has been created! Additional information: " + information, card.getId());
