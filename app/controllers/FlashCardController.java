@@ -236,7 +236,7 @@ public class FlashCardController {
             ret = FlashCardRepository.getAnswers(id, urlParams);
 
         } catch (Exception e) {
-            System.err.println(e);
+            e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         }
         return ok(JsonUtil.toJson(ret));

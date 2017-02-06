@@ -47,7 +47,7 @@ public class AnswerRating extends Rating{
      */
     public static boolean exists(User author, Answer answer){
         int hits=(Rating.find.where().and(eq(JsonKeys.USER_ID,author.getId()),eq(JsonKeys.ANSWER_ID,answer.getId())).findList().size());
-        return hits!=0;
+        return hits>0;
     }
 
     /**

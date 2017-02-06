@@ -82,7 +82,7 @@ public class UserController extends Controller {
     /**
      * Returns the user with a specific ID.
      *
-     * @param id
+     * @param id of the user
      * @return HTTP Status Result OK if found or NOT_FOUND if not found.
      */
     public Result getUser(Long id) {
@@ -97,7 +97,7 @@ public class UserController extends Controller {
     /**
      * Returns the user with a specific (unique!) Email.
      *
-     * @param email
+     * @param email of the user
      * @return OK when found, NOT_FOUND if it doesnt exist.
      */
     public Result getUserByEmail(String email) {
@@ -113,8 +113,8 @@ public class UserController extends Controller {
     /**
      * Deletes a user with the given id.
      *
-     * @param id
-     * @return OK
+     * @param id of the user
+     * @return ok if found else not found or unauthorized
      */
     @Security.Authenticated(ActionAuthenticator.class)
     public Result deleteUser(Long id) {
@@ -133,7 +133,7 @@ public class UserController extends Controller {
      * Adds a new user to the database, throws an error if the email, name or
      * password are missing.
      *
-     * @return
+     * @return appropriate response depending on errors or ok with user id.
      */
     @BodyParser.Of(BodyParser.Json.class)
     public Result addUser() {

@@ -49,7 +49,7 @@ public class HomeController extends Controller {
     /**
      * Accepts a picture as multipart/formdata, saves them in /var/www/html/img/<year>/<date>/img*.<ext>.
      *
-     * @return
+     * @return matching http result
      */
     @Security.Authenticated(ActionAuthenticator.class)
     public Result upload() {
@@ -97,10 +97,10 @@ public class HomeController extends Controller {
     }
 
     /**
-     * Strips unneccesary parts of the path and replaces backslashes with slashes.
+     * Strips unnecessary parts of the path and replaces backslashes with slashes.
      * (e.g: \img\2016\11\x.png -> /img/2016/11/x.png")
      *
-     * @param path
+     * @param path to the image
      * @return path minus everything before lastShowndirectory.
      */
     private String getUrl(Path path, String lastShownDirectory) {
@@ -115,7 +115,7 @@ public class HomeController extends Controller {
      * Expects a filename including extension (i.e. abcd.jpeg) and returns the extension after the last dot.
      * (e.g. "abc.def.gh.ix" returns "ix")
      *
-     * @param fileName
+     * @param fileName name of the file
      * @return substring after the last dot in the filename
      */
     private String determineFileType(String fileName) {
@@ -167,7 +167,7 @@ public class HomeController extends Controller {
     /**
      * Creates one user with two tokens, attempts to delete both tokens.
      *
-     * @return
+     * @return appropriate http result
      */
     public Result testTokens() {
         String output = "";
@@ -274,7 +274,7 @@ public class HomeController extends Controller {
     /**
      * Checks the credentials in the body - users password and email and returns a token if valid or forbidden if invalid.
      *
-     * @return
+     * @return appropriate http result
      */
     @BodyParser.Of(BodyParser.Json.class)
     public Result login() {

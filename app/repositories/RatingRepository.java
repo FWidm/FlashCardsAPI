@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import models.Answer;
 import models.FlashCard;
 import models.User;
+import models.UserGroup;
 import models.rating.AnswerRating;
 import models.rating.CardRating;
 import models.rating.Rating;
@@ -16,8 +17,10 @@ import play.mvc.Result;
 import util.JsonKeys;
 import util.JsonUtil;
 import util.RequestKeys;
+import util.UserOperations;
 import util.exceptions.DuplicateKeyException;
 import util.exceptions.InvalidInputException;
+import util.exceptions.NotAuthorizedException;
 import util.exceptions.ObjectNotFoundException;
 
 import java.util.List;
@@ -88,13 +91,12 @@ public class RatingRepository {
     /**
      * Retrieves a rating by its id.
      *
-     * @param id
-     * @return either the card or a notfound with an error status
+     * @param id of the rating.
+     * @return either the card or a notfound with an error status.
      */
     public static Rating getRating(long id) throws ObjectNotFoundException {
         try {
-            Rating rating = Rating.find.byId(id);
-            return rating;
+            return Rating.find.byId(id);
         } catch (NullPointerException e) {
             throw new ObjectNotFoundException("Error, no rating with the given id exists", id);
         }
@@ -103,7 +105,7 @@ public class RatingRepository {
     /**
      * Creates a new Rating object for either type (Answer/Cardrating)
      *
-     * @return
+     * @return the new Rating object.
      */
     @BodyParser.Of(BodyParser.Json.class)
     public static Rating addRating(JsonNode json) throws DuplicateKeyException, InvalidInputException, ObjectNotFoundException {
@@ -159,16 +161,25 @@ public class RatingRepository {
     }
 
     /**
-     * Creates a new Rating object for either type (Answer/Cardrating)
-     *
-     * @return
+     * Updates a rating by its id.
+     * @param id - of the rating.
+     * @param email - of the auth. user.
+     * @param json - request content.
+     * @return changed Rating.
+     * @throws Exception if no valid rating class is found we throw this
+     * @throws NotAuthorizedException if the user is not authorized
      */
     @BodyParser.Of(BodyParser.Json.class)
-    public static Rating changeRating(Long id, JsonNode json) throws Exception {
+    public static Rating changeRating(Long id, String email, JsonNode json) throws Exception, NotAuthorizedException {
         if (JsonKeys.debugging)
             Logger.debug("json=" + json);
         //check if the rating is for an answer or a card
         Rating rating = Rating.find.byId(id);
+        User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
+        // get the specific user we want to edit
+        if (!author.hasRight(UserOperations.EDIT_RATING, rating))
+            throw new NotAuthorizedException("This user is not authorized to modify the rating with this id.");
+
         Logger.debug("Rating=" + rating + " | class simple name=" + rating.getClass().getSimpleName());
         if (json.has("ratingModifier")) {
             int ratingModifier=json.get("ratingModifier").asInt();
@@ -203,8 +214,8 @@ public class RatingRepository {
     /**
      * Deletes a rating by id, compensates the rating of affected users/cards/answers automagically.
      *
-     * @param id
-     * @return
+     * @param id - of the rating
+     * @return Rating or not Found
      */
     public static Rating deleteRating(Long id) throws ObjectNotFoundException {
         try {
@@ -220,10 +231,10 @@ public class RatingRepository {
     /**
      * Parses a cardrating object from the given jsonnode.
      *
-     * @param json
+     * @param json - content of the request.
      * @return cardrating
      */
-    public static CardRating parseCardRating(JsonNode json) {
+    private static CardRating parseCardRating(JsonNode json) {
         User author = null;
         FlashCard flashCard = null;
         int modifier = 0;
@@ -242,10 +253,7 @@ public class RatingRepository {
             modifier = json.get(JsonKeys.RATING_MODIFIER).asInt();
         }
 
-        CardRating rating = new CardRating(author, flashCard, modifier);
-//        System.out.println("Rating object=" + rating);
-
-        return rating;
+        return new CardRating(author, flashCard, modifier);
     }
 
     /**

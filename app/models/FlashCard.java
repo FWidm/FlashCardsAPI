@@ -141,7 +141,7 @@ public class FlashCard extends Model {
 
     /**
      * Adds one answer to this specific flashcard, updates the flashcards in the DB.
-     * @param answer
+     * @param answer to add
      */
     public void addAnswer(Answer answer){
 //        System.out.println("Flashcard: addAnswer a="+answer);
@@ -154,7 +154,7 @@ public class FlashCard extends Model {
 
     /**
      * Sets the question of this card to a specific question object and updates the flashcard in the DB.
-     * @param question
+     * @param question to set
      */
     public void setQuestion(Question question) {
 //        System.out.println("Flashcard: setQuestionText q="+question);

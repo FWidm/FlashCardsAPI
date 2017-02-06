@@ -29,10 +29,10 @@ public class UserRepository {
     /**
      * Parses the given json to a new User object, then saves it in the database.
      *
-     * @param json
+     * @param json body of the request
      * @return newly created user object
-     * @throws InvalidInputException
-     * @throws ParameterNotSupportedException
+     * @throws InvalidInputException          if the password of the user is too short
+     * @throws ParameterNotSupportedException if a group is passed as this is not supported here
      */
     public static User createUser(JsonNode json) throws InvalidInputException, ParameterNotSupportedException {
 
@@ -85,10 +85,10 @@ public class UserRepository {
      * Changes one user via it's id, it supports appending or replacing current user groups via url params and handles
      * partial and complete updates.
      *
-     * @param id
-     * @param email
-     * @param json
-     * @param urlParams
+     * @param id           of the user
+     * @param email        of the modifying user
+     * @param json         body of the request
+     * @param urlParams    url parameters
      * @param updateMethod @return updated user object
      * @throws InvalidInputException
      */
@@ -98,7 +98,7 @@ public class UserRepository {
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         // get the specific user we want to edit
         User editedUser = User.find.byId(id);
-        if(!author.hasRight(UserOperations.EDIT_USER,editedUser))
+        if (!author.hasRight(UserOperations.EDIT_USER, editedUser))
             throw new NotAuthorizedException("This user is not authorized to modify the user with this id.");
 
         boolean appendMode = false;
@@ -133,7 +133,7 @@ public class UserRepository {
 
         if (json.has(JsonKeys.USER_PASSWORD) && minLengthValidator.isValid(json.get(JsonKeys.USER_PASSWORD).asText())) {
             String password = json.get(JsonKeys.USER_PASSWORD).asText();
-            Logger.debug("Pass="+password);
+            Logger.debug("Pass=" + password);
 
             try {
                 // format iterations:salt:hash
@@ -186,8 +186,8 @@ public class UserRepository {
     /**
      * Deletes a User object from the database if the user has the rights to do this.
      *
-     * @param id
-     * @param email
+     * @param id    of the user
+     * @param email of the modifying user
      */
     public static void deleteUserById(Long id, String email) throws NotAuthorizedException {
         User u = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
@@ -200,8 +200,8 @@ public class UserRepository {
     /**
      * Returns one User by email instead of id.
      *
-     * @param email
-     * @return
+     * @param email of the user we look for
+     * @return user or null
      */
     public static User findUserByEmail(String email) {
         return User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
@@ -210,8 +210,8 @@ public class UserRepository {
     /**
      * Returns one user by id.
      *
-     * @param id
-     * @return
+     * @param id of the user
+     * @return user or null
      */
     public static User findById(Long id) {
         return User.find.byId(id);
@@ -220,8 +220,8 @@ public class UserRepository {
     /**
      * Get all users, all users with a specific name or all users with the same email (should not happen).
      *
-     * @param urlParams
-     * @return
+     * @param urlParams parameters of the requests url
+     * @return list of users
      */
     public static List<User> getUsers(Map<String, String[]> urlParams) {
         if (urlParams.containsKey(RequestKeys.EMAIL)) {
@@ -238,24 +238,36 @@ public class UserRepository {
             return User.find.all();
         }
     }
+
+    /**
+     * Retrieve users from one jsonnode.
+     *
+     * @param nodes body of the request
+     * @return list of users or empty list
+     */
     public static List<User> retrieveUsers(JsonNode nodes) {
-        List<User> userList=new ArrayList<>();
-        for (JsonNode node:nodes){
-            User tmpUser=parseUser(node);
-            if(tmpUser!=null)
+        List<User> userList = new ArrayList<>();
+        for (JsonNode node : nodes) {
+            User tmpUser = parseUser(node);
+            if (tmpUser != null)
                 userList.add(tmpUser);
         }
         return userList;
     }
 
-
+    /**
+     * parse each node to a user object. Then find the user by id or email and return it.
+     *
+     * @param node one json node that contains either user id or email
+     * @return User object
+     */
     public static User parseUser(JsonNode node) {
         User u = null;
-        if(node.has(JsonKeys.USER_ID))
-            u=User.find.byId(node.get(JsonKeys.USER_ID).asLong());
+        if (node.has(JsonKeys.USER_ID))
+            u = User.find.byId(node.get(JsonKeys.USER_ID).asLong());
 
-        if(node.has(JsonKeys.USER_EMAIL))
-            u=UserRepository.findUserByEmail(node.get(JsonKeys.USER_EMAIL).asText());
+        if (node.has(JsonKeys.USER_EMAIL))
+            u = UserRepository.findUserByEmail(node.get(JsonKeys.USER_EMAIL).asText());
         return u;
     }
 }

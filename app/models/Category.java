@@ -61,7 +61,7 @@ public class Category extends Model{
 
     /**
      * Create a new object with the same attribute value as another one.
-     * @param category
+     * @param category - copies the whole objects content in a new object.
      */
     public Category(Category category) {
         this.name = category.getName();

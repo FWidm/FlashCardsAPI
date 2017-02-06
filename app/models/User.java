@@ -3,6 +3,7 @@ package models;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import com.avaje.ebean.Model;
 import com.avaje.ebean.annotation.CreatedTimestamp;
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import models.rating.Rating;
 import org.apache.http.auth.AUTH;
 import play.Logger;
 import play.data.validation.Constraints.*;
@@ -80,7 +82,7 @@ public class User extends Model {
     private List<AuthToken> authTokenList;
 
 
-    public static Model.Finder<Long, User> find = new Model.Finder<Long, User>(User.class);
+    public static Model.Finder<Long, User> find = new Model.Finder<>(User.class);
 
 
     public User(String name, String email, String password, int rating) {
@@ -182,7 +184,7 @@ public class User extends Model {
     /**
      * Adds one token to the tokenlist, updates this entity.
      *
-     * @param token
+     * @param token - to be added to the list.
      */
     public void addAuthToken(AuthToken token) {
         if (!authTokenList.contains(token)) {
@@ -195,9 +197,7 @@ public class User extends Model {
      * Deletes all Tokens associated with this entity.
      */
     public void deleteTokens() {
-        for (int i = 0; i < authTokenList.size(); i++) {
-            authTokenList.get(i).delete();
-        }
+        authTokenList.forEach(token->token.delete());
         authTokenList = new ArrayList<>();
         this.update();
     }
@@ -226,9 +226,9 @@ public class User extends Model {
     /**
      * Adds the given rating to the current rating, updates this instance.
      *
-     * @param ratingModifier
+     * @param ratingModifier - describes the value that is added/subtracted from the current rating
      */
-    public void updateRating(int ratingModifier) {
+    void updateRating(int ratingModifier) {
         Logger.debug("Userid=" + id + " | " + new Date() + " Modifying rating from=" + rating + " by modifier=" + ratingModifier + " to=" + (rating + ratingModifier));
         this.rating += ratingModifier;
         this.update();
@@ -277,7 +277,7 @@ public class User extends Model {
         super.delete();
     }
 
-    public void removeGroup(UserGroup userGroup) {
+    void removeGroup(UserGroup userGroup) {
         if (userGroups.contains(userGroup)) {
             userGroups.remove(userGroup);
             this.update();
@@ -290,9 +290,9 @@ public class User extends Model {
      * Checks whether the current user has the rights to perform the operation we want to check. If an object is passed
      * we can check if the user is in any way an owner and has rights regardless of his rating.
      *
-     * @param userOperation
-     * @param manipulated
-     * @return
+     * @param userOperation - the operation the user wants to do
+     * @param manipulated - the manipulated object
+     * @return true if the user can do the operation, else false.
      */
     public boolean hasRight(UserOperations userOperation, Object manipulated) {
         Logger.debug("Checking " + email + ": for (" + userOperation + "|" + manipulated + ")");
@@ -314,25 +314,23 @@ public class User extends Model {
 		final int RATING_EDIT_GROUP = 1000;
 		final int RATING_DELETE_GROUP = 1000;
 
+        //Used class compare instead of instanceof due to performance reasons.
         switch (userOperation) {
             //category
             case CREATE_CATEGORY: {
                 if (rating >= RATING_CREATE_CATEGORY) {
                     return true;
                 }
-                return false;
             }
             case DELETE_CATEGORY: {
                 if (rating >= RATING_DELETE_CATEGORY) {
                     return true;
                 }
-                return false;
             }
             case EDIT_CATEGORY: {
                 if (rating >= RATING_EDIT_CATEGORY) {
                     return true;
                 }
-                return false;
             }
             //cards
             case DELETE_CARD: {
@@ -345,7 +343,6 @@ public class User extends Model {
                         return true;
                     }
                 }
-                return false;
             }
             case EDIT_CARD_QUESTION: {
                 if (manipulated != null && manipulated.getClass() == FlashCard.class) {
@@ -355,7 +352,6 @@ public class User extends Model {
                         return true;
                     }
                 }
-                return false;
             }
             //answers
             case DELETE_ANSWER: {
@@ -366,7 +362,6 @@ public class User extends Model {
                         return true;
                     }
                 }
-                return false;
             }
             case EDIT_ANSWER: {
                 if (manipulated != null && manipulated.getClass() == Answer.class) {
@@ -376,7 +371,6 @@ public class User extends Model {
                         return true;
                     }
                 }
-                return false;
             }
             //deck - check users usergroups
             case DELETE_DECK: {
@@ -389,7 +383,6 @@ public class User extends Model {
                         return true;
                     }
                 }
-                return false;
             }
             case EDIT_DECK: {
                 if (manipulated != null && manipulated.getClass() == CardDeck.class) {
@@ -398,11 +391,10 @@ public class User extends Model {
                     Logger.debug("group: "+group.getUsers());
                     //can delete own cards OR any cards when this user's rating is over a specific value
 
-                    if (rating >= RATING_EDIT_DECK || (group != null && group.getUsers().contains(this))) {
+                    if (rating >= RATING_EDIT_DECK || group.getUsers().contains(this)) {
                         return true;
                     }
                 }
-                return false;
             }
             case EDIT_USER: {
                 if (manipulated != null && manipulated.getClass() == User.class) {
@@ -410,7 +402,6 @@ public class User extends Model {
                     if (this.equals(user) || rating >= RATING_EDIT_USER)
                         return true;
                 }
-                return false;
             }
             case DELETE_USER: {
                 if (manipulated != null && manipulated.getClass() == User.class) {
@@ -418,7 +409,6 @@ public class User extends Model {
                     if (this.equals(user))
                         return true;
                 }
-                return false;
             }
 			case EDIT_GROUP:{
 				if(manipulated!=null && manipulated.getClass()==UserGroup.class){
@@ -429,17 +419,23 @@ public class User extends Model {
 						return true;
 					}
 				}
-				return false;
 			}
 			case DELETE_GROUP:{
-				if(manipulated!=null && manipulated.getClass()==UserGroup.class){
+				if(manipulated!=null && manipulated instanceof UserGroup){
 					UserGroup group = (UserGroup) manipulated;
 					if(group.getUsers().contains(this) || rating>RATING_DELETE_GROUP){
 						return true;
 					}
 				}
-				return false;
 			}
+            case EDIT_RATING:{
+                if(manipulated!=null && (manipulated instanceof Rating)){
+                    Rating ratingObj = (Rating) manipulated;
+                    if(Objects.equals(ratingObj.getAuthor().getId(), id)){
+                        return true;
+                    }
+                }
+            }
         }
         return false;
     }

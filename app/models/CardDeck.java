@@ -158,7 +158,7 @@ public class CardDeck extends Model {
 
         StringBuilder b = new StringBuilder();
         Logger.debug("GroupID="+userGroup.getId()+" | "+userGroup.getDecks());
-        userGroup.getDecks().forEach(deck->b.append(deck.getId()+"; "));
+        userGroup.getDecks().forEach(deck-> b.append(deck.getId()).append("; "));
         Logger.debug("delete: usergroup.deck="+b.toString());
         super.delete();
     }

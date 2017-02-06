@@ -36,8 +36,8 @@ public class CategoryController extends Controller {
     /**
      * Retrieves the Category with the specific id, if it does not exist, return notFound.
      *
-     * @param id
-     * @return
+     * @param id of a category
+     * @return matching HTTP Result.
      */
     public Result getCategory(Long id) {
         try {
@@ -50,8 +50,8 @@ public class CategoryController extends Controller {
     /**
      * Get all card decks in a category.
      *
-     * @param id
-     * @return
+     * @param id of a category
+     * @return matching HTTP Result.
      */
     public Result getCategoryCardDecks(Long id) {
         try {
@@ -64,8 +64,8 @@ public class CategoryController extends Controller {
     /**
      * Returns the children of the specified carddeck.
      *
-     * @param id
-     * @return
+     * @param id of a category
+     * @return matching HTTP Result.
      */
     public Result getChildren(Long id) {
         return ok(JsonUtil.toJson(CategoryRepository.getChildren(id)));
@@ -105,7 +105,7 @@ public class CategoryController extends Controller {
     /**
      * Updates one category by id. Catches several exceptions we expect to deliver correct output to the requestor.
      *
-     * @param id
+     * @param id of a card
      * @return ok/badRequest/unauthorized
      */
     @Security.Authenticated(ActionAuthenticator.class)

@@ -160,7 +160,7 @@ public class Answer extends Model {
     }
     /**
      * Adds the given rating to the current rating, updates this instance and calls the function on the corresponding user.
-     * @param ratingModifier
+     * @param ratingModifier - describes the value that is added/subtracted from the current rating
      */
     public void updateRating(int ratingModifier){
         this.rating+=ratingModifier;

@@ -46,7 +46,7 @@ public class FlashCardRepository {
     /**
      * Deletes the specific Flashcard including questions and answers.
      *
-     * @param email
+     * @param email of the user that wants to delete
      * @param id    of a card
      * @return deleted card object
      */
@@ -289,7 +289,7 @@ public class FlashCardRepository {
      * A method that allows us to retrieve answers for a specific card under the URI /cards/:id/answers
      *
      * @param id        of a card
-     * @param urlParams
+     * @param urlParams request parameters
      * @return answers of the card including a http result ok OR not found if nothing was found
      */
     public static List<Answer> getAnswers(long id, Map<String, String[]> urlParams) throws NullPointerException, ObjectNotFoundException {
@@ -325,7 +325,7 @@ public class FlashCardRepository {
      * Retreive all Tags or the first n Elements from the Sublist when adding ?size=x to the url, where x must be an integer.
      *
      * @param id        of a card
-     * @param urlParams
+     * @param urlParams request params
      * @return list of Tags as json to the caller
      */
     public static List<Tag> getTags(long id, Map<String, String[]> urlParams) throws IllegalArgumentException, NullPointerException, ObjectNotFoundException {
@@ -358,10 +358,10 @@ public class FlashCardRepository {
      * Retrieve all answers, passes the author as argument if the author is responsible for all created answers.
      * If no Author is specified (Null) we will parse the authors from the sent json.
      *
-     * @param author
-     * @param json
-     * @return
-     * @throws ParameterNotSupportedException
+     * @param author author of the answer
+     * @param json request body
+     * @return list of answers
+     * @throws ParameterNotSupportedException if answer ids are provided, throw an error as this should not be possible.
      */
     private static List<Answer> retrieveAnswers(User author, JsonNode json) throws ParameterNotSupportedException {
         List<Answer> answers = new ArrayList<>();
@@ -399,7 +399,7 @@ public class FlashCardRepository {
      *
      * @param node the json node to parse
      * @return answer
-     * @throws URISyntaxException
+     * @throws URISyntaxException if the uri is malformed
      */
     private static Answer parseAnswer(JsonNode node) throws URISyntaxException {
         User author = null;

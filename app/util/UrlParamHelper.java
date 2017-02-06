@@ -15,7 +15,7 @@ import java.util.Map;
 public class UrlParamHelper {
     /**
      * Checks whether the given key is in the url and determines the boolean value sent.
-     * @param key
+     * @param key of the request parameter
      * @return true if parameters bool val is true, else false
      */
     public static boolean checkBool(String key){
@@ -30,7 +30,7 @@ public class UrlParamHelper {
 
     /**
      * Returns the Value for the key. It is null if the key does not exist.
-     * @param key
+     * @param key of the request parameter
      * @return value or null
      */
     public static String getValue(String key){
@@ -44,16 +44,13 @@ public class UrlParamHelper {
     }
     /**
      * Checks whether the given key exists in the url parameters
-     * @param key
+     * @param key of the request parameter
      * @return true if the key exists, else false
      */
     public static boolean checkForKey(String key){
         Map<String, String[]> urlParams = Controller.request().queryString();
         Logger.debug("params contain "+key+"? "+urlParams.keySet().contains(key));
 
-        if(urlParams.keySet().contains(key)){
-                return true;
-        }
-        return false;
+        return urlParams.keySet().contains(key);
     }
 }

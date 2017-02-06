@@ -5,12 +5,15 @@ import models.rating.Rating;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Security;
 import repositories.RatingRepository;
+import util.ActionAuthenticator;
 import util.JsonKeys;
 import util.JsonUtil;
 import util.RequestKeys;
 import util.exceptions.DuplicateKeyException;
 import util.exceptions.InvalidInputException;
+import util.exceptions.NotAuthorizedException;
 import util.exceptions.ObjectNotFoundException;
 
 import java.util.List;
@@ -38,7 +41,7 @@ public class RatingController extends Controller {
     /**
      * Retrieves a rating by its id.
      *
-     * @param id
+     * @param id of our rating
      * @return either the card or a notfound with an error status
      */
     public Result getRating(long id) {
@@ -53,8 +56,9 @@ public class RatingController extends Controller {
     /**
      * Creates a new Rating object for either type (Answer/Cardrating)
      *
-     * @return
+     * @return created/badRequest
      */
+    @Security.Authenticated(ActionAuthenticator.class)
     @BodyParser.Of(BodyParser.Json.class)
     public Result addRating() {
         try {
@@ -82,13 +86,19 @@ public class RatingController extends Controller {
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,e.getMessage()));
         }
     }
+
+    /**
+     * Update ratings.
+     * @param id of a rating
+     * @return ok/badRequest/unauthorized
+     */
+    @Security.Authenticated(ActionAuthenticator.class)
     @BodyParser.Of(BodyParser.Json.class)
     public Result changeRating(Long id){
         JsonNode json=request().body().asJson();
         try {
-            Rating rating=RatingRepository.changeRating(id,json);
+            Rating rating=RatingRepository.changeRating(id,request().username(),json);
             return ok(JsonUtil.prepareJsonStatus(OK, "Rating has been changed.",rating.getId()));
-
         }
         catch (InvalidInputException e){
             e.printStackTrace();
@@ -104,14 +114,15 @@ public class RatingController extends Controller {
             }
         } catch (Exception e) {
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage()));
+        } catch (NotAuthorizedException e) {
+            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage(), id));
         }
-
     }
 
     /**
      * Deletes a rating by it's id, compensates the rating of affected users/cards/answers automagically.
-     * @param id
-     * @return
+     * @param id of a rating
+     * @return noContent if successful, notFound if not found
      */
     public Result deleteRating(Long id) {
         try {

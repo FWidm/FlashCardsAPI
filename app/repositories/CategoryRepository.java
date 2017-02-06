@@ -37,8 +37,8 @@ public class CategoryRepository {
     /**
      * Retrieves the Category with the specific id, if it does not exist, return notFound.
      *
-     * @param id
-     * @return
+     * @param id of a category
+     * @return category
      */
     public static Category getCategory(Long id) {
         return Category.find.byId(id);
@@ -47,8 +47,8 @@ public class CategoryRepository {
     /**
      * Get all card decks in a category.
      *
-     * @param id
-     * @return
+     * @param id of a category
+     * @return decks inside of the category
      */
     public static List<CardDeck> getCategoryCardDecks(Long id) {
         return Category.find.byId(id).getCardDecks();
@@ -57,7 +57,7 @@ public class CategoryRepository {
     /**
      * Returns the children of the specified carddeck.
      *
-     * @param id
+     * @param id of a category
      * @return list of children
      */
     public static List<Category> getChildren(Long id) {
@@ -70,7 +70,7 @@ public class CategoryRepository {
     /**
      * Creates a new category, returns either an error or a success message.
      *
-     * @return
+     * @return the newly created category
      */
     @BodyParser.Of(BodyParser.Json.class)
     public static Category addCategory(JsonNode json) throws PartiallyModifiedException, ObjectNotFoundException {
@@ -135,14 +135,14 @@ public class CategoryRepository {
      * Updates the category specified by the first parameter. Email is needed to check if the user has the rights to perform the action.
      * Json contains all the changes we want to make. Method is there to check if PUT/PATCH is required.
      *
-     * @param id
-     * @param email
-     * @param json
-     * @param method
-     * @return
-     * @throws InvalidInputException
-     * @throws ObjectNotFoundException
-     * @throws PartiallyModifiedException
+     * @param id of a category
+     * @param email of the creating user
+     * @param json content of the request body
+     * @param method PUT/PATCH
+     * @return newly updated category
+     * @throws InvalidInputException if the input contains problems
+     * @throws ObjectNotFoundException if the object does not exist
+     * @throws PartiallyModifiedException if the request could be solved but problems have been found
      */
     @BodyParser.Of(BodyParser.Json.class)
     public static Category updateCategory(Long id, String email, JsonNode json, String method) throws InvalidInputException, ObjectNotFoundException, PartiallyModifiedException, NotAuthorizedException, DuplicateKeyException {
@@ -230,8 +230,8 @@ public class CategoryRepository {
      * e.g. 1<-2<-3<-4 are connected categories where cat.id. 4 has parent 3.
      * if we now wanted to set 1 as child to 4 this method would find the loop and deny the operation.
      * The result for the illegal operation would be 1<-2<-3<-4<-1.
-     * @param id
-     * @param parentId
+     * @param id of the category
+     * @param parentId of the future parent category
      * @return true if a loop would exist or false if none is contained.
      */
     private static boolean containsEndlessLoop(Long id, Long parentId) {
@@ -265,7 +265,7 @@ public class CategoryRepository {
      *
      * @param id of the parent
      * @return the category from db or null if null is received
-     * @throws ObjectNotFoundException
+     * @throws ObjectNotFoundException if the object does not exist.
      */
     public static Category parseParent(Long id) throws ObjectNotFoundException {
         if (id > 0) {

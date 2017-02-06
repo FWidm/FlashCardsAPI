@@ -47,8 +47,8 @@ public class CardDeckController extends Controller {
      * ex. [1][2][3][4] with size=2, start=1 -> [2][3]
      * - if start is bigger than the highest index, an empty list is returned.
      * - if size is equal to 0, an empty list is returned
-     * @param id
-     * @return
+     * @param id of the carddeck
+     * @return matching result.
      */
     public Result getCardDeckCards(long id) {
         try {

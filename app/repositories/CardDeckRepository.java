@@ -40,8 +40,8 @@ public class CardDeckRepository {
      * - if start is bigger than the highest index, an empty list is returned.
      * - if size is equal to 0, an empty list is returned
      *
-     * @param id
-     * @return
+     * @param id of a card
+     * @return cards of a deck or an error.
      */
     public static List<FlashCard> getCardDeckCards(long id) {
         List<FlashCard> flashCards = CardDeck.find.byId(id).getCards();

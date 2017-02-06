@@ -47,7 +47,7 @@ public class AuthToken extends Model {
 
     /**
      * Create a new auth token, make sure it is unique.
-     * @param user
+     * @param user - the token belongs to this user.
      */
     public AuthToken(User user) {
         this.user = user;
@@ -68,7 +68,7 @@ public class AuthToken extends Model {
      * Returns one random sequence of characters of length n in UTF-8.
      * @param n length of the returned String
      * @return random sequence of characters
-     * @throws UnsupportedEncodingException
+     * @throws UnsupportedEncodingException if encoding isnt supported.
      */
     private String nextBase64String(int n) throws UnsupportedEncodingException {
         SecureRandom csprng = null;

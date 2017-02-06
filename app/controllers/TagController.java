@@ -15,10 +15,7 @@ import util.exceptions.DuplicateKeyException;
 import util.exceptions.InvalidInputException;
 import util.exceptions.ObjectNotFoundException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -39,7 +36,7 @@ public class TagController extends Controller {
     /**
      * Returns either one tag
      *
-     * @param id
+     * @param id of the tag
      * @return ok - and the card or notFound if the object with the given id does not exist
      */
     public Result getTag(Long id) {
@@ -61,7 +58,8 @@ public class TagController extends Controller {
     }
 
     /**
-     * @return
+     * get all cards attached to the tag. this is done by providing key value pairs via the query string.
+     * @return appropriate Result containing the cards or error
      */
     public Result getAttachedCardsByTags() {
         List<Long> ids = new ArrayList<>();
@@ -76,9 +74,7 @@ public class TagController extends Controller {
                         }
                     }
                     if (key.toLowerCase().contains(RequestKeys.GET_BY_NAME)) {
-                        for (String value : values) {
-                            names.add(value);
-                        }
+                        Collections.addAll(names, values);
                     }
                 });
         Logger.debug("names.size="+names.size()+" || ids.size="+ids.size());

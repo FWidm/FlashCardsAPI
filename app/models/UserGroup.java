@@ -92,7 +92,7 @@ public class UserGroup extends Model {
 
 	/**
 	 * Replaces the current users with the given users.
-	 * @param users
+	 * @param users we want as new user list.
      */
 	public void setUsers(List<User> users) {
 		this.users = users;
@@ -100,7 +100,7 @@ public class UserGroup extends Model {
 
 	/**
 	 * Adds one user to this group, updates the user's group as well.
-	 * @param user
+	 * @param user we want to add
      */
 	public void addUser(User user) {
 		if (!users.contains(user)) {
@@ -117,7 +117,7 @@ public class UserGroup extends Model {
 
     /**
      * Removes a specific user from the users of this group.
-     * @param user
+     * @param user we want to remove
      */
     public void removeUser(User user) {
         if(users.contains(user)){

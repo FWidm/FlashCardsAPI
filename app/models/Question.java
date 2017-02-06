@@ -52,7 +52,7 @@ public class Question extends Model {
      * Parses a question from the given JsonNode node.
      * @param node the json node to parse
      * @return a question object containing the information
-     * @throws URISyntaxException
+     * @throws URISyntaxException when the uri is malformed
      */
     public static Question parseQuestion(User author, JsonNode node) throws URISyntaxException {
         String questionText=null;
