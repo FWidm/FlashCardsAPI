@@ -5,17 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import models.CardDeck;
 import models.Category;
 import models.User;
-import models.UserGroup;
 import play.Logger;
 import play.mvc.BodyParser;
 import util.JsonKeys;
 import util.RequestKeys;
 import util.UrlParamHelper;
 import util.UserOperations;
-import util.exceptions.InvalidInputException;
-import util.exceptions.NotAuthorizedException;
-import util.exceptions.ObjectNotFoundException;
-import util.exceptions.PartiallyModifiedException;
+import util.exceptions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -149,7 +145,7 @@ public class CategoryRepository {
      * @throws PartiallyModifiedException
      */
     @BodyParser.Of(BodyParser.Json.class)
-    public static Category updateCategory(Long id, String email, JsonNode json, String method) throws InvalidInputException, ObjectNotFoundException, PartiallyModifiedException, NotAuthorizedException {
+    public static Category updateCategory(Long id, String email, JsonNode json, String method) throws InvalidInputException, ObjectNotFoundException, PartiallyModifiedException, NotAuthorizedException, DuplicateKeyException {
         // TODO: 06/02/17 prevent endless recursion from happening.
         String information = "";
         boolean append = UrlParamHelper.checkBool(RequestKeys.APPEND);
@@ -168,6 +164,7 @@ public class CategoryRepository {
             throw new InvalidInputException("The Update method needs all details of the category, such as name, " +
                     "an array of carddeck (ids) and a parent (null or id of another category).");
         }
+
         if (json.has(JsonKeys.CATEGORY_NAME)) {
             category.setName(receivedCategory.getName());
         }
@@ -176,15 +173,14 @@ public class CategoryRepository {
         if (json.has(JsonKeys.CATEGORY_PARENT)) {
             if (json.get(JsonKeys.CATEGORY_PARENT).has(JsonKeys.CATEGORY_ID)) {
                 Long parentId = json.get(JsonKeys.CATEGORY_PARENT).get(JsonKeys.CATEGORY_ID).asLong();
-                if (id != parentId)
-                    category.setParent(parseParent(parentId));
-            } else {
-                category.setParent(null);
 
+                //do not allow self loops or loops between two objects
+                if (!containsEndlessLoop(id, parentId))
+                    category.setParent(parseParent(parentId));
+                else
+                    throw new DuplicateKeyException("This parent is not allowed as it would create an endless loop.",1);
             }
         }
-
-        // TODO: 10.09.2016 Append mode is currently the std.!
         if (json.has(JsonKeys.CATEGORY_DECK)) {
             //handle cardDeck list
             List<CardDeck> cardDeckList = new ArrayList<>();
@@ -227,6 +223,31 @@ public class CategoryRepository {
             throw new PartiallyModifiedException("Category has been updated! Additional information: " + information, category.getId());
         }
         return category;
+    }
+
+    /**
+     * This method checks whether the Category with a given id is already a parent for the to-be parent with parentId.
+     * e.g. 1<-2<-3<-4 are connected categories where cat.id. 4 has parent 3.
+     * if we now wanted to set 1 as child to 4 this method would find the loop and deny the operation.
+     * The result for the illegal operation would be 1<-2<-3<-4<-1.
+     * @param id
+     * @param parentId
+     * @return true if a loop would exist or false if none is contained.
+     */
+    private static boolean containsEndlessLoop(Long id, Long parentId) {
+        Category child = Category.find.byId(id);
+        Category parent = Category.find.byId(parentId);
+        Category temp=parent;
+        boolean hasLoop=false;
+        Logger.debug("Checking if the current category is not already the parent to any nodes of our to-be parent.");
+        while (temp!=null){
+            Logger.debug("current id="+temp.getId()+" parent="+temp.getParent());
+            if (temp.getId()==child.getId())
+                hasLoop=true;
+            temp=temp.getParent();
+        }
+
+        return hasLoop;
     }
 
 /*    public static Result deleteCategory(Long id){

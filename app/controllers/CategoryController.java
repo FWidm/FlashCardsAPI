@@ -1,5 +1,6 @@
 package controllers;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import models.CardDeck;
@@ -11,10 +12,7 @@ import play.mvc.Result;
 import play.mvc.Security;
 import repositories.CategoryRepository;
 import util.*;
-import util.exceptions.InvalidInputException;
-import util.exceptions.NotAuthorizedException;
-import util.exceptions.ObjectNotFoundException;
-import util.exceptions.PartiallyModifiedException;
+import util.exceptions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,6 +136,8 @@ public class CategoryController extends Controller {
             return ok(JsonUtil.prepareJsonStatus(OK, e.getMessage(), e.getObjectId()));
         } catch (NotAuthorizedException e) {
             return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage(), id));
+        } catch (DuplicateKeyException e) {
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage(), id));
         }
     }
 
