@@ -69,7 +69,7 @@ public class UserGroupRepository {
             }
         }
         if (UrlParamHelper.checkForKey(RequestKeys.USER_ID)) {
-                User user = User.find.byId(Long.parseLong(UrlParamHelper.getValue(RequestKeys.USER_ID)));
+            User user = User.find.byId(Long.parseLong(UrlParamHelper.getValue(RequestKeys.USER_ID)));
             return user.getUserGroups();
         }
         if (UrlParamHelper.checkForKey(RequestKeys.EMAIL)) {
@@ -144,7 +144,8 @@ public class UserGroupRepository {
      * @param email
      * @param json
      * @param urlParams
-     * @param method    @return updated UserGroup object
+     * @param method
+     * @return updated UserGroup object
      * @throws InvalidInputException
      * @throws NullPointerException
      * @throws PartiallyModifiedException

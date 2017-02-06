@@ -58,33 +58,33 @@ public class HomeController extends Controller {
         if (picture != null) {
             String fileName = picture.getFilename();
             String contentType = picture.getContentType();
-            String fileType=determineFileType(fileName);
+            String fileType = determineFileType(fileName);
 
             if (contentType.contains("image")) {
                 File pictureFile = picture.getFile();
                 Calendar c = Calendar.getInstance();
                 int year = c.get(Calendar.YEAR);
                 int month = c.get(Calendar.MONTH);
-                File directoryFile = new File("/var/www/html/img/"+year+"/"+month +"/");
+                File directoryFile = new File("/var/www/html/img/" + year + "/" + month + "/");
                 directoryFile.mkdirs();
-                    try {
-                        directoryFile=File.createTempFile("img", "."+fileType, directoryFile);
-                        Files.write(directoryFile.toPath(),Files.readAllBytes(pictureFile.toPath()));
-                    } catch (IOException e) {
-                        return internalServerError(JsonUtil.prepareJsonStatus(INTERNAL_SERVER_ERROR, "Could not place file on the server"));
-                    }
-                    Logger.debug("Filepath:" + directoryFile.toPath());
+                try {
+                    directoryFile = File.createTempFile("img", "." + fileType, directoryFile);
+                    Files.write(directoryFile.toPath(), Files.readAllBytes(pictureFile.toPath()));
+                } catch (IOException e) {
+                    return internalServerError(JsonUtil.prepareJsonStatus(INTERNAL_SERVER_ERROR, "Could not place file on the server"));
+                }
+                Logger.debug("Filepath:" + directoryFile.toPath());
 
-                int i=0;
-                String host="http://"+request().host();
-                i=host.lastIndexOf(":");
-                host=host.substring(0,i);
-                String url=host+getUrl(directoryFile.toPath(),"img");
+                int i = 0;
+                String host = "http://" + request().host();
+                i = host.lastIndexOf(":");
+                host = host.substring(0, i);
+                String url = host + getUrl(directoryFile.toPath(), "img");
 
 
                 try {
-                    UploadedMedia mediaRecord=new UploadedMedia(new URI(url), UserRepository.findUserByEmail(request().username()),contentType);
-                    Logger.debug("Uploaded file="+mediaRecord);
+                    UploadedMedia mediaRecord = new UploadedMedia(new URI(url), UserRepository.findUserByEmail(request().username()), contentType);
+                    Logger.debug("Uploaded file=" + mediaRecord);
                     mediaRecord.save();
                     return created(JsonUtil.toJson(mediaRecord));
                 } catch (URISyntaxException e) {
@@ -99,20 +99,22 @@ public class HomeController extends Controller {
     /**
      * Strips unneccesary parts of the path and replaces backslashes with slashes.
      * (e.g: \img\2016\11\x.png -> /img/2016/11/x.png")
+     *
      * @param path
      * @return path minus everything before lastShowndirectory.
      */
     private String getUrl(Path path, String lastShownDirectory) {
-        String url =null;
-        url=path.toString();
-        url=url.replace('\\', '/');
+        String url = null;
+        url = path.toString();
+        url = url.replace('\\', '/');
         int index = url.indexOf(lastShownDirectory);
-        return url.substring(index-1);
+        return url.substring(index - 1);
     }
 
     /**
      * Expects a filename including extension (i.e. abcd.jpeg) and returns the extension after the last dot.
      * (e.g. "abc.def.gh.ix" returns "ix")
+     *
      * @param fileName
      * @return substring after the last dot in the filename
      */
@@ -120,7 +122,7 @@ public class HomeController extends Controller {
         String extension = "";
         int i = fileName.lastIndexOf('.');
         if (i > 0) {
-            extension = fileName.substring(i+1);
+            extension = fileName.substring(i + 1);
         }
         return extension;
     }
@@ -282,29 +284,31 @@ public class HomeController extends Controller {
             String email = json.get(JsonKeys.USER_EMAIL).asText();
 
             //User logInTo = User.find.where().and(like(JsonKeys.USER_EMAIL, email), like(JsonKeys.USER_PASSWORD, pass)).findUnique();
-            User logInTo=User.find.where().like(JsonKeys.USER_EMAIL, email).findUnique();
+            User logInTo = User.find.where().like(JsonKeys.USER_EMAIL, email).findUnique();
             try {
 
-            Logger.debug("Login attempt with email=" + email + " User found=" + logInTo+" valid? "+PasswordUtil.validatePassword(pass,logInTo.getPassword()));
-            if (logInTo != null  && PasswordUtil.validatePassword(pass,logInTo.getPassword())) {
-                ObjectNode result = Json.newObject();
-                result.put(JsonKeys.STATUS_CODE, OK);
-                result.put(JsonKeys.DESCRIPTION, "Login succeeded.");
-                Logger.debug("result="+result);
-                AuthToken token = new AuthToken(logInTo);
-                token.save();
-                Logger.debug("Token="+token);
-                logInTo.addAuthToken(token);
-                Logger.debug("Added authtoken to user");
-                result.put(JsonKeys.TOKEN, token.getToken());
-                Logger.debug("finished result node: "+result);
-                return ok(result);
-            }
+                Logger.debug("Login attempt with email=" + email + " User found=" + logInTo + " valid? " + PasswordUtil.validatePassword(pass, logInTo.getPassword()));
+                if (logInTo != null && PasswordUtil.validatePassword(pass, logInTo.getPassword())) {
+                    ObjectNode result = Json.newObject();
+                    result.put(JsonKeys.STATUS_CODE, OK);
+                    result.put(JsonKeys.DESCRIPTION, "Login succeeded.");
+                    Logger.debug("result=" + result);
+                    AuthToken token = new AuthToken(logInTo);
+                    token.save();
+                    Logger.debug("Token=" + token);
+                    logInTo.addAuthToken(token);
+                    Logger.debug("Added authtoken to user");
+                    result.put(JsonKeys.TOKEN, token.getToken());
+                    Logger.debug("finished result node: " + result);
+                    return ok(result);
+                }
 
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
             } catch (InvalidKeySpecException e) {
                 e.printStackTrace();
+            } catch (NullPointerException e) {
+                return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "User does not exist."));
             }
         }
         return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN, "Login failed, check email and password for errors."));

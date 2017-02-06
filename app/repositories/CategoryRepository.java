@@ -150,6 +150,7 @@ public class CategoryRepository {
      */
     @BodyParser.Of(BodyParser.Json.class)
     public static Category updateCategory(Long id, String email, JsonNode json, String method) throws InvalidInputException, ObjectNotFoundException, PartiallyModifiedException, NotAuthorizedException {
+        // TODO: 06/02/17 prevent endless recursion from happening.
         String information = "";
         boolean append = UrlParamHelper.checkBool(RequestKeys.APPEND);
         Logger.debug("Appending? " + append);
@@ -159,7 +160,7 @@ public class CategoryRepository {
         Category category = Category.find.byId(id);
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         // get the specific user we want to edit
-        if (!author.hasRight(UserOperations.EDIT_GROUP, category))
+        if (!author.hasRight(UserOperations.EDIT_CATEGORY, category))
             throw new NotAuthorizedException("This user is not authorized to modify the category with this id.");
 
         //Check whether the request was a put and if it was check if a param is missing, if that is the case --> bad req.
