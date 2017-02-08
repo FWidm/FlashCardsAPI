@@ -27,11 +27,9 @@ public class JsonKeys {
     public static final String AUTH_TOKEN_TABLE_NAME="authToken";
     public static final String CARDDECK_TABLE_NAME="cardDeck";
 
-
     //Jointable names
     public static final String CARD_TAG_JOIN_TABLE="cardTagJoinTable";
     public static final String USER_GROUP_JOIN_TABLE="userGroupJoinTable";
-
 
     //Flashcard
     public static final String FLASHCARD = "flashcard";
@@ -114,10 +112,12 @@ public class JsonKeys {
 
     //Messaging
     public static final String MESSAGE_ID="messageId";
-    public static final String MESSAGE_RECIPIENT="recipient";
+    public static final String MESSAGE_RECIPIENT="userId";
     public static final String MESSAGE_CONTENT="content";
     public static final String MESSAGE_TYPE="messageType";
 
-    public static final String DECK_CHALLENGE_MESSAGE_DECK="deckChallenge";
+    public static final String DECK_CHALLENGE_MESSAGE="deckChallengeMessage";
+    public static final String DECK_CHALLENGE_MESSAGE_DECK="deckChallengeId";
 
+    public static final String MESSAGE ="message";
 }

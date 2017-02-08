@@ -7,14 +7,17 @@ import models.User;
 import util.JsonKeys;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 /**
  * Created by fabianwidmann on 08/02/17.
  */
-public class DeckChallengeMessage extends Message {
+@Entity
+@DiscriminatorValue(JsonKeys.DECK_CHALLENGE_MESSAGE)
+public class DeckChallengeMessage extends AbstractMessage {
     @ManyToOne
-    @Column(name = JsonKeys.DECK_CHALLENGE_MESSAGE_DECK)
     @JsonProperty(JsonKeys.DECK_CHALLENGE_MESSAGE_DECK)
     CardDeck deck;
 
@@ -37,5 +40,16 @@ public class DeckChallengeMessage extends Message {
 
     public void setDeck(CardDeck deck) {
         this.deck = deck;
+    }
+
+    @Override
+    public String toString() {
+        return "DeckChallengeMessage{" +
+                "id=" + id +
+                ", recipient=" + recipient +
+                ", content='" + content + '\'' +
+                ", timestamp=" + timestamp +
+                "deck=" + deck +
+                '}';
     }
 }

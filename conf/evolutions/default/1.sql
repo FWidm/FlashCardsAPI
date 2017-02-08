@@ -3,6 +3,16 @@
 
 # --- !Ups
 
+create table message (
+  messagetype               varchar(31) not null,
+  messageId                 bigint auto_increment not null,
+  recipient_userId          bigint,
+  content                   varchar(255),
+  timestamp                 datetime(6) not null,
+  deck_cardDeckId           bigint,
+  constraint pk_message primary key (messageId))
+;
+
 create table answer (
   answerId                  bigint auto_increment not null,
   answerText                varchar(255),
@@ -123,34 +133,38 @@ create table userGroupJoinTable (
   groupId                        bigint not null,
   constraint pk_userGroupJoinTable primary key (userId, groupId))
 ;
-alter table answer add constraint fk_answer_author_1 foreign key (userId) references user (userId) on delete restrict on update restrict;
-create index ix_answer_author_1 on answer (userId);
-alter table answer add constraint fk_answer_card_2 foreign key (cardId) references flashCard (flashcardId) on delete restrict on update restrict;
-create index ix_answer_card_2 on answer (cardId);
-alter table authToken add constraint fk_authToken_user_3 foreign key (tokenUserId) references user (userId) on delete restrict on update restrict;
-create index ix_authToken_user_3 on authToken (tokenUserId);
-alter table cardDeck add constraint fk_cardDeck_userGroup_4 foreign key (userGroup) references userGroup (groupId) on delete restrict on update restrict;
-create index ix_cardDeck_userGroup_4 on cardDeck (userGroup);
-alter table cardDeck add constraint fk_cardDeck_category_5 foreign key (category) references category (categoryId) on delete restrict on update restrict;
-create index ix_cardDeck_category_5 on cardDeck (category);
-alter table category add constraint fk_category_parent_6 foreign key (parent_categoryId) references category (categoryId) on delete restrict on update restrict;
-create index ix_category_parent_6 on category (parent_categoryId);
-alter table flashCard add constraint fk_flashCard_question_7 foreign key (questionId) references question (questionId) on delete restrict on update restrict;
-create index ix_flashCard_question_7 on flashCard (questionId);
-alter table flashCard add constraint fk_flashCard_author_8 foreign key (userId) references user (userId) on delete restrict on update restrict;
-create index ix_flashCard_author_8 on flashCard (userId);
-alter table flashCard add constraint fk_flashCard_deck_9 foreign key (cardDeckId) references cardDeck (cardDeckId) on delete restrict on update restrict;
-create index ix_flashCard_deck_9 on flashCard (cardDeckId);
-alter table question add constraint fk_question_author_10 foreign key (userId) references user (userId) on delete restrict on update restrict;
-create index ix_question_author_10 on question (userId);
-alter table rating add constraint fk_rating_author_11 foreign key (userId) references user (userId) on delete restrict on update restrict;
-create index ix_rating_author_11 on rating (userId);
-alter table rating add constraint fk_rating_ratedAnswer_12 foreign key (answerId) references answer (answerId) on delete restrict on update restrict;
-create index ix_rating_ratedAnswer_12 on rating (answerId);
-alter table rating add constraint fk_rating_ratedFlashCard_13 foreign key (flashcardId) references flashCard (flashcardId) on delete restrict on update restrict;
-create index ix_rating_ratedFlashCard_13 on rating (flashcardId);
-alter table uploaded_media add constraint fk_uploaded_media_author_14 foreign key (userId) references user (userId) on delete restrict on update restrict;
-create index ix_uploaded_media_author_14 on uploaded_media (userId);
+alter table message add constraint fk_message_recipient_1 foreign key (recipient_userId) references user (userId) on delete restrict on update restrict;
+create index ix_message_recipient_1 on message (recipient_userId);
+alter table message add constraint fk_message_deck_2 foreign key (deck_cardDeckId) references cardDeck (cardDeckId) on delete restrict on update restrict;
+create index ix_message_deck_2 on message (deck_cardDeckId);
+alter table answer add constraint fk_answer_author_3 foreign key (userId) references user (userId) on delete restrict on update restrict;
+create index ix_answer_author_3 on answer (userId);
+alter table answer add constraint fk_answer_card_4 foreign key (cardId) references flashCard (flashcardId) on delete restrict on update restrict;
+create index ix_answer_card_4 on answer (cardId);
+alter table authToken add constraint fk_authToken_user_5 foreign key (tokenUserId) references user (userId) on delete restrict on update restrict;
+create index ix_authToken_user_5 on authToken (tokenUserId);
+alter table cardDeck add constraint fk_cardDeck_userGroup_6 foreign key (userGroup) references userGroup (groupId) on delete restrict on update restrict;
+create index ix_cardDeck_userGroup_6 on cardDeck (userGroup);
+alter table cardDeck add constraint fk_cardDeck_category_7 foreign key (category) references category (categoryId) on delete restrict on update restrict;
+create index ix_cardDeck_category_7 on cardDeck (category);
+alter table category add constraint fk_category_parent_8 foreign key (parent_categoryId) references category (categoryId) on delete restrict on update restrict;
+create index ix_category_parent_8 on category (parent_categoryId);
+alter table flashCard add constraint fk_flashCard_question_9 foreign key (questionId) references question (questionId) on delete restrict on update restrict;
+create index ix_flashCard_question_9 on flashCard (questionId);
+alter table flashCard add constraint fk_flashCard_author_10 foreign key (userId) references user (userId) on delete restrict on update restrict;
+create index ix_flashCard_author_10 on flashCard (userId);
+alter table flashCard add constraint fk_flashCard_deck_11 foreign key (cardDeckId) references cardDeck (cardDeckId) on delete restrict on update restrict;
+create index ix_flashCard_deck_11 on flashCard (cardDeckId);
+alter table question add constraint fk_question_author_12 foreign key (userId) references user (userId) on delete restrict on update restrict;
+create index ix_question_author_12 on question (userId);
+alter table rating add constraint fk_rating_author_13 foreign key (userId) references user (userId) on delete restrict on update restrict;
+create index ix_rating_author_13 on rating (userId);
+alter table rating add constraint fk_rating_ratedAnswer_14 foreign key (answerId) references answer (answerId) on delete restrict on update restrict;
+create index ix_rating_ratedAnswer_14 on rating (answerId);
+alter table rating add constraint fk_rating_ratedFlashCard_15 foreign key (flashcardId) references flashCard (flashcardId) on delete restrict on update restrict;
+create index ix_rating_ratedFlashCard_15 on rating (flashcardId);
+alter table uploaded_media add constraint fk_uploaded_media_author_16 foreign key (userId) references user (userId) on delete restrict on update restrict;
+create index ix_uploaded_media_author_16 on uploaded_media (userId);
 
 
 
@@ -165,6 +179,8 @@ alter table userGroupJoinTable add constraint fk_userGroupJoinTable_userGroup_02
 # --- !Downs
 
 SET FOREIGN_KEY_CHECKS=0;
+
+drop table message;
 
 drop table answer;
 

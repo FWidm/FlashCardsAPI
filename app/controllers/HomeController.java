@@ -3,6 +3,8 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.*;
+import models.msg.AbstractMessage;
+import models.msg.DeckChallengeMessage;
 import models.rating.AnswerRating;
 import models.rating.CardRating;
 import models.rating.Rating;
@@ -10,6 +12,7 @@ import play.Logger;
 import play.libs.Json;
 import play.mvc.*;
 
+import repositories.CardDeckRepository;
 import repositories.UserRepository;
 import util.*;
 import util.crypt.PasswordUtil;
@@ -24,8 +27,6 @@ import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
-
-import static com.avaje.ebean.Expr.like;
 
 /**
  * This controller contains an action to handle HTTP requests
@@ -43,6 +44,7 @@ public class HomeController extends Controller {
         x.save();
         Logger.debug(String.valueOf(x.hasRight(UserOperations.EDIT_CARD_QUESTION,y)));
         x.delete();*/
+
         return ok(file);
     }
 
@@ -429,4 +431,22 @@ public class HomeController extends Controller {
         return cardDeckList;
     }
 
+    public Result testMessages(){
+        User user = UserRepository.findUserByEmail("email1@email.com");
+        if(user==null) {
+            user = new User("name", "email1@email.com", "password", 0);
+            user.save();
+        }
+
+        CardDeck deck = CardDeck.find.where().eq(JsonKeys.CARDDECK_NAME,"deck").findUnique();
+        if(deck==null){
+            deck=new CardDeck("deck");
+            deck.save();
+        }
+
+        DeckChallengeMessage msg = new DeckChallengeMessage(user,"content",deck);
+        msg.save();
+        Logger.debug("msg="+ AbstractMessage.find.byId(1L));
+        return ok(JsonUtil.toJson(DeckChallengeMessage.find.byId(1L)));
+    }
 }
