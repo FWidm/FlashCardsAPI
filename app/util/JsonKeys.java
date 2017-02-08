@@ -112,5 +112,12 @@ public class JsonKeys {
     public static final String MEDIA_ID = "mediaId";
     public static final String MEDIA_TYPE = "mediaType";
 
+    //Messaging
+    public static final String MESSAGE_ID="messageId";
+    public static final String MESSAGE_RECIPIENT="recipient";
+    public static final String MESSAGE_CONTENT="content";
+    public static final String MESSAGE_TYPE="messageType";
+
+    public static final String DECK_CHALLENGE_MESSAGE_DECK="deckChallenge";
 
 }
