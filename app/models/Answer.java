@@ -15,59 +15,51 @@ import java.net.URI;
 import java.util.Date;
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  *         on 17/06/16.
  */
 @Entity
-@JsonPropertyOrder({ JsonKeys.ANSWER_ID})
+@JsonPropertyOrder({JsonKeys.ANSWER_ID})
 public class Answer extends Model {
-    @Id @GeneratedValue
+    public static Model.Finder<Long, Answer> find = new Model.Finder<Long, Answer>(Answer.class);
+    @Id
+    @GeneratedValue
     @Column(name = JsonKeys.ANSWER_ID)
     @JsonProperty(JsonKeys.ANSWER_ID)
     private long id;
-
     @Constraints.Required
     @Column(name = JsonKeys.ANSWER_TEXT)
     @JsonProperty(JsonKeys.ANSWER_TEXT)
     private String answerText;
-
     @JsonProperty(JsonKeys.ANSWER_HINT)
     @Column(name = JsonKeys.ANSWER_HINT)
     private String hintText;
-
     @JsonProperty(JsonKeys.URI)
     @Column(name = JsonKeys.URI)
     private URI uri;
-
-   @ManyToOne
-   @JoinColumn(name=JsonKeys.USER_ID, referencedColumnName=JsonKeys.USER_ID)
-   @JsonProperty(JsonKeys.AUTHOR)
-    private User author;
-
     @ManyToOne
-    @JoinColumn(name=JsonKeys.ANSWER_CARD_ID)
+    @JoinColumn(name = JsonKeys.USER_ID, referencedColumnName = JsonKeys.USER_ID)
+    @JsonProperty(JsonKeys.AUTHOR)
+    private User author;
+    @ManyToOne
+    @JoinColumn(name = JsonKeys.ANSWER_CARD_ID)
     @JsonIgnore
     private FlashCard card;
-
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z") @CreatedTimestamp
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
+    @CreatedTimestamp
     @Column(name = JsonKeys.DATE_CREATED)
     @JsonProperty(JsonKeys.DATE_CREATED)
     private Date created;
-
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
     @UpdatedTimestamp
     @Column(name = JsonKeys.DATE_UPDATED)
     @JsonProperty(JsonKeys.DATE_UPDATED)
     private Date lastUpdated;
     @JsonProperty(JsonKeys.RATING)
     private int rating;
-
     @JsonProperty(JsonKeys.ANSWER_CORRECT)
     @Column(name = JsonKeys.ANSWER_CORRECT)
     private boolean isCorrect;
-
-    public static Model.Finder<Long, Answer> find = new Model.Finder<Long, Answer>(Answer.class);
 
     public Answer(String answerText, String hintText, User author) {
         this.answerText = answerText;
@@ -136,15 +128,20 @@ public class Answer extends Model {
     public void setAuthor(User author) {
         this.author = author;
     }
+
     @JsonIgnore
     public FlashCard getCard() {
         return card;
     }
 
+    public void setCard(FlashCard card) {
+        this.card = card;
+        this.update();
+    }
+
     public Date getCreated() {
         return created;
     }
-
 
     public boolean isCorrect() {
         return isCorrect;
@@ -154,16 +151,13 @@ public class Answer extends Model {
         isCorrect = correct;
     }
 
-    public void setCard(FlashCard card) {
-        this.card = card;
-        this.update();
-    }
     /**
      * Adds the given rating to the current rating, updates this instance and calls the function on the corresponding user.
+     *
      * @param ratingModifier - describes the value that is added/subtracted from the current rating
      */
-    public void updateRating(int ratingModifier){
-        this.rating+=ratingModifier;
+    public void updateRating(int ratingModifier) {
+        this.rating += ratingModifier;
         this.update();
         //update user as well, work on the newest data from the db, not our local reference.
         User.find.byId(author.getId()).updateRating(ratingModifier);

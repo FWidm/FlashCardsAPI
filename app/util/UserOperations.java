@@ -1,7 +1,6 @@
 package util;
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  */
 public enum UserOperations {

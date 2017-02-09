@@ -9,7 +9,6 @@ import play.mvc.Security;
 import static play.mvc.Http.Status.UNAUTHORIZED;
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  */
 
@@ -17,6 +16,7 @@ public class ActionAuthenticator extends Security.Authenticator {
 
     /**
      * Returns the email (unique) of the user despite it's name to identify the user.
+     *
      * @param ctx context
      * @return email
      */
@@ -38,11 +38,12 @@ public class ActionAuthenticator extends Security.Authenticator {
 
     @Override
     public Result onUnauthorized(Http.Context context) {
-        return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED,"Please provide a valid token via the header field 'Authorization':'Bearer {{token}}' to authenticate before sending requests."));
+        return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, "Please provide a valid token via the header field 'Authorization':'Bearer {{token}}' to authenticate before sending requests."));
     }
 
     /**
      * Performs operations to get the tokenHeader from the context.
+     *
      * @param ctx context
      * @return token as string.
      */
@@ -51,7 +52,7 @@ public class ActionAuthenticator extends Security.Authenticator {
         String[] authTokenHeaderValues = ctx.request().headers().get(RequestKeys.TOKEN_HEADER);
         if ((authTokenHeaderValues != null) && (authTokenHeaderValues.length == 1) && (authTokenHeaderValues[0] != null)) {
             String[] tokenHeader = authTokenHeaderValues[0].split(" ");
-            if(tokenHeader.length==2){
+            if (tokenHeader.length == 2) {
                 return tokenHeader[1];
             }
 

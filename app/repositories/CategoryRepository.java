@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  */
 public class CategoryRepository {
@@ -135,13 +134,13 @@ public class CategoryRepository {
      * Updates the category specified by the first parameter. Email is needed to check if the user has the rights to perform the action.
      * Json contains all the changes we want to make. Method is there to check if PUT/PATCH is required.
      *
-     * @param id of a category
-     * @param email of the creating user
-     * @param json content of the request body
+     * @param id     of a category
+     * @param email  of the creating user
+     * @param json   content of the request body
      * @param method PUT/PATCH
      * @return newly updated category
-     * @throws InvalidInputException if the input contains problems
-     * @throws ObjectNotFoundException if the object does not exist
+     * @throws InvalidInputException      if the input contains problems
+     * @throws ObjectNotFoundException    if the object does not exist
      * @throws PartiallyModifiedException if the request could be solved but problems have been found
      */
     @BodyParser.Of(BodyParser.Json.class)
@@ -178,7 +177,7 @@ public class CategoryRepository {
                 if (!containsEndlessLoop(id, parentId))
                     category.setParent(parseParent(parentId));
                 else
-                    throw new DuplicateKeyException("This parent is not allowed as it would create an endless loop.",1);
+                    throw new DuplicateKeyException("This parent is not allowed as it would create an endless loop.", 1);
             }
         }
         if (json.has(JsonKeys.CATEGORY_DECK)) {
@@ -230,21 +229,22 @@ public class CategoryRepository {
      * e.g. 1<-2<-3<-4 are connected categories where cat.id. 4 has parent 3.
      * if we now wanted to set 1 as child to 4 this method would find the loop and deny the operation.
      * The result for the illegal operation would be 1<-2<-3<-4<-1.
-     * @param id of the category
+     *
+     * @param id       of the category
      * @param parentId of the future parent category
      * @return true if a loop would exist or false if none is contained.
      */
     private static boolean containsEndlessLoop(Long id, Long parentId) {
         Category child = Category.find.byId(id);
         Category parent = Category.find.byId(parentId);
-        Category temp=parent;
-        boolean hasLoop=false;
+        Category temp = parent;
+        boolean hasLoop = false;
         Logger.debug("Checking if the current category is not already the parent to any nodes of our to-be parent.");
-        while (temp!=null){
-            Logger.debug("current id="+temp.getId()+" parent="+temp.getParent());
-            if (temp.getId()==child.getId())
-                hasLoop=true;
-            temp=temp.getParent();
+        while (temp != null) {
+            Logger.debug("current id=" + temp.getId() + " parent=" + temp.getParent());
+            if (temp.getId() == child.getId())
+                hasLoop = true;
+            temp = temp.getParent();
         }
 
         return hasLoop;

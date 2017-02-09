@@ -21,7 +21,6 @@ import java.util.Map;
 
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  */
 public class RatingController extends Controller {
@@ -34,7 +33,7 @@ public class RatingController extends Controller {
      */
     public Result getRatingList() {
         Map<String, String[]> urlParams = Controller.request().queryString();
-        List<Rating> ratingList= RatingRepository.getRatings(urlParams);
+        List<Rating> ratingList = RatingRepository.getRatings(urlParams);
         return ok(JsonUtil.toJson(ratingList));
     }
 
@@ -49,7 +48,7 @@ public class RatingController extends Controller {
             Rating card = RatingRepository.getRating(id);
             return ok(JsonUtil.toJson(card));
         } catch (ObjectNotFoundException e) {
-            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, e.getMessage(),e.getObjectId()));
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, e.getMessage(), e.getObjectId()));
         }
     }
 
@@ -64,50 +63,47 @@ public class RatingController extends Controller {
         try {
             JsonNode json = request().body().asJson();
             Rating rating = RatingRepository.addRating(json);
-            return created(JsonUtil.prepareJsonStatus(CREATED, "Rating has been created.",rating.getId()));
+            return created(JsonUtil.prepareJsonStatus(CREATED, "Rating has been created.", rating.getId()));
 
-        }
-        catch (DuplicateKeyException e) {
-            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,e.getMessage(),e.getObjectId()));
+        } catch (DuplicateKeyException e) {
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage(), e.getObjectId()));
         } catch (InvalidInputException e) {
             e.printStackTrace();
-            if(JsonKeys.debugging){
+            if (JsonKeys.debugging) {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));
-            }
-            else {
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS + " | cause: " + e.getCause()));
+            } else {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
                                 BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
             }
         } catch (ObjectNotFoundException e) {
             //Duplicate keys
-            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,e.getMessage()));
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage()));
         }
     }
 
     /**
      * Update ratings.
+     *
      * @param id of a rating
      * @return ok/badRequest/unauthorized
      */
     @Security.Authenticated(ActionAuthenticator.class)
     @BodyParser.Of(BodyParser.Json.class)
-    public Result changeRating(Long id){
-        JsonNode json=request().body().asJson();
+    public Result changeRating(Long id) {
+        JsonNode json = request().body().asJson();
         try {
-            Rating rating=RatingRepository.changeRating(id,request().username(),json);
-            return ok(JsonUtil.prepareJsonStatus(OK, "Rating has been changed.",rating.getId()));
-        }
-        catch (InvalidInputException e){
+            Rating rating = RatingRepository.changeRating(id, request().username(), json);
+            return ok(JsonUtil.prepareJsonStatus(OK, "Rating has been changed.", rating.getId()));
+        } catch (InvalidInputException e) {
             e.printStackTrace();
-            if(JsonKeys.debugging && !e.getMessage().contains("did contain")){
+            if (JsonKeys.debugging && !e.getMessage().contains("did contain")) {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));
-            }
-            else {
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS + " | cause: " + e.getCause()));
+            } else {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
                                 BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
@@ -121,15 +117,16 @@ public class RatingController extends Controller {
 
     /**
      * Deletes a rating by it's id, compensates the rating of affected users/cards/answers automagically.
+     *
      * @param id of a rating
      * @return noContent if successful, notFound if not found
      */
     public Result deleteRating(Long id) {
         try {
-            Rating rating=RatingRepository.deleteRating(id);
+            Rating rating = RatingRepository.deleteRating(id);
             return noContent();
         } catch (ObjectNotFoundException e) {
-            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, e.getMessage(),e.getObjectId()));
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, e.getMessage(), e.getObjectId()));
         }
     }
 }

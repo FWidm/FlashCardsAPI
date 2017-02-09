@@ -16,50 +16,37 @@ import java.util.Date;
  */
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@Table (name = JsonKeys.MESSAGE)
+@Table(name = JsonKeys.MESSAGE)
 @DiscriminatorColumn(name = JsonKeys.MESSAGE_TYPE, discriminatorType = DiscriminatorType.STRING)
 @JsonPropertyOrder({JsonKeys.MESSAGE_ID})
 public abstract class AbstractMessage extends Model {
+    public static Finder<Long, AbstractMessage> find = new Finder<>(AbstractMessage.class);
     @Id
     @GeneratedValue
     @Column(name = JsonKeys.MESSAGE_ID)
     @JsonProperty(JsonKeys.MESSAGE_ID)
     protected long id;
-
-    // TODO: 08.02.2017 find out why column name isnt working here but everywhere else. 
+    // TODO: 08.02.2017 find out why column name isnt working here but everywhere else.
     @ManyToOne
-    @Column(name = JsonKeys.MESSAGE_RECIPIENT)
+    @JoinColumn(name = JsonKeys.MESSAGE_RECIPIENT, referencedColumnName = JsonKeys.USER_ID)
     @JsonProperty(JsonKeys.MESSAGE_RECIPIENT)
-    protected User recipient;
-
+    protected User recipientUser;
     @Column(name = JsonKeys.MESSAGE_CONTENT)
     @JsonProperty(JsonKeys.MESSAGE_CONTENT)
     protected String content;
-
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
     @CreatedTimestamp
     @JsonProperty(JsonKeys.DATE_CREATED)
     protected Date timestamp;
 
-    public static Finder<Long, AbstractMessage> find = new Finder<>(AbstractMessage.class);
-
     /**
-     * Create a new message for one recipient with a specific string message
+     * Create a new message for one recipientUser with a specific string message
      *
      * @param recipient
      * @param content
      */
     public AbstractMessage(User recipient, String content) {
-        this.recipient = recipient;
-        this.content = content;
-    }
-
-    //setter
-    public void setRecipient(User recipient) {
-        this.recipient = recipient;
-    }
-
-    public void setContent(String content) {
+        this.recipientUser = recipient;
         this.content = content;
     }
 
@@ -68,12 +55,21 @@ public abstract class AbstractMessage extends Model {
         return id;
     }
 
-    public User getRecipient() {
-        return recipient;
+    public User getRecipientUser() {
+        return recipientUser;
+    }
+
+    //setter
+    public void setRecipientUser(User recipientUser) {
+        this.recipientUser = recipientUser;
     }
 
     public String getContent() {
         return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public Date getTimestamp() {
@@ -84,7 +80,7 @@ public abstract class AbstractMessage extends Model {
     public String toString() {
         return "AbstractMessage{" +
                 "id=" + id +
-                ", recipient=" + recipient +
+                ", recipientUser=" + recipientUser +
                 ", content='" + content + '\'' +
                 ", timestamp=" + timestamp +
                 '}';

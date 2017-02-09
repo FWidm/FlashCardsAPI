@@ -1,10 +1,5 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-
 import com.avaje.ebean.Model;
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -12,63 +7,60 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import models.rating.Rating;
-import org.apache.http.auth.AUTH;
 import play.Logger;
-import play.data.validation.Constraints.*;
+import play.data.validation.Constraints.Email;
+import play.data.validation.Constraints.MinLength;
+import play.data.validation.Constraints.Required;
 import util.JsonKeys;
 import util.UserOperations;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  *         on 13/06/16.
  */
 @Entity
 @JsonPropertyOrder({JsonKeys.USER_ID})
 public class User extends Model {
+    public static Model.Finder<Long, User> find = new Model.Finder<>(User.class);
     @Id
     @GeneratedValue
     @Column(name = JsonKeys.USER_ID)
     @JsonProperty(JsonKeys.USER_ID)
     private Long id;
-
     @Lob //blob
     @JsonProperty(JsonKeys.USER_AVATAR)
     private String avatar;
-
     @Required
     @MinLength(JsonKeys.USER_NAME_MIN_LENGTH)
     @JsonProperty(JsonKeys.USER_NAME)
     private String name;
-
     @Required
     @MinLength(JsonKeys.USER_PASSWORD_MIN_LENGTH)
     @JsonProperty(JsonKeys.USER_PASSWORD)
     @JsonIgnore
     private String password;
-
     @Required
     @Column(unique = true)
     @Email
     @JsonProperty(JsonKeys.USER_EMAIL)
     private String email;
-
     @JsonProperty(JsonKeys.RATING)
     private int rating;
-
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
     @CreatedTimestamp
     @JsonProperty(JsonKeys.DATE_CREATED)
     private Date created;
-
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
     @CreatedTimestamp
     @JsonProperty(JsonKeys.DATE_LAST_LOGIN)
     @Column(name = JsonKeys.DATE_LAST_LOGIN)
     private Date lastLogin;
-
     @ManyToMany/*(cascade = CascadeType.ALL)*/
     @JoinTable(name = JsonKeys.USER_GROUP_JOIN_TABLE,
             joinColumns = @JoinColumn(name = JsonKeys.USER_ID, referencedColumnName = JsonKeys.USER_ID),
@@ -76,13 +68,9 @@ public class User extends Model {
     @JsonProperty(JsonKeys.USER_GROUPS)
     @JsonIgnore
     private List<UserGroup> userGroups;
-
     @OneToMany(mappedBy = "user")
     @JsonIgnore    // to prevent endless recursion.
     private List<AuthToken> authTokenList;
-
-
-    public static Model.Finder<Long, User> find = new Model.Finder<>(User.class);
 
 
     public User(String name, String email, String password, int rating) {
@@ -197,7 +185,7 @@ public class User extends Model {
      * Deletes all Tokens associated with this entity.
      */
     public void deleteTokens() {
-        authTokenList.forEach(token->token.delete());
+        authTokenList.forEach(token -> token.delete());
         authTokenList = new ArrayList<>();
         this.update();
     }
@@ -291,7 +279,7 @@ public class User extends Model {
      * we can check if the user is in any way an owner and has rights regardless of his rating.
      *
      * @param userOperation - the operation the user wants to do
-     * @param manipulated - the manipulated object
+     * @param manipulated   - the manipulated object
      * @return true if the user can do the operation, else false.
      */
     public boolean hasRight(UserOperations userOperation, Object manipulated) {
@@ -311,8 +299,8 @@ public class User extends Model {
 
         final int RATING_EDIT_USER = 1000;
 
-		final int RATING_EDIT_GROUP = 1000;
-		final int RATING_DELETE_GROUP = 1000;
+        final int RATING_EDIT_GROUP = 1000;
+        final int RATING_DELETE_GROUP = 1000;
 
         //Used class compare instead of instanceof due to performance reasons.
         switch (userOperation) {
@@ -388,7 +376,7 @@ public class User extends Model {
                 if (manipulated != null && manipulated.getClass() == CardDeck.class) {
                     CardDeck deck = (CardDeck) manipulated;
                     UserGroup group = deck.getUserGroup();
-                    Logger.debug("group: "+group.getUsers());
+                    Logger.debug("group: " + group.getUsers());
                     //can delete own cards OR any cards when this user's rating is over a specific value
 
                     if (rating >= RATING_EDIT_DECK || group.getUsers().contains(this)) {
@@ -410,28 +398,28 @@ public class User extends Model {
                         return true;
                 }
             }
-			case EDIT_GROUP:{
-				if(manipulated!=null && manipulated.getClass()==UserGroup.class){
-					UserGroup group = (UserGroup) manipulated;
-                    Logger.debug("First condition: "+group.getUsers().contains(this) + " | second condition: "+(rating>RATING_EDIT_GROUP));
-                    group.getUsers().forEach(u->Logger.debug("u="+u));
-					if(group.getUsers().contains(this) || rating>RATING_EDIT_GROUP){
-						return true;
-					}
-				}
-			}
-			case DELETE_GROUP:{
-				if(manipulated!=null && manipulated instanceof UserGroup){
-					UserGroup group = (UserGroup) manipulated;
-					if(group.getUsers().contains(this) || rating>RATING_DELETE_GROUP){
-						return true;
-					}
-				}
-			}
-            case EDIT_RATING:{
-                if(manipulated!=null && (manipulated instanceof Rating)){
+            case EDIT_GROUP: {
+                if (manipulated != null && manipulated.getClass() == UserGroup.class) {
+                    UserGroup group = (UserGroup) manipulated;
+                    Logger.debug("First condition: " + group.getUsers().contains(this) + " | second condition: " + (rating > RATING_EDIT_GROUP));
+                    group.getUsers().forEach(u -> Logger.debug("u=" + u));
+                    if (group.getUsers().contains(this) || rating > RATING_EDIT_GROUP) {
+                        return true;
+                    }
+                }
+            }
+            case DELETE_GROUP: {
+                if (manipulated != null && manipulated instanceof UserGroup) {
+                    UserGroup group = (UserGroup) manipulated;
+                    if (group.getUsers().contains(this) || rating > RATING_DELETE_GROUP) {
+                        return true;
+                    }
+                }
+            }
+            case EDIT_RATING: {
+                if (manipulated != null && (manipulated instanceof Rating)) {
                     Rating ratingObj = (Rating) manipulated;
-                    if(Objects.equals(ratingObj.getAuthor().getId(), id)){
+                    if (Objects.equals(ratingObj.getAuthor().getId(), id)) {
                         return true;
                     }
                 }
@@ -441,7 +429,7 @@ public class User extends Model {
     }
 
     public void addUserGroup(UserGroup newGroup) {
-        if(!userGroups.contains(newGroup)){
+        if (!userGroups.contains(newGroup)) {
             userGroups.add(newGroup);
             this.save();
         }

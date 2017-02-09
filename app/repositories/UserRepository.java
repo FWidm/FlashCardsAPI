@@ -7,7 +7,6 @@ import models.UserGroup;
 import play.Logger;
 import play.data.validation.Constraints;
 import util.JsonKeys;
-import util.JsonUtil;
 import util.RequestKeys;
 import util.UserOperations;
 import util.crypt.PasswordUtil;
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  */
 public class UserRepository {

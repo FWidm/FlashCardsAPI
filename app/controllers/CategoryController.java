@@ -1,25 +1,19 @@
 package controllers;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import models.CardDeck;
 import models.Category;
-import play.Logger;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
 import repositories.CategoryRepository;
-import util.*;
+import util.ActionAuthenticator;
+import util.JsonKeys;
+import util.JsonUtil;
 import util.exceptions.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  */
 public class CategoryController extends Controller {

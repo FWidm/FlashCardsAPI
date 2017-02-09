@@ -10,31 +10,27 @@ import util.JsonKeys;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  *         on 09/08/16.
  */
 @Entity
 @Table(name = JsonKeys.CARDDECK_TABLE_NAME)
 public class CardDeck extends Model {
+    public static Finder<Long, CardDeck> find = new Finder<Long, CardDeck>(CardDeck.class);
     @Id
     @GeneratedValue
     @Column(name = JsonKeys.CARDDECK_ID)
     @JsonProperty(JsonKeys.CARDDECK_ID)
     private long id;
-
     @Constraints.Required
     private boolean visible;
-
     @Constraints.Required
     @ManyToOne
-    @JoinColumn(name=JsonKeys.CARDDECK_GROUP)
+    @JoinColumn(name = JsonKeys.CARDDECK_GROUP)
     @JsonProperty(JsonKeys.CARDDECK_GROUP)
     private UserGroup userGroup;
-
     @Constraints.Required
     @Column(name = JsonKeys.CARDDECK_NAME)
     @Constraints.MinLength(3)
@@ -44,19 +40,16 @@ public class CardDeck extends Model {
     @JsonProperty(JsonKeys.CARDDECK_DESCRIPTION)
     private String description;
     //this cascades from the "tag" to "join_cards_tag" - e.g. tag.delete -> delete evey entry with tag.id
-    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = JsonKeys.FLASHCARD_DECK,fetch = FetchType.EAGER)
+    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = JsonKeys.FLASHCARD_DECK, fetch = FetchType.EAGER)
     @PrivateOwned
     @JsonProperty(JsonKeys.CARDDECK_CARDS)
     @JsonIgnore
     private List<FlashCard> cards;
-
     @ManyToOne
-    @JoinColumn(name=JsonKeys.CARDDECK_CATEGORY)
+    @JoinColumn(name = JsonKeys.CARDDECK_CATEGORY)
     @JsonProperty(JsonKeys.CARDDECK_CATEGORY)
     @JsonIgnore
     private Category category;
-
-    public static Finder<Long, CardDeck> find = new Finder<Long, CardDeck>(CardDeck.class);
 
 
     public CardDeck(String name) {
@@ -78,10 +71,10 @@ public class CardDeck extends Model {
         this.name = otherDeck.getName();
         this.description = otherDeck.getDescription();
         this.cards = otherDeck.getCards();
-        this.userGroup=otherDeck.getUserGroup();
+        this.userGroup = otherDeck.getUserGroup();
         userGroup.addDeck(this);
-        this.visible=otherDeck.isVisible();
-        Logger.debug("constructor: "+this);
+        this.visible = otherDeck.isVisible();
+        Logger.debug("constructor: " + this);
     }
 
 
@@ -107,7 +100,7 @@ public class CardDeck extends Model {
     }
 
     public void setCards(List<FlashCard> cards) {
-        for (FlashCard c:this.cards) {
+        for (FlashCard c : this.cards) {
             c.setDeck(null);
         }
         this.cards = cards;
@@ -154,12 +147,12 @@ public class CardDeck extends Model {
             card.update();*/
             card.delete();
         }
-        String gIds="";
+        String gIds = "";
 
         StringBuilder b = new StringBuilder();
-        Logger.debug("GroupID="+userGroup.getId()+" | "+userGroup.getDecks());
-        userGroup.getDecks().forEach(deck-> b.append(deck.getId()).append("; "));
-        Logger.debug("delete: usergroup.deck="+b.toString());
+        Logger.debug("GroupID=" + userGroup.getId() + " | " + userGroup.getDecks());
+        userGroup.getDecks().forEach(deck -> b.append(deck.getId()).append("; "));
+        Logger.debug("delete: usergroup.deck=" + b.toString());
         super.delete();
     }
 

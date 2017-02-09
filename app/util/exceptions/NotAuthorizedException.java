@@ -7,39 +7,33 @@ package util.exceptions;
 public class NotAuthorizedException extends Throwable {
     private long objectId;
 
-    public long getObjectId() {
-        return objectId;
+    public NotAuthorizedException() {
     }
 
 
-    public NotAuthorizedException()
-    {
-    }
-
-    public NotAuthorizedException(String message, long id)
-    {
+    public NotAuthorizedException(String message, long id) {
         super(message);
-        objectId=id;
+        objectId = id;
     }
 
-    public NotAuthorizedException(String message)
-    {
+    public NotAuthorizedException(String message) {
         super(message);
     }
 
-    public NotAuthorizedException(Throwable cause)
-    {
+    public NotAuthorizedException(Throwable cause) {
         super(cause);
     }
 
-    public NotAuthorizedException(String message, Throwable cause)
-    {
+    public NotAuthorizedException(String message, Throwable cause) {
         super(message, cause);
     }
 
     public NotAuthorizedException(String message, Throwable cause,
-                                   boolean enableSuppression, boolean writableStackTrace)
-    {
+                                  boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
+    }
+
+    public long getObjectId() {
+        return objectId;
     }
 }

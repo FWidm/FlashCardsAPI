@@ -18,7 +18,6 @@ import java.util.Map;
 import static play.mvc.Controller.request;
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  */
 public class FlashCardRepository {
@@ -360,7 +359,7 @@ public class FlashCardRepository {
      * If no Author is specified (Null) we will parse the authors from the sent json.
      *
      * @param author author of the answer
-     * @param json request body
+     * @param json   request body
      * @return list of answers
      * @throws ParameterNotSupportedException if answer ids are provided, throw an error as this should not be possible.
      */

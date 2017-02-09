@@ -1,7 +1,6 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import models.*;
 import play.Logger;
 import play.mvc.BodyParser;
@@ -12,11 +11,11 @@ import repositories.FlashCardRepository;
 import util.ActionAuthenticator;
 import util.JsonKeys;
 import util.JsonUtil;
-import util.exceptions.*;
-import util.RequestKeys;
+import util.exceptions.InvalidInputException;
+import util.exceptions.NotAuthorizedException;
+import util.exceptions.ParameterNotSupportedException;
+import util.exceptions.PartiallyModifiedException;
 
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +24,6 @@ import static play.mvc.Http.Status.*;
 import static play.mvc.Results.*;
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  *         on 17/06/16.
  *         <p>

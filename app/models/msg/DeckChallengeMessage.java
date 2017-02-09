@@ -6,9 +6,9 @@ import models.CardDeck;
 import models.User;
 import util.JsonKeys;
 
-import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 /**
@@ -17,21 +17,21 @@ import javax.persistence.ManyToOne;
 @Entity
 @DiscriminatorValue(JsonKeys.DECK_CHALLENGE_MESSAGE)
 public class DeckChallengeMessage extends AbstractMessage {
+    public static Model.Finder<Long, DeckChallengeMessage> find = new Model.Finder<Long, DeckChallengeMessage>(DeckChallengeMessage.class);
     @ManyToOne
+    @JoinColumn(name = JsonKeys.DECK_CHALLENGE_MESSAGE_DECK, referencedColumnName = JsonKeys.CARDDECK_ID)
     @JsonProperty(JsonKeys.DECK_CHALLENGE_MESSAGE_DECK)
     CardDeck deck;
 
-    public static Model.Finder<Long, DeckChallengeMessage> find = new Model.Finder<Long, DeckChallengeMessage>(DeckChallengeMessage.class);
-
     /**
-     * Create a new message for one recipient with a specific string message
+     * Create a new message for one recipientUser with a specific string message
      *
      * @param recipient
      * @param content
      */
     public DeckChallengeMessage(User recipient, String content, CardDeck deck) {
         super(recipient, content);
-        this.deck=deck;
+        this.deck = deck;
     }
 
     public CardDeck getDeck() {
@@ -46,7 +46,7 @@ public class DeckChallengeMessage extends AbstractMessage {
     public String toString() {
         return "DeckChallengeMessage{" +
                 "id=" + id +
-                ", recipient=" + recipient +
+                ", recipientUser=" + recipientUser +
                 ", content='" + content + '\'' +
                 ", timestamp=" + timestamp +
                 "deck=" + deck +

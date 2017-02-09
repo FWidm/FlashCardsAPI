@@ -19,6 +19,7 @@ GET     /testRating         controllers.HomeController.testRating
 GET     /testCardDeck         controllers.HomeController.testCardDeck
 GET     /testCategories     controllers.HomeController.testCategories
 GET     /testMessages       controllers.HomeController.testMessages
+
 ## General methods
 GET     /test               controllers.HomeController.test
 GET     /heartbeat          controllers.HomeController.heartbeat

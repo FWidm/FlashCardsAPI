@@ -9,19 +9,21 @@ import models.UserGroup;
 import play.Logger;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
-import play.mvc.Result;
-import util.*;
-import util.exceptions.*;
+import util.JsonKeys;
+import util.RequestKeys;
+import util.UrlParamHelper;
+import util.UserOperations;
+import util.exceptions.DuplicateKeyException;
+import util.exceptions.InvalidInputException;
+import util.exceptions.NotAuthorizedException;
+import util.exceptions.ObjectNotFoundException;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  */
 public class CardDeckRepository {
@@ -68,11 +70,11 @@ public class CardDeckRepository {
     public static CardDeck deleteCardDeck(long id, String email) throws NotAuthorizedException {
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         CardDeck deck = CardDeck.find.byId(id);
-        if(deck==null)
+        if (deck == null)
             throw new NullPointerException();
         if (!author.hasRight(UserOperations.EDIT_DECK, deck))
             throw new NotAuthorizedException("This user is not authorized to delete the deck with this id.");
-            deck.delete();
+        deck.delete();
 
         return deck;
     }

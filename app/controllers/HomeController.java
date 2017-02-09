@@ -11,12 +11,12 @@ import models.rating.Rating;
 import play.Logger;
 import play.libs.Json;
 import play.mvc.*;
-
-import repositories.CardDeckRepository;
 import repositories.UserRepository;
-import util.*;
+import util.ActionAuthenticator;
+import util.JsonKeys;
+import util.JsonUtil;
 import util.crypt.PasswordUtil;
-import views.html.*;
+import views.html.index;
 
 import java.io.File;
 import java.io.IOException;
@@ -431,22 +431,22 @@ public class HomeController extends Controller {
         return cardDeckList;
     }
 
-    public Result testMessages(){
+    public Result testMessages() {
         User user = UserRepository.findUserByEmail("email1@email.com");
-        if(user==null) {
+        if (user == null) {
             user = new User("name", "email1@email.com", "password", 0);
             user.save();
         }
 
-        CardDeck deck = CardDeck.find.where().eq(JsonKeys.CARDDECK_NAME,"deck").findUnique();
-        if(deck==null){
-            deck=new CardDeck("deck");
+        CardDeck deck = CardDeck.find.where().eq(JsonKeys.CARDDECK_NAME, "deck").findUnique();
+        if (deck == null) {
+            deck = new CardDeck("deck");
             deck.save();
         }
 
-        DeckChallengeMessage msg = new DeckChallengeMessage(user,"content",deck);
+        DeckChallengeMessage msg = new DeckChallengeMessage(user, "content", deck);
         msg.save();
-        Logger.debug("msg="+ AbstractMessage.find.byId(1L));
+        Logger.debug("msg=" + AbstractMessage.find.byId(1L));
         return ok(JsonUtil.toJson(DeckChallengeMessage.find.byId(1L)));
     }
 }

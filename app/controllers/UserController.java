@@ -1,22 +1,22 @@
 package controllers;
 
-import java.util.List;
-import java.util.Map;
-
-import models.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import models.User;
+import models.UserGroup;
 import play.Logger;
+import play.mvc.BodyParser;
+import play.mvc.Controller;
+import play.mvc.Result;
 import play.mvc.Security;
 import repositories.UserRepository;
 import util.ActionAuthenticator;
 import util.JsonKeys;
 import util.JsonUtil;
-import play.mvc.BodyParser;
-import play.mvc.Controller;
-import play.mvc.Result;
-
-import com.fasterxml.jackson.databind.JsonNode;
 import util.exceptions.InvalidInputException;
 import util.exceptions.NotAuthorizedException;
+
+import java.util.List;
+import java.util.Map;
 
 public class UserController extends Controller {
 

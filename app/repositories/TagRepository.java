@@ -1,24 +1,19 @@
 package repositories;
 
-import com.avaje.ebean.ExpressionList;
-import com.avaje.ebean.RawSql;
 import com.fasterxml.jackson.databind.JsonNode;
-import models.Answer;
 import models.FlashCard;
 import models.Tag;
 import models.User;
 import play.Logger;
-import play.api.mvc.Flash;
-import play.api.routing.Router;
 import util.JsonKeys;
 import util.RequestKeys;
 import util.UrlParamHelper;
 
-import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  */
 public class TagRepository {
@@ -148,9 +143,9 @@ public class TagRepository {
                 } else {
                     //check if tag name does not lead to the same tag being added twice. This would lead to a primary key constraint error.
                     boolean idExists = tags.stream()
-                            .anyMatch(t -> t.getId()==lookupTag.getId());
+                            .anyMatch(t -> t.getId() == lookupTag.getId());
                     //Logger.debug("TAGREPO ID="+tmpT.getId()+" EXISTS? "+idExists);
-                    if(!idExists)
+                    if (!idExists)
                         tags.add(tmpT);
                 }
 

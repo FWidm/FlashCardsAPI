@@ -1,21 +1,15 @@
 package repositories;
 
-import com.avaje.ebean.ExpressionList;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import models.Answer;
 import models.FlashCard;
 import models.User;
-import models.UserGroup;
 import models.rating.AnswerRating;
 import models.rating.CardRating;
 import models.rating.Rating;
 import play.Logger;
 import play.mvc.BodyParser;
-import play.mvc.Controller;
-import play.mvc.Result;
 import util.JsonKeys;
-import util.JsonUtil;
 import util.RequestKeys;
 import util.UserOperations;
 import util.exceptions.DuplicateKeyException;
@@ -29,7 +23,6 @@ import java.util.Map;
 import static com.avaje.ebean.Expr.eq;
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  */
 public class RatingRepository {
@@ -52,14 +45,14 @@ public class RatingRepository {
             return ratingList;
         }
         //by uid + rated object id
-        if (urlParams.containsKey(RequestKeys.USER_ID)&&urlParams.containsKey(RequestKeys.FLASHCARD_ID)) {
+        if (urlParams.containsKey(RequestKeys.USER_ID) && urlParams.containsKey(RequestKeys.FLASHCARD_ID)) {
             Logger.debug("uid+cardId");
             Long uid = Long.parseLong(urlParams.get(RequestKeys.USER_ID)[0]);
             Long id = Long.parseLong(urlParams.get(RequestKeys.FLASHCARD_ID)[0]);
             ratingList = Rating.find.where().and(eq(JsonKeys.USER_ID, uid), eq(JsonKeys.FLASHCARD_ID, id)).findList();
             return ratingList;
         }
-        if (urlParams.containsKey(RequestKeys.USER_ID)&&urlParams.containsKey(RequestKeys.ANSWER_ID)) {
+        if (urlParams.containsKey(RequestKeys.USER_ID) && urlParams.containsKey(RequestKeys.ANSWER_ID)) {
             Logger.debug("uid+answerId");
             Long uid = Long.parseLong(urlParams.get(RequestKeys.USER_ID)[0]);
             Long id = Long.parseLong(urlParams.get(RequestKeys.ANSWER_ID)[0]);
@@ -162,11 +155,12 @@ public class RatingRepository {
 
     /**
      * Updates a rating by its id.
-     * @param id - of the rating.
+     *
+     * @param id    - of the rating.
      * @param email - of the auth. user.
-     * @param json - request content.
+     * @param json  - request content.
      * @return changed Rating.
-     * @throws Exception if no valid rating class is found we throw this
+     * @throws Exception              if no valid rating class is found we throw this
      * @throws NotAuthorizedException if the user is not authorized
      */
     @BodyParser.Of(BodyParser.Json.class)
@@ -182,9 +176,9 @@ public class RatingRepository {
 
         Logger.debug("Rating=" + rating + " | class simple name=" + rating.getClass().getSimpleName());
         if (json.has("ratingModifier")) {
-            int ratingModifier=json.get("ratingModifier").asInt();
-            Logger.debug("Ratingmodifiers differ? "+(ratingModifier!=rating.getRatingModifier())+"| sent modifier="+ratingModifier+" | in db="+rating.getRatingModifier());
-            if(ratingModifier!=rating.getRatingModifier()) {
+            int ratingModifier = json.get("ratingModifier").asInt();
+            Logger.debug("Ratingmodifiers differ? " + (ratingModifier != rating.getRatingModifier()) + "| sent modifier=" + ratingModifier + " | in db=" + rating.getRatingModifier());
+            if (ratingModifier != rating.getRatingModifier()) {
                 switch (rating.getClass().getSimpleName()) {
                     case "AnswerRating":
                         Logger.debug("AnswerRating!");

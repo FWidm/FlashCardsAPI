@@ -21,7 +21,6 @@ import java.util.Map;
 
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  */
 public class UserGroupRepository {
@@ -258,9 +257,9 @@ public class UserGroupRepository {
     /**
      * Deletes a UserGroup by it's id.
      *
-     * @param id of a group
+     * @param id    of a group
      * @param email of the manipulating user
-     * @throws NullPointerException if not found
+     * @throws NullPointerException   if not found
      * @throws NotAuthorizedException if the user that wants to delete is not authorized
      */
     public static void deleteUserGroup(long id, String email) throws NullPointerException, NotAuthorizedException {
@@ -295,7 +294,8 @@ public class UserGroupRepository {
 
     /**
      * Unsubscribe one user from a group
-     * @param id usergroup we want to unsubscribe from
+     *
+     * @param id    usergroup we want to unsubscribe from
      * @param email of the user
      * @return true if removed, false if not.
      */
