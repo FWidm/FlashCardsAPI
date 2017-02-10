@@ -16,7 +16,6 @@ import util.ActionAuthenticator;
 import util.JsonKeys;
 import util.JsonUtil;
 import util.crypt.PasswordUtil;
-import views.html.index;
 
 import java.io.File;
 import java.io.IOException;
@@ -163,7 +162,7 @@ public class HomeController extends Controller {
         f.delete();
         a.delete();
         u.delete();*/
-        return ok(index.render("Test done."));
+        return ok(JsonUtil.prepareJsonStatus(OK,"Rating test done!"));
     }
 
     /**
@@ -191,7 +190,7 @@ public class HomeController extends Controller {
         u.deleteTokens();
         u.delete();
         Logger.debug(output);
-        return ok(index.render(output));
+        return ok(JsonUtil.prepareJsonStatus(OK,"Token test done! output="+output));
     }
 
     public Result testCards() {
@@ -236,7 +235,7 @@ public class HomeController extends Controller {
         Logger.debug("Card tags: " + fc.getTags());
         List<Tag> fc_tags = FlashCard.find.byId(fc.getId()).getTags();
 
-        return ok(index.render("Card test done!"));
+        return ok(JsonUtil.prepareJsonStatus(OK,"Card test done!"));
     }
 
     public Result testGroups() {
@@ -270,7 +269,7 @@ public class HomeController extends Controller {
             u.getUserGroups().forEach((group) -> Logger.debug(u.getId() + ":" + group));
         }
 
-        return ok(index.render("Group test done!"));
+        return ok(JsonUtil.prepareJsonStatus(OK,"Group test done!"));
     }
 
     /**

@@ -24,7 +24,7 @@ public class DeckChallengeMessage extends AbstractMessage {
     CardDeck deck;
 
     /**
-     * Create a new message for one recipientUser with a specific string message
+     * Create a new message for one recipient with a specific string message
      *
      * @param recipient
      * @param content
@@ -46,7 +46,7 @@ public class DeckChallengeMessage extends AbstractMessage {
     public String toString() {
         return "DeckChallengeMessage{" +
                 "id=" + id +
-                ", recipientUser=" + recipientUser +
+                ", recipient=" + recipient +
                 ", content='" + content + '\'' +
                 ", timestamp=" + timestamp +
                 "deck=" + deck +

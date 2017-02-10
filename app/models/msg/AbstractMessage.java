@@ -30,7 +30,7 @@ public abstract class AbstractMessage extends Model {
     @ManyToOne
     @JoinColumn(name = JsonKeys.MESSAGE_RECIPIENT, referencedColumnName = JsonKeys.USER_ID)
     @JsonProperty(JsonKeys.MESSAGE_RECIPIENT)
-    protected User recipientUser;
+    protected User recipient;
     @Column(name = JsonKeys.MESSAGE_CONTENT)
     @JsonProperty(JsonKeys.MESSAGE_CONTENT)
     protected String content;
@@ -40,13 +40,13 @@ public abstract class AbstractMessage extends Model {
     protected Date timestamp;
 
     /**
-     * Create a new message for one recipientUser with a specific string message
+     * Create a new message for one recipient with a specific string message
      *
      * @param recipient
      * @param content
      */
     public AbstractMessage(User recipient, String content) {
-        this.recipientUser = recipient;
+        this.recipient = recipient;
         this.content = content;
     }
 
@@ -55,13 +55,13 @@ public abstract class AbstractMessage extends Model {
         return id;
     }
 
-    public User getRecipientUser() {
-        return recipientUser;
+    public User getRecipient() {
+        return recipient;
     }
 
     //setter
-    public void setRecipientUser(User recipientUser) {
-        this.recipientUser = recipientUser;
+    public void setRecipient(User recipient) {
+        this.recipient = recipient;
     }
 
     public String getContent() {
@@ -80,7 +80,7 @@ public abstract class AbstractMessage extends Model {
     public String toString() {
         return "AbstractMessage{" +
                 "id=" + id +
-                ", recipientUser=" + recipientUser +
+                ", recipient=" + recipient +
                 ", content='" + content + '\'' +
                 ", timestamp=" + timestamp +
                 '}';

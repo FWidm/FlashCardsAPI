@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import models.msg.AbstractMessage;
 import models.rating.Rating;
 import play.Logger;
 import play.data.validation.Constraints.Email;
@@ -272,8 +273,6 @@ public class User extends Model {
         }
     }
 
-    // TODO: 19.01.2017 write the whole method when we decided what has to be done, also adapt values
-
     /**
      * Checks whether the current user has the rights to perform the operation we want to check. If an object is passed
      * we can check if the user is in any way an owner and has rights regardless of his rating.
@@ -302,8 +301,26 @@ public class User extends Model {
         final int RATING_EDIT_GROUP = 1000;
         final int RATING_DELETE_GROUP = 1000;
 
+
         //Used class compare instead of instanceof due to performance reasons.
         switch (userOperation) {
+            //message
+            case GET_MESSAGE:{
+                //receive single message
+                if (manipulated != null && manipulated instanceof AbstractMessage) {
+                    AbstractMessage msg = (AbstractMessage) manipulated;
+                    Logger.debug("is Recipient=" + (msg.getRecipient() == this));
+
+                    //can delete own cards OR any cards when this user's rating is over a specific value
+                    if (msg.getRecipient() == this) {
+                        return true;
+                    }
+                }
+                //receive list of messages
+                if(manipulated==null){
+
+                }
+            }
             //category
             case CREATE_CATEGORY: {
                 if (rating >= RATING_CREATE_CATEGORY) {
