@@ -11,6 +11,7 @@ import util.JsonUtil;
 import util.exceptions.InvalidInputException;
 import util.exceptions.NotAuthorizedException;
 
+import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -21,20 +22,25 @@ public class MessagingController extends Controller {
     @Security.Authenticated(ActionAuthenticator.class)
     public Result getMessages() {
         try {
-            List<AbstractMessage> messageList=MessagingRepository.getMessages(request().username());
+            List<AbstractMessage> messageList = MessagingRepository.getMessages(request().username());
             return ok(JsonUtil.toJson(messageList));
         } catch (NotAuthorizedException e) {
             return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage()));
+        } catch (ParseException e) {
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Error while parsing date. Date should have the format: 'yyyy-MM-dd HH:mm:ss z'. Example: ?startDate=2017-02-10 13:24:29 UTC"));
         }
     }
 
     @Security.Authenticated(ActionAuthenticator.class)
     public Result getMessage(Long id) {
-        try{
-            AbstractMessage message=MessagingRepository.getMessage(id,request().username());
+        try {
+            AbstractMessage message = MessagingRepository.getMessage(id, request().username());
             return ok(JsonUtil.toJson(message));
         } catch (NotAuthorizedException e) {
             return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage()));
+        } catch (NullPointerException e) {
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
+                    "The message could not be found.", id));
         }
     }
 
@@ -52,5 +58,16 @@ public class MessagingController extends Controller {
         } catch (InvalidInputException e) {
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage()));
         }
+    }
+
+    @Security.Authenticated(ActionAuthenticator.class)
+    public Result deleteMessage(Long id) {
+        try {
+            MessagingRepository.deleteMessage(id, request().username());
+        } catch (NullPointerException e) {
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
+                    "The message could not be found.", id));
+        }
+        return noContent();
     }
 }

@@ -117,8 +117,10 @@ public class MessagingRepository {
         AbstractMessage msg = AbstractMessage.find.byId(id);
         User currentUser = UserRepository.findUserByEmail(email);
 
-        if (currentUser.hasRight(UserOperations.GET_MESSAGE, msg))
+        if (msg !=null && currentUser.hasRight(UserOperations.GET_MESSAGE, msg)) {
             msg.delete();
-        return msg;
+            return msg;
+        }
+        throw new NullPointerException();
     }
 }

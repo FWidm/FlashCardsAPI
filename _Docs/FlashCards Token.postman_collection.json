@@ -2017,6 +2017,23 @@
 						"description": ""
 					},
 					"response": []
+				},
+				{
+					"name": "Delete MSG by id",
+					"request": {
+						"url": "{{url}}{{port}}/messages/11",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
 				}
 			]
 		},
