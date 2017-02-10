@@ -309,10 +309,10 @@ public class User extends Model {
                 //receive single message
                 if (manipulated != null && manipulated instanceof AbstractMessage) {
                     AbstractMessage msg = (AbstractMessage) manipulated;
-                    Logger.debug("is Recipient=" + (msg.getRecipient() == this));
+                    Logger.debug("is Recipient=" + (msg.getRecipient().getId() == this.getId()));
 
                     //can delete own cards OR any cards when this user's rating is over a specific value
-                    if (msg.getRecipient() == this) {
+                    if (msg.getRecipient().getId() == this.getId()) {
                         return true;
                     }
                 }

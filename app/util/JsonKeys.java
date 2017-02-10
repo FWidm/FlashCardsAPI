@@ -111,12 +111,12 @@ public class JsonKeys {
 
     //Messaging
     public static final String MESSAGE_ID = "messageId";
-    public static final String MESSAGE_RECIPIENT = "recipientId";
+    public static final String MESSAGE_RECIPIENT = "recipient";
     public static final String MESSAGE_CONTENT = "content";
     public static final String MESSAGE_TYPE = "messageType";
 
     public static final String DECK_CHALLENGE_MESSAGE = "deckChallengeMessage";
-    public static final String DECK_CHALLENGE_MESSAGE_DECK = "targetDeckId";
+    public static final String DECK_CHALLENGE_MESSAGE_DECK = "targetDeck";
 
     public static final String MESSAGE = "message";
 }

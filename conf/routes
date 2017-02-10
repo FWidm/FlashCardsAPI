@@ -93,3 +93,8 @@ GET     /tags               controllers.TagController.getTags
 GET     /tags/cards         controllers.TagController.getAttachedCardsByTags
 GET     /tags/:id           controllers.TagController.getTag(id:Long)
 GET     /tags/:id/cards     controllers.TagController.getAttachedCards(id:Long)
+
+#Messages
+GET /messages               controllers.MessagingController.getMessages
+GET /messages/:id           controllers.MessagingController.getMessage(id:Long)
+POST /messages              controllers.MessagingController.createMessage

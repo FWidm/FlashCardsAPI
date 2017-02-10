@@ -36,6 +36,7 @@ public abstract class AbstractMessage extends Model {
     protected String content;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
     @CreatedTimestamp
+    @Column(name = JsonKeys.DATE_CREATED)
     @JsonProperty(JsonKeys.DATE_CREATED)
     protected Date timestamp;
 

@@ -6,10 +6,10 @@
 create table message (
   messagetype               varchar(31) not null,
   messageId                 bigint auto_increment not null,
-  recipientId               bigint,
+  recipient                 bigint,
   content                   varchar(255),
-  timestamp                 datetime(6) not null,
-  targetDeckId              bigint,
+  created                   datetime(6) not null,
+  targetDeck                bigint,
   constraint pk_message primary key (messageId))
 ;
 
@@ -133,10 +133,10 @@ create table userGroupJoinTable (
   groupId                        bigint not null,
   constraint pk_userGroupJoinTable primary key (userId, groupId))
 ;
-alter table message add constraint fk_message_recipientUser_1 foreign key (recipientId) references user (userId) on delete restrict on update restrict;
-create index ix_message_recipientUser_1 on message (recipientId);
-alter table message add constraint fk_message_deck_2 foreign key (targetDeckId) references cardDeck (cardDeckId) on delete restrict on update restrict;
-create index ix_message_deck_2 on message (targetDeckId);
+alter table message add constraint fk_message_recipient_1 foreign key (recipient) references user (userId) on delete restrict on update restrict;
+create index ix_message_recipient_1 on message (recipient);
+alter table message add constraint fk_message_deck_2 foreign key (targetDeck) references cardDeck (cardDeckId) on delete restrict on update restrict;
+create index ix_message_deck_2 on message (targetDeck);
 alter table answer add constraint fk_answer_author_3 foreign key (userId) references user (userId) on delete restrict on update restrict;
 create index ix_answer_author_3 on answer (userId);
 alter table answer add constraint fk_answer_card_4 foreign key (cardId) references flashCard (flashcardId) on delete restrict on update restrict;

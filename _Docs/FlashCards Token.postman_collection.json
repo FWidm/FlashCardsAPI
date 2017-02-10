@@ -1,1832 +1,2785 @@
 {
-	"id": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-	"name": "FlashCards Token",
-	"description": "",
-	"order": [],
-	"folders": [
+	"variables": [],
+	"info": {
+		"name": "FlashCards Token",
+		"_postman_id": "2e25468d-679e-53d3-642c-bebe88eed4d7",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
 		{
-			"owner": "728454",
-			"lastUpdatedBy": "728454",
-			"lastRevision": 969381701,
-			"id": "898baedc-b965-4274-f9ab-d9b93a25abd3",
 			"name": "Auth/Upload",
 			"description": "",
-			"order": [
-				"06d60905-e79f-4f69-f3bc-e8ad6d4442fb",
-				"3a52ab67-4191-020f-dae9-86515f1a6842",
-				"2bc834f5-f46c-10a1-5efa-342461cfab24",
-				"92917707-7eee-ff00-2bf0-2352f4a92f74"
+			"item": [
+				{
+					"name": "Create a new User copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var uname=Math.random().toString(36).substr(2, 5);\r",
+									"postman.setEnvironmentVariable(\"userEmail\",uname +\"@test.com\")\r",
+									"postman.setEnvironmentVariable(\"userName\",uname);\r",
+									"postman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve token for current User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"token\", jsonData.token);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/login",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "test token auth",
+					"request": {
+						"url": "{{url}}{{port}}/auth",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Media to the server (IMG)",
+					"request": {
+						"url": "{{url}}{{port}}/upload",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "picture",
+									"type": "file",
+									"enabled": true,
+									"warning": "",
+									"src": "fragmuttidribbble.png"
+								}
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				}
 			]
 		},
 		{
-			"owner": "728454",
-			"lastUpdatedBy": "728454",
-			"lastRevision": 1004744696,
-			"id": "8284e735-de28-b8cd-5152-c747487d001c",
 			"name": "CardDeck (edited)",
 			"description": "",
-			"order": [
-				"0235e08f-ca77-5610-f4b9-01d614237e69",
-				"9cbdbde7-a8c2-0760-e572-cd040ef8f49a",
-				"8769473e-cf32-442a-75e4-bc3e52298037",
-				"70adb5be-c72a-1c45-fe88-f600b47bb8f7",
-				"67215914-3347-5a5e-5ba1-a680a49d1e72",
-				"c9aaaddd-ab31-121e-7b8c-3249267e6dd4",
-				"45aebb07-3794-e7fd-3bc8-f6a09aa76364",
-				"49ba4be2-a4d6-fde4-e4de-ce2b9a0d6cf2",
-				"f8cd9cc8-3f07-1310-a3b2-112a954f1e7b",
-				"295e0e5b-c9be-8799-a8d6-a7eacf1a7a04",
-				"9bcce854-7d13-a8e5-e539-a90682d4b0a8",
-				"d4dcbcb4-2618-5641-ee21-2e32336e9921",
-				"35fa8b39-7f74-c54d-0b82-ade656327282",
-				"ae643786-d96b-0420-821b-396dadb60664",
-				"4a5f5d43-6426-dc16-da93-2c9f73968468",
-				"18489978-2019-4265-c0a7-72c3770e7369"
-			],
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
+			"item": [
+				{
+					"name": "Create User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
+									"postman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r",
+									"postman.setEnvironmentVariable(\"userName\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve token for current User copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"token\", jsonData.token);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/login",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create card 1 for the deck",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId1\", jsonData.id);\r",
+									"tests[\"created card with id=\"+jsonData.id]=true;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
+						},
+						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "Create card 2 for the deck",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId2\", jsonData.id);\r",
+									"tests[\"created card with id=\"+jsonData.id]=true;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
+						},
+						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Group for the Deck",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"groupId\", jsonData.id);\r",
+									"tests[\"created group with id=\"+jsonData.id]=true;"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"groupName\", \"Group \"+Math.random().toString(36).substr(2, 5));",
+									"postman.setEnvironmentVariable(\"groupDescription\", \"Description \"+Math.random().toString(36).substr(2, 5));"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/groups",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"{{groupName}}\",\n    \"description\": \"{{groupDescription}}\",\n    \"users\":[{\"userId\":{{userId}}\n    }]\n}"
+						},
+						"description": "Creates a new Group and adds two users."
+					},
+					"response": []
+				},
+				{
+					"name": "Create a new Carddeck",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardDeckId\", jsonData.id);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cardDeckName\": \"{{cardDeckName}}\",\n    \"cardDeckDescpription\": \"\",\n    \"cards\": [\n              {\n        \"flashcardId\": {{cardId1}}\n      },\n      {\n        \"flashcardId\": {{cardId2}}\n      }\n    ],\n    \"userGroup\":{\n        \"groupId\":{{groupId}}\n    }\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "get all carddecks",
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "get one cardDeck by id (2cards)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Part. update, changes name and description",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cardDeckName\": \"{{cardDeckName}}\",\n    \"cardDeckDescpription\": \"This is a test\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create card1 for the deck",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId1\", jsonData.id);\r",
+									"\r",
+									"tests[\"created card with id=\"+jsonData.id]=true;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
+						},
+						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "Create card2 for the deck",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId2\", jsonData.id);\r",
+									"tests[\"created card with id=\"+jsonData.id]=true;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update Carddeck, moves cards, appends",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardDeckId\", jsonData.id);\r",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}?append=true&redirect=true",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cardDeckName\": \"{{cardDeckName}}\",\n    \"cardDeckDescpription\": \"\",\n     \"userGroup\":{\n        \"groupId\":{{groupId}}\n    },\n    \"cards\": [\n      {\n        \"flashcardId\": {{cardId1}}\n      },\n      {\n        \"flashcardId\": {{cardId2}}\n      }\n    ]\n}"
+						},
+						"description": "Result: group with 4 cards"
+					},
+					"response": []
+				},
+				{
+					"name": "get one cardDeck by id",
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "get one cardDecks cards",
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}/cards",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "get the first card of a carddeck (size & start param)",
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks/1/cards?size=1&start=0",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "delete one cardDeck by id",
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
 		},
 		{
-			"owner": "728454",
-			"lastUpdatedBy": "728454",
-			"lastRevision": 979654413,
-			"id": "47f8bb17-900c-458c-7b58-279f4c111a8c",
 			"name": "Cards (edited)",
 			"description": "",
-			"order": [
-				"80ba9c17-3f76-4e78-73e7-109c7f372724",
-				"99f56811-ef4a-458c-8518-fae9531955f2",
-				"d7f07bb9-7c15-c183-bb5a-e908935a0b2f",
-				"256c3d60-6c90-c2d8-d7f6-9461aae99dc3",
-				"a3199a5f-f341-6660-9336-9707f51f83e0",
-				"00cc0664-f351-87a3-92e8-a5846e28daf5",
-				"ec68f331-50dd-2234-ecbd-31eac4d611d2",
-				"9e739ece-7580-782b-93ea-797d803d8dbe",
-				"2e77b7d0-7e1c-3b25-d439-52fca0a149ce",
-				"a6c92310-1957-257b-578a-1dc0e03542d1",
-				"aa8ab3a5-1deb-73a8-7e5b-e8cc5a3fef00",
-				"215e4187-c1cc-f89b-ddce-c4199f475b78"
+			"item": [
+				{
+					"name": "Create a new User copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var uname=Math.random().toString(36).substr(2, 5);\r",
+									"postman.setEnvironmentVariable(\"userEmail\",uname +\"@test.com\")\r",
+									"postman.setEnvironmentVariable(\"userName\",uname);\r",
+									"postman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"10000\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve token for current User copy copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"token\", jsonData.token);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/login",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "get all cards",
+					"request": {
+						"url": "{{url}}{{port}}/cards",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all cards"
+					},
+					"response": []
+				},
+				{
+					"name": "create new card with a custom question.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId2\", environment[\"cardId1\"]);\r",
+									"postman.setEnvironmentVariable(\"cardId1\", jsonData.id);\r",
+									"\r",
+									"\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hintasfdqwrgwwbrgeqqbreasbasbfabfs\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        },\n        \"answerCorrect\": true\n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":1\n    }]\n  }"
+						},
+						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "retrieve a specific card",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards/{{cardId1}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves one card"
+					},
+					"response": []
+				},
+				{
+					"name": "retrieve a specific cards question",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards/{{cardId1}}/question",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves one question"
+					},
+					"response": []
+				},
+				{
+					"name": "retrieve a specific cards answers (with param)",
+					"request": {
+						"url": "{{url}}{{port}}/cards/{{cardId1}}/answers?size=1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all answers, can be limited with the parameter size=(int)."
+					},
+					"response": []
+				},
+				{
+					"name": "get the author of a specific card.",
+					"request": {
+						"url": "{{url}}{{port}}/cards/{{cardId1}}/author",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Patch card with id3 to be multichoice and have a new answer.",
+					"request": {
+						"url": "{{url}}{{port}}/cards/{{cardId1}}?append=true",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"rating\": 0,\n    \"question\": {\n      \"question\": \"hello world!2\",\n      \"mediaURI\": \"www.google.de2\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer1\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      },\n      {\n        \"answerText\": \"answer2\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      },\n      {\n        \"answerText\": \"answer3\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": true\n  }"
+						},
+						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "Update card completely with relevant data.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards/{{cardId1}}?append=false",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"rating\": 3,\n    \"question\": {\n      \"question\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"tags\": [\n        {\n            \"tagName\":\"testTag\"\n        }\n    ],\n    \"answers\": [\n      {\n        \"answerText\": \"answer1\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": true\n  }"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Answers of a card sorted by rating",
+					"request": {
+						"url": "{{url}}{{port}}/cards/{{cardId1}}/answers?sortBy=rating%20asc",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "deletes card with the given id",
+					"request": {
+						"url": "{{url}}{{port}}/cards/{{cardId1}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
 			]
 		},
 		{
-			"owner": "728454",
-			"lastUpdatedBy": "728454",
-			"lastRevision": 969381704,
-			"id": "7f04c465-fb75-dfb3-a52b-c1ad09de4bd3",
 			"name": "Categories (edited)",
 			"description": "",
-			"order": [
-				"d36fb8cc-f7d3-abf8-f6c1-0f817de76350",
-				"235413a0-c855-2733-5914-4337c60e1dcc",
-				"86d40c03-4452-7275-0c58-1fa6adc3c3e0",
-				"afc675f1-7172-fcb8-765f-f6183fc405fd",
-				"7fac1852-0f9e-724e-7cf5-a741738dffd9",
-				"0ec0cf1b-d58a-77a7-e576-6f25900ee8a0",
-				"16adbf15-4750-9214-8c9d-6cb193e5f1c5",
-				"fb6b940d-654b-22f4-615f-382b4fcd7a28",
-				"9444d712-dd3c-2e2f-9e16-a37d63994ff1",
-				"894c9b1c-823c-b225-aa83-8504f8556905"
-			],
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
+			"item": [
+				{
+					"name": "Create a new User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var uname=Math.random().toString(36).substr(2, 5);\r",
+									"postman.setEnvironmentVariable(\"userEmail\",uname +\"@test.com\")\r",
+									"postman.setEnvironmentVariable(\"userName\",uname);\r",
+									"postman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"10000\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve token for current User copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"token\", jsonData.token);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/login",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve all Categories",
+					"request": {
+						"url": "{{url}}{{port}}/categories",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"0\",\n  \"name\": \"0\",\n  \"cardDecks\": [\n    {\n      \"cardDeckId\": 29\n    }],\n  \"parent\": {\"categoryId\": 1}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve all Root categories",
+					"request": {
+						"url": "{{url}}{{port}}/categories?root=true",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"0\",\n  \"name\": \"0\",\n  \"cardDecks\": [\n    {\n      \"cardDeckId\": 29\n    }],\n  \"parent\": {\"categoryId\": 1}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "create a new category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"categoryId\", jsonData.id);",
+									"",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"randomString\", \"cat\"+Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"{{randomString}}\",\n  \"cardDecks\": [],\n  \"parent\": null\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "create child category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"categoryIdChild\", jsonData.id);",
+									"",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"randomString\", \"cat\"+Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"{{randomString}}\",\n  \"cardDecks\": [],\n  \"parent\": {\"categoryId\": {{cardDeckId}}}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "update category with a child.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"randomString\", \"cat\"+Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories/{{categoryId}}",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"{{randomString}}\",\n  \"cardDecks\": [],\n  \"parent\": {\"categoryId\": {{categoryIdChild}}}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Find children of a category",
+					"request": {
+						"url": "{{url}}{{port}}/categories/{{categoryId}}/children",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Find a specific category",
+					"request": {
+						"url": "{{url}}{{port}}/categories/{{categoryId}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Find a specific categorys decks",
+					"request": {
+						"url": "{{url}}{{port}}/categories/{{categoryId}}/decks",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
 		},
 		{
-			"owner": "728454",
-			"lastUpdatedBy": "728454",
-			"lastRevision": 992555178,
-			"id": "8d67ed22-97fc-3287-ab3e-b4a76722a381",
 			"name": "Groups (edited)",
 			"description": "",
-			"order": [
-				"5f0e14c1-a60c-6365-9abc-ca7554fbc8e1",
-				"b4a3f3ca-ced9-6d96-8562-7928288695f2",
-				"2aaba1cb-5541-92f5-2979-b23bd8a7b3e7",
-				"aaecaa31-cde1-8c2a-1dd0-b9703ce72da4",
-				"ea5f84f5-8667-7488-14aa-9270871ff028",
-				"db2b0f09-6d38-4279-1a33-6ee4598a41fa",
-				"c43c369f-cfb6-1b0e-1947-8f080b9b61da",
-				"49cfa68a-cd58-aaa8-2d0f-bfc1ff47b43c",
-				"6ce68fa0-b1d3-3102-2cbe-b96c363c23ba",
-				"ff72ad1f-0e08-3508-8a35-8c7b32fcefd8",
-				"671f6fd1-0829-2540-1e7f-a9decf372ecb",
-				"5515c694-aa61-b29a-db01-cfc5cfb5de4b",
-				"233fd63c-1b96-70ca-36bf-e43c24f703bb",
-				"8c337824-a269-c216-0304-92d9e448444d"
-			],
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
+			"item": [
+				{
+					"name": "Create a new User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
+									"postman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r",
+									"postman.setEnvironmentVariable(\"userName\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve token for current User copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"token\", jsonData.token);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/login",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "create a new group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"groupId\", jsonData.id);\r",
+									"\r",
+									"",
+									"",
+									"tests[\"Successful POST request\"] = responseCode.code === 201 || responseCode.code === 202;"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"groupName\", \"Group \"+Math.random().toString(36).substr(2, 5));",
+									"postman.setEnvironmentVariable(\"groupDescription\", \"Description \"+Math.random().toString(36).substr(2, 5));"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/groups",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"{{groupName}}\",\n    \"description\": \"{{groupDescription}}\",\n    \"users\":[{\"userId\":{{userId}}\n    }]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "get all groups",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"New Group can be found in all groups\"] = responseBody.has(postman.getEnvironmentVariable(\"groupName\"));"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/groups",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all groups"
+					},
+					"response": []
+				},
+				{
+					"name": "get non-empty groups",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"New Group can be found in non-empty groups\"] = responseBody.has(postman.getEnvironmentVariable(\"groupName\"));"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/groups",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all groups"
+					},
+					"response": []
+				},
+				{
+					"name": "get empty groups",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"New Group can not be found in empty groups\"] = !responseBody.has(postman.getEnvironmentVariable(\"groupName\"));"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/groups?empty=true",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all groups"
+					},
+					"response": []
+				},
+				{
+					"name": "find the newest created group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Group name matches expected name\"] = responseBody.has(postman.getEnvironmentVariable(\"groupName\"));"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/groups/{{groupId}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves a specific group"
+					},
+					"response": []
+				},
+				{
+					"name": "update with new name and description but same users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"groupName\", \"Group ed\"+Math.random().toString(36).substr(2, 5));",
+									"postman.setEnvironmentVariable(\"groupDescription\", \"Description ed\"+Math.random().toString(36).substr(2, 5));"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/groups/{{groupId}}?append=true",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"{{groupName}}\",\n    \"description\": \"{{groupDescription}}\",\n    \"users\":[{\"userId\":{{userId}}\n    }]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "set users to null",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/groups/{{groupId}}?append=true",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"users\":[{\"userId\":{{userId}}\n    }]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "UNSUBSCRIBE from a specific group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/groups/{{groupId}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve all users in one group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/groups/{{groupId}}/users",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve all decks from one group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/groups/{{groupId}}/decks",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "get groups of user via their id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"var jsonData = JSON.parse(responseBody);",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/groups?userId={{userId}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all groups"
+					},
+					"response": []
+				},
+				{
+					"name": "get grups of user via their email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"var jsonData = JSON.parse(responseBody);",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/groups?email={{userEmail}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all groups"
+					},
+					"response": []
+				}
+			]
 		},
 		{
-			"owner": "728454",
-			"lastUpdatedBy": "728454",
-			"lastRevision": 969381706,
-			"id": "ee142a89-516f-e873-ba59-90d80222f1b3",
+			"name": "Messages",
+			"description": "",
+			"item": [
+				{
+					"name": "Create a new User copy copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var uname=Math.random().toString(36).substr(2, 5);\r",
+									"postman.setEnvironmentVariable(\"userEmail\",uname +\"@test.com\")\r",
+									"postman.setEnvironmentVariable(\"userName\",uname);\r",
+									"postman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve token for current User copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"token\", jsonData.token);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/login",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create Group for the Deck copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"groupId\", jsonData.id);\r",
+									"tests[\"created group with id=\"+jsonData.id]=true;"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"groupName\", \"Group \"+Math.random().toString(36).substr(2, 5));",
+									"postman.setEnvironmentVariable(\"groupDescription\", \"Description \"+Math.random().toString(36).substr(2, 5));"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/groups",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"{{groupName}}\",\n    \"description\": \"{{groupDescription}}\",\n    \"users\":[{\"userId\":{{userId}}\n    }]\n}"
+						},
+						"description": "Creates a new Group and adds two users."
+					},
+					"response": []
+				},
+				{
+					"name": "Create a new Carddeck copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardDeckId\", jsonData.id);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cardDeckName\": \"{{cardDeckName}}\",\n    \"cardDeckDescpription\": \"\",\n    \"cards\": [],\n    \"userGroup\":{\n        \"groupId\":{{groupId}}\n    }\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create a message",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"messageId\", jsonData.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/messages",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"recipient\":{\r\n      \"userId\":{{userId}}\r\n   },\r\n   \"content\":\"content\",\r\n\r\n   \"targetDeck\":{\r\n      \"cardDeckId\":{{cardDeckId}}\r\n   }\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "GET last created MSG by id",
+					"request": {
+						"url": "{{url}}{{port}}/messages/{{messageId}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Filter messages of the auth user via startDate param.",
+					"request": {
+						"url": "{{url}}{{port}}/messages?startDate=2017-02-10 13:24:29 UTC",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Ratings (edited)",
 			"description": "",
-			"order": [
-				"84510358-041d-ada4-b030-5b8aac1b62ba",
-				"b80370d7-eb8a-5b01-c17e-e92b83185958",
-				"60662fee-66bc-8a20-5ffc-62ba28f2c2d1",
-				"c08a888f-0535-7ef7-b501-e8fd3465ef96",
-				"4105f670-115b-3fa9-ea5d-61bb1279102c",
-				"55578801-c0f8-d367-fbe2-67b052863cbe",
-				"b1643a1c-48d1-cb33-f0fb-1416f5d52ecc",
-				"3b4480be-ceaa-b4d4-d90c-4a5f5b91fc24",
-				"24a94053-b5a4-7f7b-695b-30b27242e779",
-				"7c26cdd0-3016-f505-c8df-c41b75fa2260",
-				"a47a05ec-f6f1-35ab-bc17-64cb5910020b",
-				"5b92541c-dc4e-5d7c-53f5-147a0e299ea0",
-				"372ee01b-9121-a7ef-9039-67dcd88ed999",
-				"02e5a051-ec50-c859-134b-0822c5b45217",
-				"845b9be7-9d87-9645-eac9-ac40abe495ab"
-			],
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
+			"item": [
+				{
+					"name": "Create a new User copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
+									"postman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r",
+									"postman.setEnvironmentVariable(\"userName\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve token for current User copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"token\", jsonData.token);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/login",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "create new card with a custom question. copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId1\", jsonData.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": \"{{userId}}\"\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":\"{{userId}}\"\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": \"{{userId}}\"\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false\n  }"
+						},
+						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "get answer id of last created card",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"answerId\", jsonData[0].answerId);\r",
+									"\r",
+									"tests[\"answerId=\"+jsonData[0].answerId] = true;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards/{{cardId1}}/answers",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Creates a new CardRating",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"ratingId\", jsonData.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/ratings",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"author\": {\n    \"userId\": \"{{userId}}\"\n  },\n  \n  \"flashcard\": {\n    \"flashcardId\": \"{{cardId1}}\"\n    },\n    \n   \"ratingModifier\": -1\n  }"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "retrieve the 1. answer from the last card we posted",
+					"request": {
+						"url": "{{url}}{{port}}/cards/{{cardId1}}/answers?size=1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all answers, can be limited with the parameter size=(int)."
+					},
+					"response": []
+				},
+				{
+					"name": "Creates a new AnswerRating",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"ratingId\", jsonData.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/ratings",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"author\": {\n    \"userId\": \"{{userId}}\"\n  },\n    \"answer\": {\n    \"answerId\": \"{{answerId}}\"\n    },\n  \"ratingModifier\": -1\n  }"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve all ratings",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/ratings",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve all Ratings for one card",
+					"request": {
+						"url": "{{url}}{{port}}/ratings?flashcardId={{cardId1}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve all ratings for one answer",
+					"request": {
+						"url": "{{url}}{{port}}/ratings?answerId={{answerId}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve all ratings from one user",
+					"request": {
+						"url": "{{url}}{{port}}/ratings?userId={{userId}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve one rating that has a specific user and card",
+					"request": {
+						"url": "{{url}}{{port}}/ratings?userId={{userId}}&flashcardId={{cardId1}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve the rating for one users & answer",
+					"request": {
+						"url": "{{url}}{{port}}/ratings?answerId={{answerId}}&userId={{userId}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Change the modifier of a specific rating to 0",
+					"request": {
+						"url": "{{url}}{{port}}/ratings/{{ratingId}}",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"ratingModifier\": 0\n  }"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Rating by ID",
+					"request": {
+						"url": "{{url}}{{port}}/ratings/{{ratingId}}",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
 		},
 		{
-			"owner": "728454",
-			"lastUpdatedBy": "728454",
-			"lastRevision": 969381707,
-			"id": "272f64f3-76ec-e7e3-db73-bce792642513",
 			"name": "Tags",
 			"description": "",
-			"order": [
-				"bba1f4ae-ef33-dafc-72c4-c996b40dbf30",
-				"faaa939a-32b9-1426-ab5e-262e91080867",
-				"3b604f7e-94e4-c1e8-183b-1a4584450224",
-				"8a75b789-409d-db88-eaef-068a2ffb8c2a",
-				"72464563-e17b-d40c-bab5-a895070fbafc",
-				"9372c1c7-36de-7776-ff2a-fad5ebe4cf20",
-				"fff4ef69-0120-325d-a9a9-84eb2adb8623"
+			"item": [
+				{
+					"name": "Get Tags sorted by usageCount (supports ASC/DESC)",
+					"request": {
+						"url": "{{url}}{{port}}/tags?sortBy=usageCount%20asc",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Tags",
+					"request": {
+						"url": "{{url}}{{port}}/tags",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Tags starting with \"h\"",
+					"request": {
+						"url": "{{url}}{{port}}/tags?startsWith=h",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get all cards attached to a specific tag",
+					"request": {
+						"url": "{{url}}{{port}}/tags/1/cards",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get one tag by id",
+					"request": {
+						"url": "{{url}}{{port}}/tags/1",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Cards that have the given tags (id)",
+					"request": {
+						"url": "{{url}}{{port}}/tags/cards?id=2&id=1",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Cards that have the given tags (name)",
+					"request": {
+						"url": "{{url}}{{port}}/tags/cards?name=testTag&name=halp",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
 			]
 		},
 		{
-			"owner": "728454",
-			"lastUpdatedBy": "728454",
-			"lastRevision": 992334176,
-			"id": "9c7930bf-1dca-a126-1d22-2d3ad970f8a0",
 			"name": "Users (edited)",
 			"description": "",
-			"order": [
-				"d561fee3-152e-f9a8-67bb-bdf7d559cba0",
-				"8cdf6d03-46f9-2f23-6310-32f083aeb6d2",
-				"ab968c05-787a-541f-625f-7f972dfd4e90",
-				"91318ea3-f0c7-22fc-dac0-12ac727bb660",
-				"4b81f382-a871-8530-c60b-d24ea468c6de",
-				"fb223937-5612-523e-2b18-16fef08afd35",
-				"2f2e9d2b-faa2-42b2-85e5-659961d3855e",
-				"ba1db957-14c8-70e2-d999-63358120999a",
-				"6755ff0b-ed87-e997-5265-df960eca5f7d"
-			]
-		}
-	],
-	"timestamp": 0,
-	"owner": "728454",
-	"public": false,
-	"requests": [
-		{
-			"folder": "47f8bb17-900c-458c-7b58-279f4c111a8c",
-			"id": "00cc0664-f351-87a3-92e8-a5846e28daf5",
-			"name": "get the author of a specific card.",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\n",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cards/{{cardId1}}/author",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
-		},
-		{
-			"folder": "8284e735-de28-b8cd-5152-c747487d001c",
-			"id": "0235e08f-ca77-5610-f4b9-01d614237e69",
-			"name": "Create User",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/users",
-			"preRequestScript": "postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r\npostman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r\npostman.setEnvironmentVariable(\"userName\", Math.random().toString(36).substr(2, 5));\r\n",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"userId\", jsonData.id);",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
-		},
-		{
-			"id": "02e5a051-ec50-c859-134b-0822c5b45217",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"url": "{{url}}{{port}}/ratings/{{ratingId}}",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "PATCH",
-			"data": [],
-			"dataMode": "raw",
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1486392093699,
-			"name": "Change the modifier of a specific rating to 0",
-			"description": "",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n   \"ratingModifier\": 0\n  }"
-		},
-		{
-			"folder": "898baedc-b965-4274-f9ab-d9b93a25abd3",
-			"id": "06d60905-e79f-4f69-f3bc-e8ad6d4442fb",
-			"name": "Create a new User copy",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/users",
-			"preRequestScript": "var uname=Math.random().toString(36).substr(2, 5);\r\npostman.setEnvironmentVariable(\"userEmail\",uname +\"@test.com\")\r\npostman.setEnvironmentVariable(\"userName\",uname);\r\npostman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r\n",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"userId\", jsonData.id);",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
-		},
-		{
-			"id": "0ec0cf1b-d58a-77a7-e576-6f25900ee8a0",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"url": "{{url}}{{port}}/categories",
-			"preRequestScript": "postman.setEnvironmentVariable(\"randomString\", \"cat\"+Math.random().toString(36).substr(2, 5));\r\n",
-			"pathVariables": {},
-			"method": "POST",
-			"data": [],
-			"dataMode": "raw",
-			"tests": "var jsonData = JSON.parse(responseBody);\npostman.setEnvironmentVariable(\"categoryIdChild\", jsonData.id);\n\n",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1486393332884,
-			"name": "create child category",
-			"description": "",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n  \"categoryName\": \"{{randomString}}\",\n  \"cardDecks\": [\n    {\n      \"cardDeckId\": 29\n    },\n    {\n      \"cardDeckId\": 29\n    },\n    {\n      \"cardDeckId\": 29\n    }],\n  \"parent\": {\"categoryId\": 1}\n}"
-		},
-		{
-			"id": "16adbf15-4750-9214-8c9d-6cb193e5f1c5",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"url": "{{url}}{{port}}/categories/{{categoryId}}",
-			"preRequestScript": "postman.setEnvironmentVariable(\"randomString\", \"cat\"+Math.random().toString(36).substr(2, 5));\r\n",
-			"pathVariables": {},
-			"method": "PUT",
-			"data": [],
-			"dataMode": "raw",
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1486392111033,
-			"name": "update category with a child.",
-			"description": "",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n  \"categoryName\": \"{{randomString}}\",\n  \"cardDecks\": [],\n  \"parent\": {\"categoryId\": {{categoryIdChild}}}\n}"
-		},
-		{
-			"id": "18489978-2019-4265-c0a7-72c3770e7369",
-			"folder": "8284e735-de28-b8cd-5152-c747487d001c",
-			"name": "delete one cardDeck by id",
-			"dataMode": "params",
-			"data": [],
-			"rawModeData": "",
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Authorization: Bearer {{token}}\n",
-			"method": "DELETE",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": "{}",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "47f8bb17-900c-458c-7b58-279f4c111a8c",
-			"id": "215e4187-c1cc-f89b-ddce-c4199f475b78",
-			"name": "Retrieve token for current User copy copy",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/login",
-			"preRequestScript": "",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"token\", jsonData.token);",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
-		},
-		{
-			"folder": "8d67ed22-97fc-3287-ab3e-b4a76722a381",
-			"id": "233fd63c-1b96-70ca-36bf-e43c24f703bb",
-			"name": "get groups of user via their id",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": "html",
-			"description": "Retrieves all groups",
-			"headers": "Content-Type: application/json\n",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/groups?userId={{userId}}",
-			"preRequestScript": null,
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;\nvar jsonData = JSON.parse(responseBody);\n",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
-		},
-		{
-			"folder": "7f04c465-fb75-dfb3-a52b-c1ad09de4bd3",
-			"id": "235413a0-c855-2733-5914-4337c60e1dcc",
-			"name": "Retrieve token for current User copy",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/login",
-			"preRequestScript": "",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"token\", jsonData.token);",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
-		},
-		{
-			"folder": "ee142a89-516f-e873-ba59-90d80222f1b3",
-			"id": "24a94053-b5a4-7f7b-695b-30b27242e779",
-			"name": "Retrieve all Ratings for one card",
-			"dataMode": "params",
-			"data": [],
-			"rawModeData": null,
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/ratings?flashcardId={{cardId1}}",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "47f8bb17-900c-458c-7b58-279f4c111a8c",
-			"id": "256c3d60-6c90-c2d8-d7f6-9461aae99dc3",
-			"name": "retrieve a specific cards question",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "Retrieves one question",
-			"headers": "Content-Type: application/json\n",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cards/{{cardId1}}/question",
-			"preRequestScript": null,
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
-		},
-		{
-			"id": "295e0e5b-c9be-8799-a8d6-a7eacf1a7a04",
-			"folder": "8284e735-de28-b8cd-5152-c747487d001c",
-			"name": "Create card1 for the deck",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "Inserts a question to the db instead of using one already created.",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cards",
-			"preRequestScript": "",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardId1\", jsonData.id);\r\n\r\ntests[\"created card with id=\"+jsonData.id]=true;",
-			"currentHelper": "normal",
-			"helperAttributes": "{}",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
-		},
-		{
-			"id": "2aaba1cb-5541-92f5-2979-b23bd8a7b3e7",
-			"folder": "8d67ed22-97fc-3287-ab3e-b4a76722a381",
-			"name": "create a new group",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/groups",
-			"preRequestScript": "postman.setEnvironmentVariable(\"groupName\", \"Group \"+Math.random().toString(36).substr(2, 5));\npostman.setEnvironmentVariable(\"groupDescription\", \"Description \"+Math.random().toString(36).substr(2, 5));",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"groupId\", jsonData.id);\r\n\r\n\n\ntests[\"Successful POST request\"] = responseCode.code === 201 || responseCode.code === 202;",
-			"currentHelper": "normal",
-			"helperAttributes": "{}",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"{{groupName}}\",\n    \"description\": \"{{groupDescription}}\",\n    \"users\":[{\"userId\":{{userId}}\n    }]\n}"
-		},
-		{
-			"folder": "898baedc-b965-4274-f9ab-d9b93a25abd3",
-			"id": "2bc834f5-f46c-10a1-5efa-342461cfab24",
-			"name": "test token auth",
-			"dataMode": "raw",
-			"data": [],
-			"rawModeData": "",
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Authorization: Bearer {{token}}",
-			"method": "POST",
-			"pathVariables": null,
-			"url": "{{url}}{{port}}/auth",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": null,
-			"helperAttributes": null,
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "47f8bb17-900c-458c-7b58-279f4c111a8c",
-			"id": "2e77b7d0-7e1c-3b25-d439-52fca0a149ce",
-			"name": "Get all Answers of a card sorted by rating",
-			"dataMode": "params",
-			"data": [],
-			"rawModeData": "",
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": null,
-			"url": "{{url}}{{port}}/cards/{{cardId1}}/answers?sortBy=rating%20asc",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": null,
-			"helperAttributes": null,
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"id": "2f2e9d2b-faa2-42b2-85e5-659961d3855e",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"url": "{{url}}{{port}}/users/{{userId}}?append=true",
-			"preRequestScript": "postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r\npostman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r\n",
-			"pathVariables": {},
-			"method": "PATCH",
-			"data": [],
-			"dataMode": "raw",
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1485770390719,
-			"name": "Append Usergroup",
-			"description": "",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"groups\":[{\n        \"name\":\"2\",\n        \"description\":\"2\"\n    },{\n        \"name\":\"1\",\n        \"description\":\"1\"\n    }],\n    \"name\":\"newName\"\n}"
-		},
-		{
-			"folder": "8284e735-de28-b8cd-5152-c747487d001c",
-			"id": "35fa8b39-7f74-c54d-0b82-ade656327282",
-			"name": "get one cardDeck by id",
-			"dataMode": "params",
-			"data": [],
-			"rawModeData": null,
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}",
-			"preRequestScript": "",
-			"tests": "",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "ee142a89-516f-e873-ba59-90d80222f1b3",
-			"id": "372ee01b-9121-a7ef-9039-67dcd88ed999",
-			"name": "Retrieve the rating for one users & answer",
-			"dataMode": "params",
-			"data": [],
-			"rawModeData": null,
-			"descriptionFormat": "html",
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/ratings?answerId={{answerId}}&userId={{userId}}",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "898baedc-b965-4274-f9ab-d9b93a25abd3",
-			"id": "3a52ab67-4191-020f-dae9-86515f1a6842",
-			"name": "Retrieve token for current User",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/login",
-			"preRequestScript": "",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"token\", jsonData.token);",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
-		},
-		{
-			"folder": "ee142a89-516f-e873-ba59-90d80222f1b3",
-			"id": "3b4480be-ceaa-b4d4-d90c-4a5f5b91fc24",
-			"name": "Retrieve all ratings",
-			"dataMode": "params",
-			"data": [],
-			"rawModeData": null,
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/ratings",
-			"preRequestScript": null,
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "272f64f3-76ec-e7e3-db73-bce792642513",
-			"id": "3b604f7e-94e4-c1e8-183b-1a4584450224",
-			"name": "Get all Tags starting with \"h\"",
-			"dataMode": "params",
-			"data": null,
-			"rawModeData": null,
-			"descriptionFormat": "html",
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/tags?startsWith=h",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"id": "4105f670-115b-3fa9-ea5d-61bb1279102c",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"url": "{{url}}{{port}}/ratings",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "POST",
-			"data": [],
-			"dataMode": "raw",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"ratingId\", jsonData.id);",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1486392095834,
-			"name": "Creates a new CardRating",
-			"description": "",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n  \"author\": {\n    \"userId\": \"{{userId}}\"\n  },\n  \n  \"flashcard\": {\n    \"flashcardId\": \"{{cardId1}}\"\n    },\n    \n   \"ratingModifier\": -1\n  }"
-		},
-		{
-			"folder": "8284e735-de28-b8cd-5152-c747487d001c",
-			"id": "45aebb07-3794-e7fd-3bc8-f6a09aa76364",
-			"name": "get all carddecks",
-			"dataMode": "params",
-			"data": [],
-			"rawModeData": "",
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": null,
-			"url": "{{url}}{{port}}/cardDecks",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": null,
-			"helperAttributes": null,
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "8284e735-de28-b8cd-5152-c747487d001c",
-			"id": "49ba4be2-a4d6-fde4-e4de-ce2b9a0d6cf2",
-			"name": "get one cardDeck by id (2cards)",
-			"dataMode": "params",
-			"data": [],
-			"rawModeData": null,
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}",
-			"preRequestScript": "",
-			"tests": "var jsonData = JSON.parse(responseBody);\n",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"id": "49cfa68a-cd58-aaa8-2d0f-bfc1ff47b43c",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"url": "{{url}}{{port}}/groups/{{groupId}}?append=true",
-			"preRequestScript": "postman.setEnvironmentVariable(\"groupName\", \"Group ed\"+Math.random().toString(36).substr(2, 5));\npostman.setEnvironmentVariable(\"groupDescription\", \"Description ed\"+Math.random().toString(36).substr(2, 5));",
-			"pathVariables": {},
-			"method": "PUT",
-			"data": [],
-			"dataMode": "raw",
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;\n",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1486393101182,
-			"name": "update with new name and description but same users",
-			"description": "",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"{{groupName}}\",\n    \"description\": \"{{groupDescription}}\",\n    \"users\":[{\"userId\":{{userId}}\n    }]\n}"
-		},
-		{
-			"folder": "8284e735-de28-b8cd-5152-c747487d001c",
-			"id": "4a5f5d43-6426-dc16-da93-2c9f73968468",
-			"name": "get the first card of a carddeck (size & start param)",
-			"dataMode": "params",
-			"data": null,
-			"rawModeData": null,
-			"descriptionFormat": "html",
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cardDecks/1/cards?size=1&start=0",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "9c7930bf-1dca-a126-1d22-2d3ad970f8a0",
-			"id": "4b81f382-a871-8530-c60b-d24ea468c6de",
-			"name": "Filter userlist by email.",
-			"dataMode": "params",
-			"data": [],
-			"rawModeData": "",
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": null,
-			"url": "{{url}}{{port}}/users?email={{userEmail}}",
-			"preRequestScript": "",
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;",
-			"currentHelper": null,
-			"helperAttributes": null,
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"id": "5515c694-aa61-b29a-db01-cfc5cfb5de4b",
-			"folder": "8d67ed22-97fc-3287-ab3e-b4a76722a381",
-			"name": "Retrieve all decks from one group",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\n",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/groups/{{groupId}}/decks",
-			"preRequestScript": null,
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;\n",
-			"currentHelper": "normal",
-			"helperAttributes": "{}",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
-		},
-		{
-			"folder": "ee142a89-516f-e873-ba59-90d80222f1b3",
-			"id": "55578801-c0f8-d367-fbe2-67b052863cbe",
-			"name": "retrieve the 1. answer from the last card we posted",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "Retrieves all answers, can be limited with the parameter size=(int).",
-			"headers": "Content-Type: application/json\n",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cards/{{cardId1}}/answers?size=1",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
-		},
-		{
-			"folder": "ee142a89-516f-e873-ba59-90d80222f1b3",
-			"id": "5b92541c-dc4e-5d7c-53f5-147a0e299ea0",
-			"name": "Retrieve one rating that has a specific user and card",
-			"dataMode": "params",
-			"data": [],
-			"rawModeData": null,
-			"descriptionFormat": "html",
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/ratings?userId={{userId}}&flashcardId={{cardId1}}",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "8d67ed22-97fc-3287-ab3e-b4a76722a381",
-			"id": "5f0e14c1-a60c-6365-9abc-ca7554fbc8e1",
-			"name": "Create a new User",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/users",
-			"preRequestScript": "postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r\npostman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r\npostman.setEnvironmentVariable(\"userName\", Math.random().toString(36).substr(2, 5));\r\n",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"userId\", jsonData.id);",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
-		},
-		{
-			"id": "60662fee-66bc-8a20-5ffc-62ba28f2c2d1",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"url": "{{url}}{{port}}/cards",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "POST",
-			"data": [],
-			"dataMode": "raw",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardId1\", jsonData.id);",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1486391745935,
-			"name": "create new card with a custom question. copy",
-			"description": "Inserts a question to the db instead of using one already created.",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": \"{{userId}}\"\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":\"{{userId}}\"\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": \"{{userId}}\"\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false\n  }"
-		},
-		{
-			"id": "671f6fd1-0829-2540-1e7f-a9decf372ecb",
-			"folder": "8d67ed22-97fc-3287-ab3e-b4a76722a381",
-			"name": "Retrieve all users in one group",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\n",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/groups/{{groupId}}/users",
-			"preRequestScript": null,
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;\n",
-			"currentHelper": "normal",
-			"helperAttributes": "{}",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
-		},
-		{
-			"id": "67215914-3347-5a5e-5ba1-a680a49d1e72",
-			"folder": "8284e735-de28-b8cd-5152-c747487d001c",
-			"name": "Create Group for the Deck",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "Creates a new Group and adds two users.",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/groups",
-			"preRequestScript": "postman.setEnvironmentVariable(\"groupName\", \"Group \"+Math.random().toString(36).substr(2, 5));\npostman.setEnvironmentVariable(\"groupDescription\", \"Description \"+Math.random().toString(36).substr(2, 5));",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"groupId\", jsonData.id);\r\ntests[\"created group with id=\"+jsonData.id]=true;",
-			"currentHelper": "normal",
-			"helperAttributes": "{}",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"{{groupName}}\",\n    \"description\": \"{{groupDescription}}\",\n    \"users\":[{\"userId\":{{userId}}\n    }]\n}"
-		},
-		{
-			"id": "6755ff0b-ed87-e997-5265-df960eca5f7d",
-			"headers": "Authorization: Bearer {{token}}\n",
-			"url": "{{url}}{{port}}/users/{{userId}}",
-			"preRequestScript": "",
-			"pathVariables": {},
-			"method": "DELETE",
-			"data": [],
-			"dataMode": "raw",
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1485771130065,
-			"name": "Delete user with id {{userId}}",
-			"description": "",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": ""
-		},
-		{
-			"id": "6ce68fa0-b1d3-3102-2cbe-b96c363c23ba",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"url": "{{url}}{{port}}/groups/{{groupId}}?append=true",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "PATCH",
-			"data": [],
-			"dataMode": "raw",
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;",
-			"currentHelper": "normal",
-			"helperAttributes": "{}",
-			"time": 1485943549903,
-			"name": "set users to null",
-			"description": "",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"folder": "8d67ed22-97fc-3287-ab3e-b4a76722a381",
-			"descriptionFormat": null,
-			"rawModeData": "{\n    \"users\":[{\"userId\":{{userId}}\n    }]\n}"
-		},
-		{
-			"id": "70adb5be-c72a-1c45-fe88-f600b47bb8f7",
-			"folder": "8284e735-de28-b8cd-5152-c747487d001c",
-			"name": "Create card 2 for the deck",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "Inserts a question to the db instead of using one already created.",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cards",
-			"preRequestScript": "",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardId2\", jsonData.id);\r\ntests[\"created card with id=\"+jsonData.id]=true;",
-			"currentHelper": "normal",
-			"helperAttributes": "{}",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
-		},
-		{
-			"folder": "272f64f3-76ec-e7e3-db73-bce792642513",
-			"id": "72464563-e17b-d40c-bab5-a895070fbafc",
-			"name": "Get one tag by id",
-			"dataMode": "params",
-			"data": null,
-			"rawModeData": null,
-			"descriptionFormat": "html",
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/tags/1",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "ee142a89-516f-e873-ba59-90d80222f1b3",
-			"id": "7c26cdd0-3016-f505-c8df-c41b75fa2260",
-			"name": "Retrieve all ratings for one answer",
-			"dataMode": "params",
-			"data": [],
-			"rawModeData": null,
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/ratings?answerId={{answerId}}",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"id": "7fac1852-0f9e-724e-7cf5-a741738dffd9",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"url": "{{url}}{{port}}/categories",
-			"preRequestScript": "postman.setEnvironmentVariable(\"randomString\", \"cat\"+Math.random().toString(36).substr(2, 5));\r\n",
-			"pathVariables": {},
-			"method": "POST",
-			"data": [],
-			"dataMode": "raw",
-			"tests": "var jsonData = JSON.parse(responseBody);\npostman.setEnvironmentVariable(\"categoryId\", jsonData.id);\n\n",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1486379568236,
-			"name": "create a new category",
-			"description": "",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n  \"categoryName\": \"{{randomString}}\",\n  \"cardDecks\": [],\n  \"parent\": null\n}"
-		},
-		{
-			"folder": "47f8bb17-900c-458c-7b58-279f4c111a8c",
-			"id": "80ba9c17-3f76-4e78-73e7-109c7f372724",
-			"name": "get all cards",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "Retrieves all cards",
-			"headers": "Content-Type: application/json",
-			"method": "GET",
-			"pathVariables": null,
-			"url": "{{url}}{{port}}/cards",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": null,
-			"helperAttributes": null,
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
-		},
-		{
-			"folder": "ee142a89-516f-e873-ba59-90d80222f1b3",
-			"id": "84510358-041d-ada4-b030-5b8aac1b62ba",
-			"name": "Create a new User copy",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/users",
-			"preRequestScript": "postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r\npostman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r\npostman.setEnvironmentVariable(\"userName\", Math.random().toString(36).substr(2, 5));\r\n",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"userId\", jsonData.id);",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
-		},
-		{
-			"folder": "ee142a89-516f-e873-ba59-90d80222f1b3",
-			"id": "845b9be7-9d87-9645-eac9-ac40abe495ab",
-			"name": "Delete Rating by ID",
-			"dataMode": "params",
-			"data": [],
-			"rawModeData": null,
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "DELETE",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/ratings/{{ratingId}}",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "7f04c465-fb75-dfb3-a52b-c1ad09de4bd3",
-			"id": "86d40c03-4452-7275-0c58-1fa6adc3c3e0",
-			"name": "Retrieve all Categories",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/categories",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n  \"categoryName\": \"0\",\n  \"name\": \"0\",\n  \"cardDecks\": [\n    {\n      \"cardDeckId\": 29\n    }],\n  \"parent\": {\"categoryId\": 1}\n}"
-		},
-		{
-			"id": "8769473e-cf32-442a-75e4-bc3e52298037",
-			"folder": "8284e735-de28-b8cd-5152-c747487d001c",
-			"name": "Create card 1 for the deck",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "Inserts a question to the db instead of using one already created.",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cards",
-			"preRequestScript": "",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardId1\", jsonData.id);\r\ntests[\"created card with id=\"+jsonData.id]=true;",
-			"currentHelper": "normal",
-			"helperAttributes": "{}",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
-		},
-		{
-			"folder": "7f04c465-fb75-dfb3-a52b-c1ad09de4bd3",
-			"id": "894c9b1c-823c-b225-aa83-8504f8556905",
-			"name": "Find a specific categorys decks",
-			"dataMode": "params",
-			"data": null,
-			"rawModeData": null,
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/categories/{{categoryId}}/decks",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "272f64f3-76ec-e7e3-db73-bce792642513",
-			"id": "8a75b789-409d-db88-eaef-068a2ffb8c2a",
-			"name": "Get all cards attached to a specific tag",
-			"dataMode": "params",
-			"data": null,
-			"rawModeData": null,
-			"descriptionFormat": "html",
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/tags/1/cards",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "8d67ed22-97fc-3287-ab3e-b4a76722a381",
-			"id": "8c337824-a269-c216-0304-92d9e448444d",
-			"name": "get grups of user via their email",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": "html",
-			"description": "Retrieves all groups",
-			"headers": "Content-Type: application/json\n",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/groups?email={{userEmail}}",
-			"preRequestScript": null,
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;\nvar jsonData = JSON.parse(responseBody);\n",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
-		},
-		{
-			"folder": "9c7930bf-1dca-a126-1d22-2d3ad970f8a0",
-			"id": "8cdf6d03-46f9-2f23-6310-32f083aeb6d2",
-			"name": "Create a new User",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/users",
-			"preRequestScript": "postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r\npostman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r\npostman.setEnvironmentVariable(\"userName\", Math.random().toString(36).substr(2, 5));\r\n",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"userId\", jsonData.id);",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
-		},
-		{
-			"folder": "9c7930bf-1dca-a126-1d22-2d3ad970f8a0",
-			"id": "91318ea3-f0c7-22fc-dac0-12ac727bb660",
-			"name": "Get the user with id {{userId}}",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": null,
-			"url": "{{url}}{{port}}/users/{{userId}}",
-			"preRequestScript": "",
-			"tests": "var jsonData = JSON.parse(responseBody);\ntests[\"exists id=\"+jsonData.userId] = responseBody.has(\"userId\");",
-			"currentHelper": null,
-			"helperAttributes": null,
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"patchtest\"\n}"
-		},
-		{
-			"folder": "898baedc-b965-4274-f9ab-d9b93a25abd3",
-			"id": "92917707-7eee-ff00-2bf0-2352f4a92f74",
-			"name": "Upload Media to the server (IMG)",
-			"dataMode": "params",
-			"data": [
+			"item": [
 				{
-					"key": "picture",
-					"value": "fragmuttidribbble.png",
-					"type": "file",
-					"enabled": true,
-					"warning": ""
+					"name": "Get all users in a list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"get users\"] = responseCode.code===200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"patchtest\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create a new User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
+									"postman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r",
+									"postman.setEnvironmentVariable(\"userName\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"{{userRating}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve token for current User copy copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"token\", jsonData.token);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/login",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get the user with id {{userId}}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"exists id=\"+jsonData.userId] = responseBody.has(\"userId\");"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users/{{userId}}",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"patchtest\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Filter userlist by email.",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users?email={{userEmail}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Completely update a user with the id {{userId}}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
+									"postman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users/{{userId}}",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"rating\": \"{{userRating}}\",\n    \"email\": \"{{userEmail}}\",\n    \"groups\": []\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Append Usergroup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
+									"postman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users/{{userId}}?append=true",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"groups\":[{\n        \"name\":\"2\",\n        \"description\":\"2\"\n    },{\n        \"name\":\"1\",\n        \"description\":\"1\"\n    }],\n    \"name\":\"newName\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Replace Usergroup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r",
+									"postman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users/{{userId}}",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"groups\":[],\n    \"name\":\"testaaaa\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user with id {{userId}}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users/{{userId}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
 				}
-			],
-			"rawModeData": null,
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Authorization: Bearer {{token}}\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/upload",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "272f64f3-76ec-e7e3-db73-bce792642513",
-			"id": "9372c1c7-36de-7776-ff2a-fad5ebe4cf20",
-			"name": "Get all Cards that have the given tags (id)",
-			"dataMode": "params",
-			"data": null,
-			"rawModeData": null,
-			"descriptionFormat": "html",
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/tags/cards?id=2&id=1",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "7f04c465-fb75-dfb3-a52b-c1ad09de4bd3",
-			"id": "9444d712-dd3c-2e2f-9e16-a37d63994ff1",
-			"name": "Find a specific category",
-			"dataMode": "params",
-			"data": null,
-			"rawModeData": null,
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/categories/{{categoryId}}",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "47f8bb17-900c-458c-7b58-279f4c111a8c",
-			"id": "99f56811-ef4a-458c-8518-fae9531955f2",
-			"name": "create new card with a custom question.",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "Inserts a question to the db instead of using one already created.",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cards",
-			"preRequestScript": null,
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardId2\", environment[\"cardId1\"]);\r\npostman.setEnvironmentVariable(\"cardId1\", jsonData.id);\r\n\r\n\r\n",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hintasfdqwrgwwbrgeqqbreasbasbfabfs\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        },\n        \"answerCorrect\": true\n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":1\n    },\n    {\n      \"tagName\": \"halp\"\n    }]\n  }"
-		},
-		{
-			"id": "9bcce854-7d13-a8e5-e539-a90682d4b0a8",
-			"folder": "8284e735-de28-b8cd-5152-c747487d001c",
-			"name": "Create card2 for the deck",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cards",
-			"preRequestScript": "",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardId2\", jsonData.id);\r\ntests[\"created card with id=\"+jsonData.id]=true;",
-			"currentHelper": "normal",
-			"helperAttributes": "{}",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
-		},
-		{
-			"folder": "8284e735-de28-b8cd-5152-c747487d001c",
-			"id": "9cbdbde7-a8c2-0760-e572-cd040ef8f49a",
-			"name": "Retrieve token for current User copy",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/login",
-			"preRequestScript": "",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"token\", jsonData.token);",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
-		},
-		{
-			"folder": "47f8bb17-900c-458c-7b58-279f4c111a8c",
-			"id": "9e739ece-7580-782b-93ea-797d803d8dbe",
-			"name": "Update card completely with relevant data.",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"method": "PUT",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cards/{{cardId1}}?append=false",
-			"preRequestScript": null,
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n\"rating\": 3,\n    \"question\": {\n      \"question\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"tags\": [\n        {\n            \"tagName\":\"testTag\"\n        }\n    ],\n    \"answers\": [\n      {\n        \"answerText\": \"answer1\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": true\n  }"
-		},
-		{
-			"folder": "47f8bb17-900c-458c-7b58-279f4c111a8c",
-			"id": "a3199a5f-f341-6660-9336-9707f51f83e0",
-			"name": "retrieve a specific cards answers (with param)",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "Retrieves all answers, can be limited with the parameter size=(int).",
-			"headers": "Content-Type: application/json\n",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cards/{{cardId1}}/answers?size=1",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
-		},
-		{
-			"folder": "ee142a89-516f-e873-ba59-90d80222f1b3",
-			"id": "a47a05ec-f6f1-35ab-bc17-64cb5910020b",
-			"name": "Retrieve all ratings from one user",
-			"dataMode": "params",
-			"data": [],
-			"rawModeData": null,
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/ratings?userId={{userId}}",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "47f8bb17-900c-458c-7b58-279f4c111a8c",
-			"id": "a6c92310-1957-257b-578a-1dc0e03542d1",
-			"name": "deletes card with the given id",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"method": "DELETE",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cards/{{cardId1}}",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
-		},
-		{
-			"id": "aa8ab3a5-1deb-73a8-7e5b-e8cc5a3fef00",
-			"headers": "Content-Type: application/json\n",
-			"url": "{{url}}{{port}}/users",
-			"preRequestScript": "var uname=Math.random().toString(36).substr(2, 5);\r\npostman.setEnvironmentVariable(\"userEmail\",uname +\"@test.com\")\r\npostman.setEnvironmentVariable(\"userName\",uname);\r\npostman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r\n",
-			"pathVariables": {},
-			"method": "POST",
-			"data": [],
-			"dataMode": "raw",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"userId\", jsonData.id);",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1486393435261,
-			"name": "Create a new User copy",
-			"description": "",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"folder": "47f8bb17-900c-458c-7b58-279f4c111a8c",
-			"rawModeData": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"10000\"\n}"
-		},
-		{
-			"folder": "8d67ed22-97fc-3287-ab3e-b4a76722a381",
-			"id": "aaecaa31-cde1-8c2a-1dd0-b9703ce72da4",
-			"name": "get all groups",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "Retrieves all groups",
-			"headers": "Content-Type: application/json\n",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/groups",
-			"preRequestScript": null,
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;\nvar jsonData = JSON.parse(responseBody);\ntests[\"New Group can be found in all groups\"] = responseBody.has(postman.getEnvironmentVariable(\"groupName\"));",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
-		},
-		{
-			"folder": "9c7930bf-1dca-a126-1d22-2d3ad970f8a0",
-			"id": "ab968c05-787a-541f-625f-7f972dfd4e90",
-			"name": "Retrieve token for current User copy copy",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/login",
-			"preRequestScript": "",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"token\", jsonData.token);",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
-		},
-		{
-			"folder": "8284e735-de28-b8cd-5152-c747487d001c",
-			"id": "ae643786-d96b-0420-821b-396dadb60664",
-			"name": "get one cardDecks cards",
-			"dataMode": "params",
-			"data": [],
-			"rawModeData": null,
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}/cards",
-			"preRequestScript": "",
-			"tests": "",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "7f04c465-fb75-dfb3-a52b-c1ad09de4bd3",
-			"id": "afc675f1-7172-fcb8-765f-f6183fc405fd",
-			"name": "Retrieve all Root categories",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/categories?root=true",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n  \"categoryName\": \"0\",\n  \"name\": \"0\",\n  \"cardDecks\": [\n    {\n      \"cardDeckId\": 29\n    }],\n  \"parent\": {\"categoryId\": 1}\n}"
-		},
-		{
-			"id": "b1643a1c-48d1-cb33-f0fb-1416f5d52ecc",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"url": "{{url}}{{port}}/ratings",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "POST",
-			"data": [],
-			"dataMode": "raw",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"ratingId\", jsonData.id);",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1486392095087,
-			"name": "Creates a new AnswerRating",
-			"description": "",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n  \"author\": {\n    \"userId\": \"{{userId}}\"\n  },\n    \"answer\": {\n    \"answerId\": \"{{answerId}}\"\n    },\n  \"ratingModifier\": -1\n  }"
-		},
-		{
-			"folder": "8d67ed22-97fc-3287-ab3e-b4a76722a381",
-			"id": "b4a3f3ca-ced9-6d96-8562-7928288695f2",
-			"name": "Retrieve token for current User copy",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/login",
-			"preRequestScript": "",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"token\", jsonData.token);",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
-		},
-		{
-			"folder": "ee142a89-516f-e873-ba59-90d80222f1b3",
-			"id": "b80370d7-eb8a-5b01-c17e-e92b83185958",
-			"name": "Retrieve token for current User copy",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/login",
-			"preRequestScript": "",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"token\", jsonData.token);",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
-		},
-		{
-			"id": "ba1db957-14c8-70e2-d999-63358120999a",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"url": "{{url}}{{port}}/users/{{userId}}",
-			"preRequestScript": "postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r\npostman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r\n",
-			"pathVariables": {},
-			"method": "PATCH",
-			"data": [],
-			"dataMode": "raw",
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1485770396912,
-			"name": "Replace Usergroup",
-			"description": "",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"groups\":[],\n    \"name\":\"testaaaa\"\n}"
-		},
-		{
-			"folder": "272f64f3-76ec-e7e3-db73-bce792642513",
-			"id": "bba1f4ae-ef33-dafc-72c4-c996b40dbf30",
-			"name": "Get Tags sorted by usageCount (supports ASC/DESC)",
-			"dataMode": "params",
-			"data": null,
-			"rawModeData": null,
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/tags?sortBy=usageCount%20asc",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "ee142a89-516f-e873-ba59-90d80222f1b3",
-			"id": "c08a888f-0535-7ef7-b501-e8fd3465ef96",
-			"name": "get answer id of last created card",
-			"dataMode": "params",
-			"data": [],
-			"rawModeData": null,
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cards/{{cardId1}}/answers",
-			"preRequestScript": null,
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"answerId\", jsonData[0].answerId);\r\n\r\ntests[\"answerId=\"+jsonData[0].answerId] = true;",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "8d67ed22-97fc-3287-ab3e-b4a76722a381",
-			"id": "c43c369f-cfb6-1b0e-1947-8f080b9b61da",
-			"name": "find the newest created group",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "Retrieves a specific group",
-			"headers": "Content-Type: application/json\n",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/groups/{{groupId}}",
-			"preRequestScript": null,
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;\nvar jsonData = JSON.parse(responseBody);\ntests[\"Group name matches expected name\"] = responseBody.has(postman.getEnvironmentVariable(\"groupName\"));",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
-		},
-		{
-			"id": "c9aaaddd-ab31-121e-7b8c-3249267e6dd4",
-			"folder": "8284e735-de28-b8cd-5152-c747487d001c",
-			"name": "Create a new Carddeck",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"method": "POST",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cardDecks",
-			"preRequestScript": "postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardDeckId\", jsonData.id);",
-			"currentHelper": "normal",
-			"helperAttributes": "{}",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"cardDeckName\": \"{{cardDeckName}}\",\n    \"cardDeckDescpription\": \"\",\n    \"cards\": [\n              {\n        \"flashcardId\": {{cardId1}}\n      },\n      {\n        \"flashcardId\": {{cardId2}}\n      }\n    ],\n    \"userGroup\":{\n        \"groupId\":{{groupId}}\n    }\n}"
-		},
-		{
-			"id": "d36fb8cc-f7d3-abf8-f6c1-0f817de76350",
-			"headers": "Content-Type: application/json\n",
-			"url": "{{url}}{{port}}/users",
-			"preRequestScript": "var uname=Math.random().toString(36).substr(2, 5);\r\npostman.setEnvironmentVariable(\"userEmail\",uname +\"@test.com\")\r\npostman.setEnvironmentVariable(\"userName\",uname);\r\npostman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r\n",
-			"pathVariables": {},
-			"method": "POST",
-			"data": [],
-			"dataMode": "raw",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"userId\", jsonData.id);",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1486393435261,
-			"name": "Create a new User",
-			"description": "",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"10000\"\n}"
-		},
-		{
-			"id": "d4dcbcb4-2618-5641-ee21-2e32336e9921",
-			"folder": "8284e735-de28-b8cd-5152-c747487d001c",
-			"name": "Update Carddeck, moves cards, appends",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "Result: group with 4 cards",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"method": "PUT",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}?append=true&redirect=true",
-			"preRequestScript": "postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));\r\n",
-			"tests": "var jsonData = JSON.parse(responseBody);\r\npostman.setEnvironmentVariable(\"cardDeckId\", jsonData.id);\r\n",
-			"currentHelper": "normal",
-			"helperAttributes": "{}",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"cardDeckName\": \"{{cardDeckName}}\",\n    \"cardDeckDescpription\": \"\",\n     \"userGroup\":{\n        \"groupId\":{{groupId}}\n    },\n    \"cards\": [\n      {\n        \"flashcardId\": {{cardId1}}\n      },\n      {\n        \"flashcardId\": {{cardId2}}\n      }\n    ]\n}"
-		},
-		{
-			"folder": "9c7930bf-1dca-a126-1d22-2d3ad970f8a0",
-			"id": "d561fee3-152e-f9a8-67bb-bdf7d559cba0",
-			"name": "Get all users in a list",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": null,
-			"url": "{{url}}{{port}}/users",
-			"preRequestScript": "",
-			"tests": "tests[\"get users\"] = responseCode.code===200;",
-			"currentHelper": null,
-			"helperAttributes": null,
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"patchtest\"\n}"
-		},
-		{
-			"folder": "47f8bb17-900c-458c-7b58-279f4c111a8c",
-			"id": "d7f07bb9-7c15-c183-bb5a-e908935a0b2f",
-			"name": "retrieve a specific card",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "Retrieves one card",
-			"headers": "Content-Type: application/json\n",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cards/{{cardId1}}",
-			"preRequestScript": null,
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
-		},
-		{
-			"folder": "8d67ed22-97fc-3287-ab3e-b4a76722a381",
-			"id": "db2b0f09-6d38-4279-1a33-6ee4598a41fa",
-			"name": "get empty groups",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "Retrieves all groups",
-			"headers": "Content-Type: application/json\n",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/groups?empty=true",
-			"preRequestScript": null,
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;\nvar jsonData = JSON.parse(responseBody);\ntests[\"New Group can not be found in empty groups\"] = !responseBody.has(postman.getEnvironmentVariable(\"groupName\"));",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
-		},
-		{
-			"folder": "8d67ed22-97fc-3287-ab3e-b4a76722a381",
-			"id": "ea5f84f5-8667-7488-14aa-9270871ff028",
-			"name": "get non-empty groups",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "Retrieves all groups",
-			"headers": "Content-Type: application/json\n",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/groups",
-			"preRequestScript": null,
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;\nvar jsonData = JSON.parse(responseBody);\ntests[\"New Group can be found in non-empty groups\"] = responseBody.has(postman.getEnvironmentVariable(\"groupName\"));",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
-		},
-		{
-			"id": "ec68f331-50dd-2234-ecbd-31eac4d611d2",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"url": "{{url}}{{port}}/cards/{{cardId1}}?append=true",
-			"preRequestScript": null,
-			"pathVariables": {},
-			"method": "PATCH",
-			"data": [],
-			"dataMode": "raw",
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1486393734339,
-			"name": "Patch card with id3 to be multichoice and have a new answer.",
-			"description": "Inserts a question to the db instead of using one already created.",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n\"rating\": 0,\n    \"question\": {\n      \"question\": \"hello world!2\",\n      \"mediaURI\": \"www.google.de2\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer1\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      },\n      {\n        \"answerText\": \"answer2\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      },\n      {\n        \"answerText\": \"answer3\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": true\n  }"
-		},
-		{
-			"id": "f8cd9cc8-3f07-1310-a3b2-112a954f1e7b",
-			"folder": "8284e735-de28-b8cd-5152-c747487d001c",
-			"name": "Part. update, changes name and description",
-			"dataMode": "raw",
-			"data": [],
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"method": "PATCH",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}",
-			"preRequestScript": "postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));\r\n",
-			"tests": "",
-			"currentHelper": "normal",
-			"helperAttributes": "{}",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"cardDeckName\": \"{{cardDeckName}}\",\n    \"cardDeckDescpription\": \"This is a test\"\n}"
-		},
-		{
-			"folder": "272f64f3-76ec-e7e3-db73-bce792642513",
-			"id": "faaa939a-32b9-1426-ab5e-262e91080867",
-			"name": "Get all Tags",
-			"dataMode": "params",
-			"data": null,
-			"rawModeData": null,
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/tags",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"id": "fb223937-5612-523e-2b18-16fef08afd35",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"url": "{{url}}{{port}}/users/{{userId}}",
-			"preRequestScript": "postman.setEnvironmentVariable(\"userEmail\", Math.random().toString(36).substr(2, 5)+\"@test.com\");\r\npostman.setEnvironmentVariable(\"userPass\", Math.random().toString(36).substr(2, 5));\r\n",
-			"pathVariables": {},
-			"method": "PUT",
-			"data": [],
-			"dataMode": "raw",
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;",
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1485770032105,
-			"name": "Completely update a user with the id {{userId}}",
-			"description": "",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7",
-			"rawModeData": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"rating\": \"{{userRating}}\",\n    \"email\": \"{{userEmail}}\",\n    \"groups\": []\n}"
-		},
-		{
-			"folder": "7f04c465-fb75-dfb3-a52b-c1ad09de4bd3",
-			"id": "fb6b940d-654b-22f4-615f-382b4fcd7a28",
-			"name": "Find children of a category",
-			"dataMode": "params",
-			"data": null,
-			"rawModeData": null,
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/categories/{{categoryId}}/children",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"id": "ff72ad1f-0e08-3508-8a35-8c7b32fcefd8",
-			"folder": "8d67ed22-97fc-3287-ab3e-b4a76722a381",
-			"name": "UNSUBSCRIBE from a specific group",
-			"dataMode": "raw",
-			"data": [],
-			"rawModeData": "",
-			"descriptionFormat": null,
-			"description": "",
-			"headers": "Content-Type: application/json\nAuthorization: Bearer {{token}}\n",
-			"method": "DELETE",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/groups/{{groupId}}",
-			"preRequestScript": null,
-			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;",
-			"currentHelper": "normal",
-			"helperAttributes": "{}",
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
-		},
-		{
-			"folder": "272f64f3-76ec-e7e3-db73-bce792642513",
-			"id": "fff4ef69-0120-325d-a9a9-84eb2adb8623",
-			"name": "Get all Cards that have the given tags (name)",
-			"dataMode": "params",
-			"data": null,
-			"rawModeData": null,
-			"descriptionFormat": "html",
-			"description": "",
-			"headers": "",
-			"method": "GET",
-			"pathVariables": {},
-			"url": "{{url}}{{port}}/tags/cards?name=testTag&name=halp",
-			"preRequestScript": null,
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"collectionId": "2e25468d-679e-53d3-642c-bebe88eed4d7"
+			]
 		}
 	]
 }

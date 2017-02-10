@@ -13,7 +13,14 @@ import util.UserOperations;
 import util.exceptions.InvalidInputException;
 import util.exceptions.NotAuthorizedException;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+
+import static com.avaje.ebean.Expr.between;
+import static com.avaje.ebean.Expr.eq;
 
 /**
  * @author Fabian Widmann
@@ -27,19 +34,23 @@ public class MessagingRepository {
      * @param email of the user
      * @return list of messages (can be empty).
      */
-    public static List<AbstractMessage> getMessages(String email) throws NotAuthorizedException {
+    public static List<AbstractMessage> getMessages(String email) throws NotAuthorizedException, ParseException {
         List<AbstractMessage> messages;
         User user = UserRepository.findUserByEmail(email);
         if(user==null)
             throw new NotAuthorizedException("User has to be logged in to retrieve messages");
 
         if (UrlParamHelper.checkForKey(RequestKeys.START_DATE)) {
-            String date = UrlParamHelper.getValue(RequestKeys.START_DATE);
+            String textDate = UrlParamHelper.getValue(RequestKeys.START_DATE);
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+            Date date = format.parse(textDate);
             Logger.debug("Got date=" + date);
             // TODO: 10/02/17 query by date.
-            messages = null;
+
+            messages = AbstractMessage.find.where().and(eq(JsonKeys.MESSAGE_RECIPIENT,user),between(JsonKeys.DATE_CREATED,date,new Date())).findList();
+
         } else {
-            messages = AbstractMessage.find.where().eq(JsonKeys.MESSAGE_RECIPIENT, user.getId()).findList();
+            messages = AbstractMessage.find.where().eq(JsonKeys.MESSAGE_RECIPIENT, user).findList();
         }
         return messages;
 
@@ -70,19 +81,27 @@ public class MessagingRepository {
      */
     public static AbstractMessage createMessage(String email, JsonNode json) throws InvalidInputException {
         AbstractMessage message = null;
-        User user = null;
+        User recipient = null;
         String content = null;
+
+        Logger.debug("Json="+json);
+
         if (json.has(JsonKeys.MESSAGE_RECIPIENT)) {
-            user = UserRepository.findById(json.get(JsonKeys.MESSAGE_RECIPIENT).asLong());
+            if(json.get(JsonKeys.MESSAGE_RECIPIENT).has(JsonKeys.USER_ID))
+                recipient = UserRepository.findById(json.get(JsonKeys.MESSAGE_RECIPIENT).get(JsonKeys.USER_ID).asLong());
         }
         if (json.has(JsonKeys.MESSAGE_CONTENT)) {
             content = json.get(JsonKeys.MESSAGE_CONTENT).asText();
         }
         if (json.has(JsonKeys.DECK_CHALLENGE_MESSAGE_DECK)) {
-            CardDeck deck = CardDeckRepository.getCardDeck(json.get(JsonKeys.DECK_CHALLENGE_MESSAGE_DECK).asLong());
-            message = new DeckChallengeMessage(user, content, deck);
-            message.save();
-            return message;
+            if(json.get(JsonKeys.DECK_CHALLENGE_MESSAGE_DECK).has(JsonKeys.CARDDECK_ID)) {
+                CardDeck deck = CardDeckRepository.getCardDeck(json.get(JsonKeys.DECK_CHALLENGE_MESSAGE_DECK).get(JsonKeys.CARDDECK_ID).asLong());
+                if(recipient!=null){
+                    message = new DeckChallengeMessage(recipient, content, deck);
+                    message.save();
+                    return message;
+                }
+            }
         }
 
         throw new InvalidInputException("A message needs to consist of a recipient, the content and the deck id.");
@@ -94,9 +113,12 @@ public class MessagingRepository {
      * @param id of the message
      * @return temporary remaining object of the message
      */
-    public static AbstractMessage deleteMessage(Long id) {
+    public static AbstractMessage deleteMessage(Long id, String email) {
         AbstractMessage msg = AbstractMessage.find.byId(id);
-        msg.delete();
+        User currentUser = UserRepository.findUserByEmail(email);
+
+        if (currentUser.hasRight(UserOperations.GET_MESSAGE, msg))
+            msg.delete();
         return msg;
     }
 }
