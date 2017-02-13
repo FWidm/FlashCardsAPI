@@ -1,28 +1,19 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import models.CardDeck;
 import models.Category;
-import play.Logger;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Security;
 import repositories.CategoryRepository;
+import util.ActionAuthenticator;
 import util.JsonKeys;
 import util.JsonUtil;
-import util.RequestKeys;
-import util.UrlParamHelper;
-import util.exceptions.InvalidInputException;
-import util.exceptions.ObjectNotFoundException;
-import util.exceptions.PartiallyModifiedException;
-
-import java.util.ArrayList;
-import java.util.List;
+import util.exceptions.*;
 
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  */
 public class CategoryController extends Controller {
@@ -39,8 +30,8 @@ public class CategoryController extends Controller {
     /**
      * Retrieves the Category with the specific id, if it does not exist, return notFound.
      *
-     * @param id
-     * @return
+     * @param id of a category
+     * @return matching HTTP Result.
      */
     public Result getCategory(Long id) {
         try {
@@ -53,8 +44,8 @@ public class CategoryController extends Controller {
     /**
      * Get all card decks in a category.
      *
-     * @param id
-     * @return
+     * @param id of a category
+     * @return matching HTTP Result.
      */
     public Result getCategoryCardDecks(Long id) {
         try {
@@ -67,8 +58,8 @@ public class CategoryController extends Controller {
     /**
      * Returns the children of the specified carddeck.
      *
-     * @param id
-     * @return
+     * @param id of a category
+     * @return matching HTTP Result.
      */
     public Result getChildren(Long id) {
         return ok(JsonUtil.toJson(CategoryRepository.getChildren(id)));
@@ -77,23 +68,23 @@ public class CategoryController extends Controller {
     /**
      * Creates a new category, returns either an error or a success message.
      *
-     * @return
+     * @return ok/badRequest/unauthorized
      */
+    @Security.Authenticated(ActionAuthenticator.class)
     @BodyParser.Of(BodyParser.Json.class)
     public Result addCategory() {
         JsonNode json = request().body().asJson();
 
         try {
-            Category addCategory=CategoryRepository.addCategory(json);
-            return created(JsonUtil.prepareJsonStatus(CREATED,"Category has been created!",addCategory.getId()));
+            Category addCategory = CategoryRepository.addCategory(json);
+            return created(JsonUtil.prepareJsonStatus(CREATED, "Category has been created!", addCategory.getId()));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
-            if(JsonKeys.debugging){
+            if (JsonKeys.debugging) {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));
-            }
-            else {
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS + " | cause: " + e.getCause()));
+            } else {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
                                 BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
@@ -101,26 +92,31 @@ public class CategoryController extends Controller {
         } catch (ObjectNotFoundException e) {
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage()));
         } catch (PartiallyModifiedException e) {
-            return created(JsonUtil.prepareJsonStatus(OK,e.getMessage(), e.getObjectId()));
+            return created(JsonUtil.prepareJsonStatus(OK, e.getMessage(), e.getObjectId()));
         }
     }
 
-
+    /**
+     * Updates one category by id. Catches several exceptions we expect to deliver correct output to the requestor.
+     *
+     * @param id of a card
+     * @return ok/badRequest/unauthorized
+     */
+    @Security.Authenticated(ActionAuthenticator.class)
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateCategory(Long id) {
         JsonNode json = request().body().asJson();
 
         try {
-            Category updateCategory=CategoryRepository.updateCategory(id,json,request().method());
+            Category updateCategory = CategoryRepository.updateCategory(id, request().username(), json, request().method());
             return ok(JsonUtil.prepareJsonStatus(OK, "Category has been updated.", updateCategory.getId()));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
-            if(JsonKeys.debugging){
+            if (JsonKeys.debugging) {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));
-            }
-            else {
+                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS + " | cause: " + e.getCause()));
+            } else {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
                                 BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
@@ -131,7 +127,11 @@ public class CategoryController extends Controller {
             return badRequest(JsonUtil
                     .prepareJsonStatus(BAD_REQUEST, e.getMessage()));
         } catch (PartiallyModifiedException e) {
-            return ok(JsonUtil.prepareJsonStatus(OK,e.getMessage(), e.getObjectId()));
+            return ok(JsonUtil.prepareJsonStatus(OK, e.getMessage(), e.getObjectId()));
+        } catch (NotAuthorizedException e) {
+            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage(), id));
+        } catch (DuplicateKeyException e) {
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage(), id));
         }
     }
 

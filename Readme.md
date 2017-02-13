@@ -1,5 +1,12 @@
 # FlashCards RESTful API
 ![FlashCards Logo](_Docs/img/flash_icon_250.png)
+
+## TODO
+- Implement Token invalidation after time
+- Implement auth for nearly all Update/Delete operations
+- Test Production build
+- Implement Backend for challenge/leaderbords
+
 ## Methods
 ### Users
 | Resource | GET | PUT | POST | PATCH | DELETE|
@@ -44,23 +51,7 @@
 for more working routing look at the [routes](conf/routes).
 
 ## German Tutorial/Insights
-If you're interested in reading about the things we use, there is a dev log file that describes problems and other topics we came across in German: [here]((https://github.com/FWidm/FlashCardsAPI/blob/master/_Docs/PlayDokuFabian.md)).
-
-## TODO
-- [ ] Decide where appending is useful in the future
-- [x] Add append via url parameter to card PUT/PATCH methods
-- [x] Session Management/Authentication/Token based system
-- [x] Write Ratingsystem
-- [x] Rewrite Group System
-- [ ] Implement CardDeck and Categories
-    - [ ] Implement Categories
-      - [ ] Write Postman tests
-      - [ ] Implement delete function
-    - [x] Implement CardDeck
-- [ ] Write proper Unit-Tests in Postman
-    - [x] `/users`
-    - [x] `/cardDecks`
-- [ ] check if methods exist for querying answers and groups containing ONE user or getting users of ONE group
+If you're interested in reading about the things we use, there is a dev log file that describes problems and other topics we came across in German: [here](https://github.com/FWidm/FlashCardsAPI/blob/master/_Docs/PlayDokuFabian.md).
 
 
 ## Example Calls

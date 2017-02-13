@@ -1,7 +1,9 @@
 package models;
 
 import com.avaje.ebean.Model;
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import play.data.validation.Constraints;
 import util.JsonKeys;
 
@@ -9,39 +11,34 @@ import javax.persistence.*;
 import java.util.List;
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  */
-@JsonPropertyOrder({ JsonKeys.CATEGORY_ID, JsonKeys.CATEGORY_NAME})
+@JsonPropertyOrder({JsonKeys.CATEGORY_ID, JsonKeys.CATEGORY_NAME})
 //@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property=JsonKeys.CATEGORY_ID)
 @Entity
-public class Category extends Model{
+public class Category extends Model {
+    public static Model.Finder<Long, Category> find = new Model.Finder<Long, Category>(Category.class);
     @Id
     @GeneratedValue
     @Column(name = JsonKeys.CATEGORY_ID)
     @JsonProperty(JsonKeys.CATEGORY_ID)
     private long id;
-
     @Constraints.Required
     @Column(name = JsonKeys.CATEGORY_NAME)
     @JsonProperty(JsonKeys.CATEGORY_NAME)
     @Constraints.MinLength(3)
     @Constraints.MaxLength(30)
     private String name;
-
     @Column(name = JsonKeys.CATEGORY_DECK)
-    @OneToMany(mappedBy = JsonKeys.CARDDECK_CATEGORY,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = JsonKeys.CARDDECK_CATEGORY, fetch = FetchType.EAGER)
     @JsonProperty(JsonKeys.CATEGORY_DECK)
     @JsonIgnore
     private List<CardDeck> cardDecks;
-
     @Column(name = JsonKeys.CATEGORY_PARENT)
     @JsonProperty(JsonKeys.CATEGORY_PARENT)
 
     @ManyToOne
     private Category parent;
-
-    public static Model.Finder<Long, Category> find = new Model.Finder<Long, Category>(Category.class);
 
     public Category(String name) {
         this.name = name;
@@ -61,12 +58,13 @@ public class Category extends Model{
 
     /**
      * Create a new object with the same attribute value as another one.
-     * @param category
+     *
+     * @param category - copies the whole objects content in a new object.
      */
     public Category(Category category) {
         this.name = category.getName();
-        this.parent=category.getParent();
-        this.cardDecks =category.getCardDecks();
+        this.parent = category.getParent();
+        this.cardDecks = category.getCardDecks();
     }
 
     public long getId() {
@@ -84,6 +82,7 @@ public class Category extends Model{
     public void setName(String name) {
         this.name = name;
     }
+
     @JsonIgnore
     public List<CardDeck> getCardDecks() {
         return cardDecks;
@@ -91,7 +90,7 @@ public class Category extends Model{
 
     public void setCardDecks(List<CardDeck> cardDecks) {
         this.cardDecks = cardDecks;
-        for (CardDeck deck: cardDecks) {
+        for (CardDeck deck : cardDecks) {
             deck.setCategory(this);
         }
     }

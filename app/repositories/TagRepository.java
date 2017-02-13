@@ -1,24 +1,19 @@
 package repositories;
 
-import com.avaje.ebean.ExpressionList;
-import com.avaje.ebean.RawSql;
 import com.fasterxml.jackson.databind.JsonNode;
-import models.Answer;
 import models.FlashCard;
 import models.Tag;
 import models.User;
 import play.Logger;
-import play.api.mvc.Flash;
-import play.api.routing.Router;
 import util.JsonKeys;
 import util.RequestKeys;
 import util.UrlParamHelper;
 
-import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  */
 public class TagRepository {
@@ -85,9 +80,9 @@ public class TagRepository {
         List<Tag> tagList = retrieveTags(ids, names);
 
         Logger.debug("Tags found=" + tagList);
-        cardList=tagList.get(0).getCards();
+        cardList = tagList.get(0).getCards();
         for (int i = 1; i < tagList.size(); i++) {
-            List<FlashCard> retrievedCardList=tagList.get(i).getCards();
+            List<FlashCard> retrievedCardList = tagList.get(i).getCards();
             cardList.retainAll(retrievedCardList); // keeps only values that are both in cardList AND retrievedCardlist
         }
         return cardList;
@@ -98,9 +93,8 @@ public class TagRepository {
      *
      * @param node the json node to parse
      * @return a question object containing the information
-     * @throws URISyntaxException
      */
-    public static Tag parseTag(JsonNode node) throws URISyntaxException {
+    public static Tag parseTag(JsonNode node) {
         User author = null;
         String tagText = null;
 
@@ -131,28 +125,30 @@ public class TagRepository {
                 Tag found = Tag.find.byId(node.get(JsonKeys.TAG_ID).asLong());
                 if (found != null) {
                     System.out.println(">> tag: " + found);
-                    tags.add(found);
+                    if (!tags.contains(found))
+                        tags.add(found);
                 } else tags.add(null);
 
 
             } else {
-                try {
-                    Tag tmpT = TagRepository.parseTag(node);
-                    Tag lookupTag = Tag.find.where().eq(JsonKeys.TAG_NAME, tmpT.getName()).findUnique();
-                    //check if the tag is unique
-                    if (lookupTag == null) {
-                        tmpT.save();
-                        System.out.println(">> tag: " + tmpT);
-                        //save our new tag so that no foreign constraint fails
-                        //((`flashcards`.`card_tag`, CONSTRAINT `fk_card_tag_tag_02` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tagId`))]]
+                Tag tmpT = TagRepository.parseTag(node);
+                Tag lookupTag = Tag.find.where().eq(JsonKeys.TAG_NAME, tmpT.getName()).findUnique();
+                //check if the tag is unique
+                if (lookupTag == null) {
+                    tmpT.save();
+                    System.out.println(">> tag: " + tmpT);
+                    //save our new tag so that no foreign constraint fails
+                    //((`flashcards`.`card_tag`, CONSTRAINT `fk_card_tag_tag_02` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tagId`))]]
+                    tags.add(tmpT);
+                } else {
+                    //check if tag name does not lead to the same tag being added twice. This would lead to a primary key constraint error.
+                    boolean idExists = tags.stream()
+                            .anyMatch(t -> t.getId() == lookupTag.getId());
+                    //Logger.debug("TAGREPO ID="+tmpT.getId()+" EXISTS? "+idExists);
+                    if (!idExists)
                         tags.add(tmpT);
-                    } else {
-                        tags.add(lookupTag);
-                    }
-
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
                 }
+
             }
         }
         return tags;
@@ -161,9 +157,9 @@ public class TagRepository {
     /**
      * Retrieves a list of tags by iterating over the provided ids and names and retrieving the single expected Tags
      *
-     * @param ids
-     * @param names
-     * @return
+     * @param ids   of the tags
+     * @param names of the tags
+     * @return a list that contains all tags found with the given ids and names.
      */
     public static List<Tag> retrieveTags(List<Long> ids, List<String> names) {
         List<Tag> tags = new ArrayList<>();

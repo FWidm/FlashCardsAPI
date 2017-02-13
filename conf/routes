@@ -11,13 +11,16 @@ GET     /message            controllers.AsyncController.message
 GET     /assets/*file       controllers.Assets.versioned(path="/public", file: Asset)
 
 #Flash Cards API
+## Test single components
 GET     /testCards          controllers.HomeController.testCards
 GET     /testGroups         controllers.HomeController.testGroups
 GET     /testTokens         controllers.HomeController.testTokens
 GET     /testRating         controllers.HomeController.testRating
 GET     /testCardDeck         controllers.HomeController.testCardDeck
 GET     /testCategories     controllers.HomeController.testCategories
+GET     /testMessages       controllers.HomeController.testMessages
 
+## General methods
 GET     /test               controllers.HomeController.test
 GET     /heartbeat          controllers.HomeController.heartbeat
 POST    /auth               controllers.HomeController.auth
@@ -45,7 +48,7 @@ GET 	/groups/:id/decks	controllers.UserGroupController.getDecksFromGroup(id:Long
 PUT 	/groups/:id			controllers.UserGroupController.updateUserGroup(id:Long)
 PATCH 	/groups/:id			controllers.UserGroupController.updateUserGroup(id:Long)
 POST 	/groups				controllers.UserGroupController.addUserGroup
-DELETE	/groups/:id			controllers.UserGroupController.deleteUserGroup(id:Long)
+DELETE	/groups/:id			controllers.UserGroupController.unSubscribe(id:Long)
 
 #Flashcards
 GET     /cards              controllers.FlashCardController.getFlashCardList
@@ -90,3 +93,9 @@ GET     /tags               controllers.TagController.getTags
 GET     /tags/cards         controllers.TagController.getAttachedCardsByTags
 GET     /tags/:id           controllers.TagController.getTag(id:Long)
 GET     /tags/:id/cards     controllers.TagController.getAttachedCards(id:Long)
+
+#Messages
+GET /messages               controllers.MessagingController.getMessages
+GET /messages/:id           controllers.MessagingController.getMessage(id:Long)
+POST /messages              controllers.MessagingController.createMessage
+DELETE /messages/:id        controllers.MessagingController.deleteMessage(id:Long)

@@ -11,35 +11,31 @@ import java.net.URI;
 import java.util.Date;
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  */
 @Entity
 public class UploadedMedia extends Model {
+    public static Model.Finder<Long, UploadedMedia> find = new Model.Finder<Long, UploadedMedia>(UploadedMedia.class);
     @Id
     @GeneratedValue
     @Column(name = JsonKeys.MEDIA_ID)
     @JsonProperty(JsonKeys.MEDIA_ID)
     private long id;
-
     @JsonProperty(JsonKeys.URI)
     @Column(name = JsonKeys.URI)
     private URI uri;
-
     @ManyToOne
-    @JoinColumn(name=JsonKeys.USER_ID, referencedColumnName=JsonKeys.USER_ID)
+    @JoinColumn(name = JsonKeys.USER_ID, referencedColumnName = JsonKeys.USER_ID)
     @JsonProperty(JsonKeys.AUTHOR)
     private User author;
-
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z") @CreatedTimestamp
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
+    @CreatedTimestamp
     @Column(name = JsonKeys.DATE_CREATED)
     @JsonProperty(JsonKeys.DATE_CREATED)
     private Date created;
-
     @JsonProperty(JsonKeys.MEDIA_TYPE)
     private String mediaType;
 
-    public static Model.Finder<Long,UploadedMedia> find = new Model.Finder<Long,UploadedMedia>(UploadedMedia.class);
     public UploadedMedia(URI uri, User author) {
         this.uri = uri;
         this.author = author;

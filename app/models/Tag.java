@@ -10,18 +10,21 @@ import javax.persistence.*;
 import java.util.List;
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  *         on 27/06/16.
  */
 @Entity
-public class Tag extends Model implements Comparable<Tag>{
-    @Id @GeneratedValue
+public class Tag extends Model implements Comparable<Tag> {
+    public static Model.Finder<Long, Tag> find = new Model.Finder<Long, Tag>(Tag.class);
+    @Id
+    @GeneratedValue
     @Column(name = JsonKeys.TAG_ID)
     @JsonProperty(JsonKeys.TAG_ID)
     private long id;
     @Constraints.Required
-    @Column(unique = true, name=JsonKeys.TAG_NAME) @Constraints.MinLength(3) @Constraints.MaxLength(16)
+    @Column(unique = true, name = JsonKeys.TAG_NAME)
+    @Constraints.MinLength(3)
+    @Constraints.MaxLength(16)
     @JsonProperty(JsonKeys.TAG_NAME)
     private String name;
     //this cascades from the "tag" to "join_cards_tag" - e.g. tag.delete -> delete evey entry with tag.id
@@ -29,14 +32,9 @@ public class Tag extends Model implements Comparable<Tag>{
     @JsonProperty(JsonKeys.TAG_CARDS)
     @JsonIgnore
     private List<FlashCard> cards;
-
-
-
     @Transient //not persistent.
     @JsonIgnore
     private int usageCount;
-
-    public static Model.Finder<Long, Tag> find = new Model.Finder<Long, Tag>(Tag.class);
 
 
     public Tag(String name) {
@@ -79,8 +77,8 @@ public class Tag extends Model implements Comparable<Tag>{
         this.cards = cards;
     }
 
-    public void addFlashCard(FlashCard flashCard){
-        if(!cards.contains(flashCard)){
+    public void addFlashCard(FlashCard flashCard) {
+        if (!cards.contains(flashCard)) {
             cards.add(flashCard);
             this.update();
             flashCard.addTag(this);
@@ -88,11 +86,12 @@ public class Tag extends Model implements Comparable<Tag>{
     }
 
     /**
-     *  Deletes the given card from he list hen it is an element
+     * Deletes the given card from he list hen it is an element
+     *
      * @param flashCard - will be removed
      */
-    public void removeFlashCard(FlashCard flashCard){
-        if (cards.contains( flashCard)){
+    public void removeFlashCard(FlashCard flashCard) {
+        if (cards.contains(flashCard)) {
             cards.remove(flashCard);
             this.update();
         }
@@ -105,9 +104,8 @@ public class Tag extends Model implements Comparable<Tag>{
 
 
     public void updateUsageCount() {
-        usageCount =Tag.find.byId(id).getCards().size();
+        usageCount = Tag.find.byId(id).getCards().size();
     }
-
 
 
     @Override
@@ -115,7 +113,7 @@ public class Tag extends Model implements Comparable<Tag>{
         return "Tag{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", usageCount='"+ usageCount +"'"+
+                ", usageCount='" + usageCount + "'" +
                 '}';
     }
 
@@ -127,9 +125,9 @@ public class Tag extends Model implements Comparable<Tag>{
          If the Integer is less than the argument then -1 is returned.
          If the Integer is greater than the argument then 1 is returned.
          */
-        if(this.usageCount >tag.usageCount)
+        if (this.usageCount > tag.usageCount)
             return -1;
-        if(this.usageCount ==tag.usageCount)
+        if (this.usageCount == tag.usageCount)
             return 0;
         return 1;
     }

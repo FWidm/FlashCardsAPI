@@ -9,7 +9,9 @@ import play.Logger;
 import util.JsonKeys;
 import util.RequestKeys;
 import util.UrlParamHelper;
+import util.UserOperations;
 import util.exceptions.InvalidInputException;
+import util.exceptions.NotAuthorizedException;
 import util.exceptions.ObjectNotFoundException;
 import util.exceptions.PartiallyModifiedException;
 
@@ -17,15 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  */
 public class UserGroupRepository {
     /**
      * Retrieve all Users from one group.
      *
-     * @param id
+     * @param id of the user
      * @return list of Users
      */
     public static List<User> getUsers(Long id) throws NullPointerException {
@@ -36,7 +38,7 @@ public class UserGroupRepository {
     /**
      * Retrieve all Carddecks from one group.
      *
-     * @param id
+     * @param id of the user
      * @return list of CardDecks
      */
     public static List<CardDeck> getDecks(Long id) throws NullPointerException {
@@ -47,7 +49,7 @@ public class UserGroupRepository {
     /**
      * Returns all models of type group, this method will return a filtered list if the RequestKeys.EMPTY url parameter is sent with value true or false.
      *
-     * @param urlParams
+     * @param urlParams url parameters from the request.
      * @return List of UserGroups
      */
     public static List<UserGroup> getGroups(Map<String, String[]> urlParams) {
@@ -78,10 +80,10 @@ public class UserGroupRepository {
     }
 
     /**
-     * Returns the user grip with a given ID
+     * Returns the user group with a given ID
      *
-     * @param id
-     * @return
+     * @param id of the usergroup
+     * @return group
      */
     public static UserGroup getGroup(long id) {
         return UserGroup.find.byId(id);
@@ -90,12 +92,11 @@ public class UserGroupRepository {
     /**
      * Adds a new UserGroup. Can throw an exception when users should be added that either do not exist or have no id in their json.
      *
-     * @param json
-     * @return
-     * @throws ObjectNotFoundException
-     * @throws IllegalArgumentException
+     * @param json body of the request
+     * @return newly created UserGroup
+     * @throws ObjectNotFoundException if one or more users do not exist
      */
-    public static UserGroup addUserGroup(JsonNode json) throws ObjectNotFoundException, IllegalArgumentException {
+    public static UserGroup addUserGroup(JsonNode json) throws ObjectNotFoundException {
         ObjectMapper mapper = new ObjectMapper();
 
         UserGroup requestGroup = mapper.convertValue(json, UserGroup.class);
@@ -137,22 +138,25 @@ public class UserGroupRepository {
     /**
      * Updates a Usergroup depending on the method used and the contents of the json. Returns the updated resource.
      *
-     * @param id
-     * @param json
-     * @param urlParams
-     * @param method
+     * @param id        of a group
+     * @param email     of the manipulating user
+     * @param json      body of the request
+     * @param urlParams parameters submitted via url
+     * @param method    put or patch
      * @return updated UserGroup object
-     * @throws InvalidInputException
-     * @throws NullPointerException
-     * @throws PartiallyModifiedException
+     * @throws InvalidInputException      if the body contains elements that are not expected OR not enough for put
+     * @throws NullPointerException       if the group id is invalid
+     * @throws PartiallyModifiedException if some parts of the requests could be fulfilled but the user needs to be notified
      */
-    public static UserGroup changeUserGroup(long id, JsonNode json, Map<String, String[]> urlParams, String method)
-            throws InvalidInputException, NullPointerException, PartiallyModifiedException {
+    public static UserGroup changeUserGroup(long id, String email, JsonNode json, Map<String, String[]> urlParams, String method)
+            throws InvalidInputException, NullPointerException, PartiallyModifiedException, NotAuthorizedException {
         String information = "";
         boolean appendMode = false;
+        User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         // get the specific user we want to edit
         UserGroup groupToUpdate = UserGroup.find.byId(id);
-
+        if (!author.hasRight(UserOperations.EDIT_GROUP, groupToUpdate))
+            throw new NotAuthorizedException("This user is not authorized to modify the group with this id.");
 
         //Check whether the request was a put and if it was check if a param is missing, if that is the case --> bad req.
         if (method.equals("PUT") && (!json.has(JsonKeys.GROUP_NAME) || !json.has(JsonKeys.GROUP_DESCRIPTION) || !json.has(JsonKeys.GROUP_USERS))) {
@@ -219,11 +223,12 @@ public class UserGroupRepository {
 
     }
 
+
     /**
      * Parses the given json to gain access to the given Usergroups.
      *
-     * @param json
-     * @return
+     * @param json body of the request
+     * @return a list of groups
      */
     public static List<UserGroup> retrieveGroups(JsonNode json) {
         List<UserGroup> userGroups = new ArrayList<>();
@@ -252,19 +257,25 @@ public class UserGroupRepository {
     /**
      * Deletes a UserGroup by it's id.
      *
-     * @param id
-     * @throws NullPointerException
+     * @param id    of a group
+     * @param email of the manipulating user
+     * @throws NullPointerException   if not found
+     * @throws NotAuthorizedException if the user that wants to delete is not authorized
      */
-    public static void deleteUserGroup(long id) throws NullPointerException {
+    public static void deleteUserGroup(long id, String email) throws NullPointerException, NotAuthorizedException {
+        User user = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         UserGroup group = UserGroup.find.byId(id);
-        group.update();
-        group.delete();
+
+        if (user.hasRight(UserOperations.DELETE_GROUP, group)) {
+            group.update();
+            group.delete();
+        } else throw new NotAuthorizedException("This user is not authorized to delete the group with this id.");
     }
 
     /**
      * Create a new UserGroup with the given name and description.
      *
-     * @param json
+     * @param json body of the request
      * @return the usergroup from the json node
      */
     public static UserGroup parseGroup(JsonNode json) {
@@ -280,4 +291,23 @@ public class UserGroupRepository {
         UserGroup group = new UserGroup(name, description, null);
         return group;
     }
+
+    /**
+     * Unsubscribe one user from a group
+     *
+     * @param id    usergroup we want to unsubscribe from
+     * @param email of the user
+     * @return true if removed, false if not.
+     */
+    public static boolean unSubscribe(long id, String email) {
+        UserGroup group = UserGroup.find.byId(id);
+        User user = UserRepository.findUserByEmail(email);
+
+        if (group.getUsers().contains(user)) {
+            group.removeUser(user);
+            return true;
+        }
+        return false;
+    }
+
 }

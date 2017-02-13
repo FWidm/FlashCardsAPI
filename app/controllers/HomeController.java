@@ -3,20 +3,19 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.*;
+import models.msg.AbstractMessage;
+import models.msg.DeckChallengeMessage;
 import models.rating.AnswerRating;
 import models.rating.CardRating;
 import models.rating.Rating;
 import play.Logger;
 import play.libs.Json;
 import play.mvc.*;
-
 import repositories.UserRepository;
 import util.ActionAuthenticator;
-import util.FileTypeChecker;
 import util.JsonKeys;
 import util.JsonUtil;
 import util.crypt.PasswordUtil;
-import views.html.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,8 +26,6 @@ import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
-
-import static com.avaje.ebean.Expr.like;
 
 /**
  * This controller contains an action to handle HTTP requests
@@ -42,13 +39,18 @@ public class HomeController extends Controller {
     public Result index() {
         java.io.File file = new java.io.File("_Docs/img/flash_icon.png");
         Logger.debug(file.getAbsolutePath());
+/*        User x = new User("HELLO","w1@amazon.com","xyz",0);
+        x.save();
+        Logger.debug(String.valueOf(x.hasRight(UserOperations.EDIT_CARD_QUESTION,y)));
+        x.delete();*/
+
         return ok(file);
     }
 
     /**
      * Accepts a picture as multipart/formdata, saves them in /var/www/html/img/<year>/<date>/img*.<ext>.
      *
-     * @return
+     * @return matching http result
      */
     @Security.Authenticated(ActionAuthenticator.class)
     public Result upload() {
@@ -57,33 +59,33 @@ public class HomeController extends Controller {
         if (picture != null) {
             String fileName = picture.getFilename();
             String contentType = picture.getContentType();
-            String fileType=determineFileType(fileName);
+            String fileType = determineFileType(fileName);
 
             if (contentType.contains("image")) {
                 File pictureFile = picture.getFile();
                 Calendar c = Calendar.getInstance();
                 int year = c.get(Calendar.YEAR);
                 int month = c.get(Calendar.MONTH);
-                File directoryFile = new File("/var/www/html/img/"+year+"/"+month +"/");
+                File directoryFile = new File("/var/www/html/img/" + year + "/" + month + "/");
                 directoryFile.mkdirs();
-                    try {
-                        directoryFile=File.createTempFile("img", "."+fileType, directoryFile);
-                        Files.write(directoryFile.toPath(),Files.readAllBytes(pictureFile.toPath()));
-                    } catch (IOException e) {
-                        return internalServerError(JsonUtil.prepareJsonStatus(INTERNAL_SERVER_ERROR, "Could not place file on the server"));
-                    }
-                    Logger.debug("Filepath:" + directoryFile.toPath());
+                try {
+                    directoryFile = File.createTempFile("img", "." + fileType, directoryFile);
+                    Files.write(directoryFile.toPath(), Files.readAllBytes(pictureFile.toPath()));
+                } catch (IOException e) {
+                    return internalServerError(JsonUtil.prepareJsonStatus(INTERNAL_SERVER_ERROR, "Could not place file on the server"));
+                }
+                Logger.debug("Filepath:" + directoryFile.toPath());
 
-                int i=0;
-                String host="http://"+request().host();
-                i=host.lastIndexOf(":");
-                host=host.substring(0,i);
-                String url=host+getUrl(directoryFile.toPath(),"img");
+                int i = 0;
+                String host = "http://" + request().host();
+                i = host.lastIndexOf(":");
+                host = host.substring(0, i);
+                String url = host + getUrl(directoryFile.toPath(), "img");
 
 
                 try {
-                    UploadedMedia mediaRecord=new UploadedMedia(new URI(url), UserRepository.findUserByEmail(request().username()),contentType);
-                    Logger.debug("Uploaded file="+mediaRecord);
+                    UploadedMedia mediaRecord = new UploadedMedia(new URI(url), UserRepository.findUserByEmail(request().username()), contentType);
+                    Logger.debug("Uploaded file=" + mediaRecord);
                     mediaRecord.save();
                     return created(JsonUtil.toJson(mediaRecord));
                 } catch (URISyntaxException e) {
@@ -96,30 +98,32 @@ public class HomeController extends Controller {
     }
 
     /**
-     * Strips unneccesary parts of the path and replaces backslashes with slashes.
+     * Strips unnecessary parts of the path and replaces backslashes with slashes.
      * (e.g: \img\2016\11\x.png -> /img/2016/11/x.png")
-     * @param path
+     *
+     * @param path to the image
      * @return path minus everything before lastShowndirectory.
      */
     private String getUrl(Path path, String lastShownDirectory) {
-        String url =null;
-        url=path.toString();
-        url=url.replace('\\', '/');
+        String url = null;
+        url = path.toString();
+        url = url.replace('\\', '/');
         int index = url.indexOf(lastShownDirectory);
-        return url.substring(index-1);
+        return url.substring(index - 1);
     }
 
     /**
      * Expects a filename including extension (i.e. abcd.jpeg) and returns the extension after the last dot.
      * (e.g. "abc.def.gh.ix" returns "ix")
-     * @param fileName
+     *
+     * @param fileName name of the file
      * @return substring after the last dot in the filename
      */
     private String determineFileType(String fileName) {
         String extension = "";
         int i = fileName.lastIndexOf('.');
         if (i > 0) {
-            extension = fileName.substring(i+1);
+            extension = fileName.substring(i + 1);
         }
         return extension;
     }
@@ -158,13 +162,13 @@ public class HomeController extends Controller {
         f.delete();
         a.delete();
         u.delete();*/
-        return ok(index.render("Test done."));
+        return ok(JsonUtil.prepareJsonStatus(OK,"Rating test done!"));
     }
 
     /**
      * Creates one user with two tokens, attempts to delete both tokens.
      *
-     * @return
+     * @return appropriate http result
      */
     public Result testTokens() {
         String output = "";
@@ -186,7 +190,7 @@ public class HomeController extends Controller {
         u.deleteTokens();
         u.delete();
         Logger.debug(output);
-        return ok(index.render(output));
+        return ok(JsonUtil.prepareJsonStatus(OK,"Token test done! output="+output));
     }
 
     public Result testCards() {
@@ -231,7 +235,7 @@ public class HomeController extends Controller {
         Logger.debug("Card tags: " + fc.getTags());
         List<Tag> fc_tags = FlashCard.find.byId(fc.getId()).getTags();
 
-        return ok(index.render("Card test done!"));
+        return ok(JsonUtil.prepareJsonStatus(OK,"Card test done!"));
     }
 
     public Result testGroups() {
@@ -265,13 +269,13 @@ public class HomeController extends Controller {
             u.getUserGroups().forEach((group) -> Logger.debug(u.getId() + ":" + group));
         }
 
-        return ok(index.render("Group test done!"));
+        return ok(JsonUtil.prepareJsonStatus(OK,"Group test done!"));
     }
 
     /**
      * Checks the credentials in the body - users password and email and returns a token if valid or forbidden if invalid.
      *
-     * @return
+     * @return appropriate http result
      */
     @BodyParser.Of(BodyParser.Json.class)
     public Result login() {
@@ -281,29 +285,31 @@ public class HomeController extends Controller {
             String email = json.get(JsonKeys.USER_EMAIL).asText();
 
             //User logInTo = User.find.where().and(like(JsonKeys.USER_EMAIL, email), like(JsonKeys.USER_PASSWORD, pass)).findUnique();
-            User logInTo=User.find.where().like(JsonKeys.USER_EMAIL, email).findUnique();
+            User logInTo = User.find.where().like(JsonKeys.USER_EMAIL, email).findUnique();
             try {
 
-            Logger.debug("Login attempt with email=" + email + " User found=" + logInTo+" valid? "+PasswordUtil.validatePassword(pass,logInTo.getPassword()));
-            if (logInTo != null  && PasswordUtil.validatePassword(pass,logInTo.getPassword())) {
-                ObjectNode result = Json.newObject();
-                result.put(JsonKeys.STATUS_CODE, OK);
-                result.put(JsonKeys.DESCRIPTION, "Login succeeded.");
-                Logger.debug("result="+result);
-                AuthToken token = new AuthToken(logInTo);
-                token.save();
-                Logger.debug("Token="+token);
-                logInTo.addAuthToken(token);
-                Logger.debug("Added authtoken to user");
-                result.put(JsonKeys.TOKEN, token.getToken());
-                Logger.debug("finished result node: "+result);
-                return ok(result);
-            }
+                Logger.debug("Login attempt with email=" + email + " User found=" + logInTo + " valid? " + PasswordUtil.validatePassword(pass, logInTo.getPassword()));
+                if (logInTo != null && PasswordUtil.validatePassword(pass, logInTo.getPassword())) {
+                    ObjectNode result = Json.newObject();
+                    result.put(JsonKeys.STATUS_CODE, OK);
+                    result.put(JsonKeys.DESCRIPTION, "Login succeeded.");
+                    Logger.debug("result=" + result);
+                    AuthToken token = new AuthToken(logInTo);
+                    token.save();
+                    Logger.debug("Token=" + token);
+                    logInTo.addAuthToken(token);
+                    Logger.debug("Added authtoken to user");
+                    result.put(JsonKeys.TOKEN, token.getToken());
+                    Logger.debug("finished result node: " + result);
+                    return ok(result);
+                }
 
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
             } catch (InvalidKeySpecException e) {
                 e.printStackTrace();
+            } catch (NullPointerException e) {
+                return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "User does not exist."));
             }
         }
         return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN, "Login failed, check email and password for errors."));
@@ -424,4 +430,22 @@ public class HomeController extends Controller {
         return cardDeckList;
     }
 
+    public Result testMessages() {
+        User user = UserRepository.findUserByEmail("email1@email.com");
+        if (user == null) {
+            user = new User("name", "email1@email.com", "password", 0);
+            user.save();
+        }
+
+        CardDeck deck = CardDeck.find.where().eq(JsonKeys.CARDDECK_NAME, "deck").findUnique();
+        if (deck == null) {
+            deck = new CardDeck("deck");
+            deck.save();
+        }
+
+        DeckChallengeMessage msg = new DeckChallengeMessage(user, "content", deck);
+        msg.save();
+        Logger.debug("msg=" + AbstractMessage.find.byId(1L));
+        return ok(JsonUtil.toJson(DeckChallengeMessage.find.byId(1L)));
+    }
 }

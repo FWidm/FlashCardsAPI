@@ -1,18 +1,22 @@
 package controllers;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import models.UserGroup;
 import play.Logger;
-import play.mvc.*;
+import play.mvc.BodyParser;
+import play.mvc.Controller;
+import play.mvc.Result;
+import play.mvc.Security;
 import repositories.UserGroupRepository;
+import util.ActionAuthenticator;
 import util.JsonKeys;
 import util.JsonUtil;
 import util.exceptions.InvalidInputException;
+import util.exceptions.NotAuthorizedException;
 import util.exceptions.ObjectNotFoundException;
 import util.exceptions.PartiallyModifiedException;
+
+import java.util.Map;
 
 public class UserGroupController extends Controller {
 
@@ -25,13 +29,12 @@ public class UserGroupController extends Controller {
     public Result getUserGroupList() {
 
         Map<String, String[]> urlParams = Controller.request().queryString();
-        try{
+        try {
             return ok(JsonUtil.toJson(UserGroupRepository.getGroups(urlParams)));
 
-        }catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Error while parsing the specified numbers, please recheck your request."));
-        }
-        catch (NullPointerException e){
+        } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND,
                     "Filtering by unkown user failed, re-check your request params."));
         }
@@ -81,6 +84,7 @@ public class UserGroupController extends Controller {
      * @param id GroupID of the group we want to update
      * @return either ok or bad_request with an explanation
      */
+    @Security.Authenticated(ActionAuthenticator.class)
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateUserGroup(Long id) {
         if (JsonKeys.debugging) Logger.debug(request().method());
@@ -89,7 +93,7 @@ public class UserGroupController extends Controller {
         String updateMethod = request().method();
         UserGroup userGroup;
         try {
-            userGroup = UserGroupRepository.changeUserGroup(id, json, urlParams, updateMethod);
+            userGroup = UserGroupRepository.changeUserGroup(id, request().username(), json, urlParams, updateMethod);
         } catch (IllegalArgumentException e) {
             return badRequest(JsonUtil
                     .prepareJsonStatus(
@@ -97,20 +101,22 @@ public class UserGroupController extends Controller {
         } catch (NullPointerException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, group does not exist", id));
         } catch (InvalidInputException e) {
-            e.printStackTrace();
-            if(JsonKeys.debugging){
+            //e.printStackTrace();
+            if (JsonKeys.debugging) {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, e.getMessage()+" | cause: "+e.getCause()));
-            }
-            else {
+                                BAD_REQUEST, e.getMessage() + " | cause: " + e.getCause()));
+            } else {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
                                 BAD_REQUEST, e.getMessage()));
             }
         } catch (PartiallyModifiedException e) {
             return ok(JsonUtil.prepareJsonStatus(OK, e.getMessage()));
+        } catch (NotAuthorizedException e) {
+            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage(), id));
         }
+
         return ok(JsonUtil.prepareJsonStatus(200, "Group has been successfully changed. " + userGroup, id));
     }
 
@@ -120,6 +126,7 @@ public class UserGroupController extends Controller {
      *
      * @return either ok with the id of the group, or bad_request with an explanation
      */
+    @Security.Authenticated(ActionAuthenticator.class)
     @BodyParser.Of(BodyParser.Json.class)
     public Result addUserGroup() {
         JsonNode json = request().body().asJson();
@@ -128,16 +135,15 @@ public class UserGroupController extends Controller {
         try {
             userGroup = UserGroupRepository.addUserGroup(json);
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            if(JsonKeys.debugging){
+            //e.printStackTrace();
+            if (JsonKeys.debugging) {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS+" | cause: "+e.getCause()));
-            }
-            else {
+                                BAD_REQUEST, e.getMessage() + " | cause: " + e.getCause()));
+            } else {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+                                BAD_REQUEST, e.getMessage()));
             }
         } catch (ObjectNotFoundException e) {
             if (e.getObjectId() > 0) {
@@ -149,19 +155,44 @@ public class UserGroupController extends Controller {
 
     }
 
+/*    */
+
     /**
      * Grabs the group by its id, deletes the reference to this group from all members and updates them and then deletes the group.
      *
      * @param id of a user
      * @return ok when deletion is successful, notFound if the user does not exist.
-     */
+     *//*
+    @Security.Authenticated(ActionAuthenticator.class)
     public Result deleteUserGroup(long id) {
         try {
-            UserGroupRepository.deleteUserGroup(id);
+            UserGroupRepository.deleteUserGroup(id, request().username());
             return ok(JsonUtil.prepareJsonStatus(OK, "The group has been deleted."));
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Group with the id could not be found", id));
+        } catch (NotAuthorizedException e) {
+            return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage(), id));
+        }
+    }   */
+
+    /*
+     * @param id of a user
+     * @return ok when deletion is successful, notFound if the user does not exist.
+     */
+    @Security.Authenticated(ActionAuthenticator.class)
+    public Result unSubscribe(long id) {
+        try {
+            boolean isUnsubscribed = UserGroupRepository.unSubscribe(id, request().username());
+            if (isUnsubscribed)
+                return ok(JsonUtil.prepareJsonStatus(OK, "User unsubscribed from the group.", id));
+            else
+                return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "User is no member of this group.", id));
         } catch (NullPointerException e) {
             e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Group with the id could not be found", id));
         }
     }
+
+
 }

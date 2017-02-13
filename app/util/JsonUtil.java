@@ -1,16 +1,12 @@
 package util;
 
-import java.util.List;
-import java.util.Map;
-
-import models.*;
-import play.Logger;
-import play.libs.Json;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import util.exceptions.ObjectNotFoundException;
+import play.libs.Json;
+
+import java.util.List;
+import java.util.Map;
 
 // TODO: 10.09.2016 Restructure
 public class JsonUtil {
@@ -19,8 +15,8 @@ public class JsonUtil {
     /**
      * Wraps the object it receives in a json file
      *
-     * @param o
-     * @return
+     * @param o object we want to convert
+     * @return JsonNode containing params of the object
      */
     public static JsonNode toJson(Object o) {
         ObjectMapper mapper = new ObjectMapper();
@@ -34,9 +30,9 @@ public class JsonUtil {
      * Generates an objectnode that will contain a given statuscode and the
      * description in human readable form.
      *
-     * @param statuscode
-     * @param description
-     * @return
+     * @param statuscode  we want to display in the json
+     * @param description text
+     * @return Json Object node
      */
     public static ObjectNode prepareJsonStatus(int statuscode,
                                                String description) {
@@ -50,9 +46,10 @@ public class JsonUtil {
      * Generates an objectnode that will contain a given statuscode and the
      * description in human readable form.
      *
-     * @param statuscode
-     * @param description
-     * @return
+     * @param statuscode  we want to display in the json
+     * @param description text
+     * @param id          we want to return matching the description text
+     * @return Json Object node
      */
     public static ObjectNode prepareJsonStatus(int statuscode, String description, Long id) {
         ObjectNode result = Json.newObject();
@@ -62,15 +59,18 @@ public class JsonUtil {
         return result;
     }
 
+
     /**
      * Generates an objectnode that will contain a given statuscode and the
-     * description in human readable form.
+     * description in human readable form. In addition to that we want to return an additional key/value pair where value is an objectlist.
      *
-     * @param statuscode
-     * @param description
-     * @return
+     * @param statuscode  we want to return
+     * @param description text
+     * @param name        of the returned key
+     * @param objectList  list of returned objects in an array (json)
+     * @return Objectnode
      */
-    public static ObjectNode prepareJsonStatus(int statuscode, String description,String name, List<Object> objectList) {
+    public static ObjectNode prepareJsonStatus(int statuscode, String description, String name, List<Object> objectList) {
         ObjectNode result = Json.newObject();
         result.put("statuscode", statuscode);
         result.put("description", description);
