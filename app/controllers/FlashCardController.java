@@ -157,8 +157,9 @@ public class FlashCardController {
             e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
             if (JsonKeys.debugging) {
+                e.printStackTrace();
+
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
                                 BAD_REQUEST, e.getMessage() + " | cause: " + e.getCause()));

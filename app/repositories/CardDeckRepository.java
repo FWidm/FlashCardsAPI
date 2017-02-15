@@ -124,6 +124,8 @@ public class CardDeckRepository {
     public static CardDeck updateCardDeck(long id, String email, JsonNode json, String method) throws InvalidInputException, ObjectNotFoundException, DuplicateKeyException, NotAuthorizedException {
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         CardDeck deck = CardDeck.find.byId(id);
+        if (JsonKeys.debugging)
+            Logger.debug("updateCardDeck");
         if (!author.hasRight(UserOperations.EDIT_DECK, deck))
             throw new NotAuthorizedException("This user is not authorized to modify the deck with this id.");
 
@@ -207,12 +209,12 @@ public class CardDeckRepository {
 
     private static List<FlashCard> parseCards(CardDeck requestObject) throws NullPointerException {
         List<FlashCard> cardList = new ArrayList<>();
-//        Logger.debug("Got cardlist=" + requestObject.getCards());
+        Logger.debug("Parsecards: Got cardlist=" + requestObject.getCards());
 
         if (requestObject.getCards() != null) {
             for (int i = 0; i < requestObject.getCards().size(); i++) {
                 FlashCard currentCard = requestObject.getCards().get(i);
-//                Logger.debug("current id=" + currentCard.getId() + "  read from db=" + FlashCard.find.byId(currentCard.getId()));
+                Logger.debug("current id=" + currentCard.getId() + "  read from db=" + FlashCard.find.byId(currentCard.getId()));
                 if (currentCard.getId() > 0) {
                     FlashCard retrievedCard = FlashCard.find.byId(currentCard.getId());
                     if (retrievedCard != null) {
