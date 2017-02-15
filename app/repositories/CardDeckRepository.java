@@ -126,6 +126,7 @@ public class CardDeckRepository {
         CardDeck deck = CardDeck.find.byId(id);
         if (JsonKeys.debugging)
             Logger.debug("updateCardDeck");
+
         if (!author.hasRight(UserOperations.EDIT_DECK, deck))
             throw new NotAuthorizedException("This user is not authorized to modify the deck with this id.");
 
