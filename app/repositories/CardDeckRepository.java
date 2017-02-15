@@ -80,7 +80,7 @@ public class CardDeckRepository {
         CardDeck deck = CardDeck.find.byId(id);
         if (deck == null)
             throw new NullPointerException();
-        if (!author.hasRight(UserOperations.EDIT_DECK, deck))
+        if (!author.hasPermission(UserOperations.EDIT_DECK, deck))
             throw new NotAuthorizedException("This user is not authorized to delete the deck with this id.");
         deck.delete();
 
@@ -141,7 +141,6 @@ public class CardDeckRepository {
 
             deck.getCards().forEach(card -> card.setDeck(deck));
         } else {
-            // TODO: 17.08.2016 Rewrite this to have a better structure in the output {"statuscode":400,"description":"...","cards":[14,15]}
             throw new DuplicateKeyException("Could not create deck with given cards, some of them already are in a deck.", cardIds);
         }
 
@@ -170,7 +169,7 @@ public class CardDeckRepository {
         if (JsonKeys.debugging)
             Logger.debug("updateCardDeck");
 
-        if (!author.hasRight(UserOperations.EDIT_DECK, deck))
+        if (!author.hasPermission(UserOperations.EDIT_DECK, deck))
             throw new NotAuthorizedException("This user is not authorized to modify the deck with this id.");
 
         boolean appendMode = false;
@@ -222,7 +221,7 @@ public class CardDeckRepository {
 
             } else {
                 cardList = parseCards(requestObject);
-                // TODO: 05.01.2017 delete replaced cards
+                // TODO: 05.01.2017 delete replaced cards?
             }
 
             boolean canSetCards = true;
@@ -237,12 +236,10 @@ public class CardDeckRepository {
             }
 
             if (canSetCards || redirectMode) {
-                // TODO: 05.01.2017 Test redirect
                 deck.setCards(cardList);
                 deck.update();
                 deck.getCards().forEach(card -> card.setDeck(deck));
             } else {
-                // TODO: 17.08.2016 Rewrite this to have a better structure in the output {"statuscode":400,"description":"...","cards":[14,15]}
                 throw new DuplicateKeyException("Could not create deck with given cards, some of them already are in a deck.", cardIds);
             }
         }

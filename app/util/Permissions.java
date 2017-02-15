@@ -8,10 +8,9 @@ import play.Logger;
 import java.util.Objects;
 
 /**
- * @author Jonas Kraus
  * @author Fabian Widmann
  */
-public class UserRightManagement {
+public class Permissions {
     public static final int RATING_CREATE_CATEGORY = 1000;
     public static final int RATING_DELETE_CATEGORY = 1000;
     public static final int RATING_EDIT_CATEGORY = 1000;
@@ -34,11 +33,12 @@ public class UserRightManagement {
      * Checks whether the current user has the rights to perform the operation we want to check. If an object is passed
      * we can check if the user is in any way an owner and has rights regardless of his rating.
      *
+     * @param user user that performs the action
      * @param userOperation - the operation the user wants to do
      * @param manipulated   - the manipulated object
      * @return true if the user can do the operation, else false.
      */
-    public boolean hasRight(User user, UserOperations userOperation, Object manipulated) {
+    public static boolean checkPermissions(User user, UserOperations userOperation, Object manipulated) {
         Logger.debug("Checking " + user.getEmail() + ": for (" + userOperation + "|" + manipulated + ")");
 
 
@@ -56,10 +56,6 @@ public class UserRightManagement {
                     if (msg.getRecipient().getId() == user.getId()) {
                         return true;
                     }
-                }
-                //receive list of messages
-                if(manipulated==null){
-
                 }
             }
             //category
@@ -125,7 +121,7 @@ public class UserRightManagement {
                     UserGroup group = deck.getUserGroup();
 
                     //can delete own cards OR any cards when this user's rating is over a specific value
-                    if (user.getRating() >= RATING_DELETE_DECK || (group != null && group.getUsers().contains(this))) {
+                    if (user.getRating() >= RATING_DELETE_DECK || (group != null && group.getUsers().contains(user))) {
                         return true;
                     }
                 }
@@ -137,7 +133,7 @@ public class UserRightManagement {
                     Logger.debug("group: " + group.getUsers());
                     //can delete own cards OR any cards when this user's rating is over a specific value
 
-                    if (user.getRating() >= RATING_EDIT_DECK || group.getUsers().contains(this)) {
+                    if (user.getRating() >= RATING_EDIT_DECK || group.getUsers().contains(user)) {
                         return true;
                     }
                 }
@@ -159,9 +155,9 @@ public class UserRightManagement {
             case EDIT_GROUP: {
                 if (manipulated != null && manipulated.getClass() == UserGroup.class) {
                     UserGroup group = (UserGroup) manipulated;
-                    Logger.debug("First condition: " + group.getUsers().contains(this) + " | second condition: " + (user.getRating() > RATING_EDIT_GROUP));
+                    Logger.debug("First condition: " + group.getUsers().contains(user) + " | second condition: " + (user.getRating() > RATING_EDIT_GROUP));
                     group.getUsers().forEach(u -> Logger.debug("u=" + u));
-                    if (group.getUsers().contains(this) || user.getRating() > RATING_EDIT_GROUP) {
+                    if (group.getUsers().contains(user) || user.getRating() > RATING_EDIT_GROUP) {
                         return true;
                     }
                 }
@@ -169,7 +165,7 @@ public class UserRightManagement {
             case DELETE_GROUP: {
                 if (manipulated != null && manipulated instanceof UserGroup) {
                     UserGroup group = (UserGroup) manipulated;
-                    if (group.getUsers().contains(this) || user.getRating() > RATING_DELETE_GROUP) {
+                    if (group.getUsers().contains(user) || user.getRating() > RATING_DELETE_GROUP) {
                         return true;
                     }
                 }

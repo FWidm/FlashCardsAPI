@@ -129,9 +129,6 @@ public class UserGroup extends Model {
         //Get all tags and unlink them from this card. Tag still exists to this point.
         for (User user : users) {
             user.removeGroup(this);
-            if (getUsers().size() == 0) {
-                // TODO: 08/08/16 do we want to delete if no reference to the user exists?
-            }
             System.out.println("Removing link to tag=" + user);
         }
         super.delete();

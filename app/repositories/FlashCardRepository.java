@@ -7,7 +7,7 @@ import play.Logger;
 import util.JsonKeys;
 import util.RequestKeys;
 import util.UserOperations;
-import util.UserRightManagement;
+import util.Permissions;
 import util.exceptions.*;
 
 import java.net.URI;
@@ -54,7 +54,7 @@ public class FlashCardRepository {
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
 
         FlashCard card = FlashCard.find.byId(id);
-        if (author.hasRight(UserOperations.DELETE_CARD, card))
+        if (author.hasPermission(UserOperations.DELETE_CARD, card))
             card.delete();
         else
             throw new NotAuthorizedException("This user is not authorized to delete this card.");
@@ -77,8 +77,6 @@ public class FlashCardRepository {
         //We expect just id's to set answers/questions/authors - we then check the db for the id's and retrieve all values
         // we nee ourselves.
         if (json.has(JsonKeys.FLASHCARD_ANSWERS)) {
-            // TODO: 10.08.2016 rewrite this part, it is ugly
-
             JsonNode answersNode = json.findValue(JsonKeys.FLASHCARD_ANSWERS);
             if (JsonKeys.debugging) Logger.debug("answersNode=" + answersNode);
             for (JsonNode node : answersNode) {
@@ -155,7 +153,7 @@ public class FlashCardRepository {
         FlashCard toUpdate = FlashCard.find.byId(id);
 
         //When using put we need to be able to edit everything inside our card.
-        if (request().method().equals("PUT") && !author.hasRight(UserOperations.EDIT_CARD, toUpdate))
+        if (request().method().equals("PUT") && !author.hasPermission(UserOperations.EDIT_CARD, toUpdate))
             throw new NotAuthorizedException("This user is not authorized to edit this card.");
 
         if (urlParams.containsKey(RequestKeys.APPEND)) {
@@ -187,7 +185,7 @@ public class FlashCardRepository {
                 mergedAnswers.addAll(retrieveAnswers(author, json));
 
                 toUpdate.setAnswers(mergedAnswers);
-            } else if (requestOwner.hasRight(UserOperations.EDIT_CARD, toUpdate)) {
+            } else if (requestOwner.hasPermission(UserOperations.EDIT_CARD, toUpdate)) {
                 List<Answer> newAnswers = retrieveAnswers(author, json);
                 newAnswers.forEach(a -> Logger.debug("new: " + a));
 
@@ -195,7 +193,7 @@ public class FlashCardRepository {
             } else
                 throw new NotAuthorizedException("This user is not authorized to edit this card. " +
                         "You cannot replace the answers without having the a rating above " +
-                        UserRightManagement.RATING_EDIT_CARD + " points or being the owner of the card. " +
+                        Permissions.RATING_EDIT_CARD + " points or being the owner of the card. " +
                         "Please append new tags with '?append=true'");
 
 
@@ -203,7 +201,7 @@ public class FlashCardRepository {
 
 
         if (json.has(JsonKeys.FLASHCARD_QUESTION)) {
-            if (author.hasRight(UserOperations.EDIT_CARD, toUpdate)) {
+            if (author.hasPermission(UserOperations.EDIT_CARD, toUpdate)) {
                 if (json.get(JsonKeys.FLASHCARD_QUESTION).has(JsonKeys.QUESTION_ID)) {
                     throw new IllegalArgumentException("A questionId is not accepted while creating new cards," +
                             " please provide a complete question object with the following components: "
@@ -223,18 +221,18 @@ public class FlashCardRepository {
                 }
             } else
                 throw new NotAuthorizedException("This user is not authorized to edit this card. You cannot modify the" +
-                        " question without having the a rating above " + UserRightManagement.RATING_EDIT_CARD + " points " +
+                        " question without having the a rating above " + Permissions.RATING_EDIT_CARD + " points " +
                         "or being the owner of the card.");
         }
 
         if (json.has(JsonKeys.AUTHOR)) {
-            if (author.hasRight(UserOperations.EDIT_CARD, toUpdate)) {
+            if (author.hasPermission(UserOperations.EDIT_CARD, toUpdate)) {
                 User u = mapper.convertValue(json.findValue(JsonKeys.AUTHOR), User.class);
                 author = User.find.byId(u.getId());
                 toUpdate.setAuthor(author);
             } else
                 throw new NotAuthorizedException("This user is not authorized to edit this card. You cannot modify the " +
-                        "author without having a rating above " + UserRightManagement.RATING_EDIT_CARD +
+                        "author without having a rating above " + Permissions.RATING_EDIT_CARD +
                         " points or being the owner of the card.");
         } else if (json.has(JsonKeys.FLASHCARD_TAGS)) {
             if (appendMode) {
@@ -248,21 +246,21 @@ public class FlashCardRepository {
 //                    mergedTags.addAll(JsonUtil.retrieveOrCreateTags(json));
                 toUpdate.setTags(mergedTags);
                 if (JsonKeys.debugging) Logger.debug("append: " + mergedTags);
-            } else if (requestOwner.hasRight(UserOperations.EDIT_CARD, toUpdate)) {
+            } else if (requestOwner.hasPermission(UserOperations.EDIT_CARD, toUpdate)) {
                 toUpdate.setTags(TagRepository.retrieveOrCreateTags(json));
 
             } else
                 throw new NotAuthorizedException("This user is not authorized to edit this card. You cannot replace the " +
-                        "tags without having a rating above " + UserRightManagement.RATING_EDIT_CARD + " points. " +
+                        "tags without having a rating above " + Permissions.RATING_EDIT_CARD + " points. " +
                         "Please append new tags with '?append=true'");
         }
 
         if (json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)) {
-            if (author.hasRight(UserOperations.EDIT_CARD, toUpdate)) {
+            if (author.hasPermission(UserOperations.EDIT_CARD, toUpdate)) {
                 toUpdate.setMultipleChoice(json.findValue(JsonKeys.FLASHCARD_MULTIPLE_CHOICE).asBoolean());
             } else
                 throw new NotAuthorizedException("This user is not authorized to edit this card. You cannot modify the " +
-                        "multiple choice status without having the a rating above " + UserRightManagement.RATING_EDIT_CARD +
+                        "multiple choice status without having the a rating above " + Permissions.RATING_EDIT_CARD +
                         " points or being the owner of the card.");
         }
 
@@ -387,7 +385,6 @@ public class FlashCardRepository {
             // when a user id is found we will get the object and add them to the userList.
             System.out.println("Node=" + node);
             if (node.has(JsonKeys.ANSWER_ID)) {
-                // TODO: 10.09.2016 do we want to support loading existing answers or can it stay this way? e.g. only new answers are allowed for a flashcard.
                 throw new ParameterNotSupportedException();
             } else {
                 try {

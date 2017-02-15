@@ -287,9 +287,6 @@ public class FlashCard extends Model {
         //Get all tags and unlink them from this card. Tag still exists to this point.
         for (Tag tmptag : tags) {
             tmptag.removeFlashCard(this);
-            if (tmptag.getCards().size() == 0) {
-                // TODO: 01/07/16 do we want to delete if no reference to the tag exists?
-            }
             System.out.println("Removing link to tag=" + tmptag);
         }
         super.delete();

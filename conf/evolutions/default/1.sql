@@ -15,9 +15,9 @@ create table message (
 
 create table answer (
   answerId                  bigint auto_increment not null,
-  answerText                varchar(255),
-  answerHint                varchar(255),
-  mediaURI                  varchar(255),
+  answerText                longtext,
+  answerHint                longtext,
+  mediaURI                  varchar(2048),
   userId                    bigint,
   cardId                    bigint,
   rating                    integer,
@@ -68,8 +68,8 @@ create table flashCard (
 
 create table question (
   questionId                bigint auto_increment not null,
-  questionText              varchar(255),
-  mediaURI                  varchar(255),
+  questionText              longtext,
+  mediaURI                  varchar(2048),
   userId                    bigint,
   constraint pk_question primary key (questionId))
 ;

@@ -26,7 +26,6 @@ public abstract class AbstractMessage extends Model {
     @Column(name = JsonKeys.MESSAGE_ID)
     @JsonProperty(JsonKeys.MESSAGE_ID)
     protected long id;
-    // TODO: 08.02.2017 find out why column name isnt working here but everywhere else.
     @ManyToOne
     @JoinColumn(name = JsonKeys.MESSAGE_RECIPIENT, referencedColumnName = JsonKeys.USER_ID)
     @JsonProperty(JsonKeys.MESSAGE_RECIPIENT)

@@ -14,6 +14,7 @@ import play.data.validation.Constraints.MinLength;
 import play.data.validation.Constraints.Required;
 import util.JsonKeys;
 import util.UserOperations;
+import util.Permissions;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -123,7 +124,6 @@ public class User extends Model {
     }
 
     public void setPassword(String password) {
-        //todo: A new random salt must be generated each time a user creates an account or changes their password.
         this.password = password;
     }
 
@@ -281,25 +281,8 @@ public class User extends Model {
      * @param manipulated   - the manipulated object
      * @return true if the user can do the operation, else false.
      */
-    public boolean hasRight(UserOperations userOperation, Object manipulated) {
+    public boolean hasPermission(UserOperations userOperation, Object manipulated) {
         Logger.debug("Checking " + email + ": for (" + userOperation + "|" + manipulated + ")");
-        final int RATING_CREATE_CATEGORY = 1000;
-        final int RATING_DELETE_CATEGORY = 1000;
-        final int RATING_EDIT_CATEGORY = 1000;
-
-        final int RATING_DELETE_CARD = 100;
-        final int RATING_EDIT_CARD = 100;
-
-        final int RATING_DELETE_ANSWER = 100;
-        final int RATING_EDIT_ANSWER = 100;
-
-        final int RATING_DELETE_DECK = 100;
-        final int RATING_EDIT_DECK = 100;
-
-        final int RATING_EDIT_USER = 1000;
-
-        final int RATING_EDIT_GROUP = 1000;
-        final int RATING_DELETE_GROUP = 1000;
 
 
         //Used class compare instead of instanceof due to performance reasons.
@@ -323,17 +306,17 @@ public class User extends Model {
             }
             //category
             case CREATE_CATEGORY: {
-                if (rating >= RATING_CREATE_CATEGORY) {
+                if (rating >= Permissions.RATING_CREATE_CATEGORY) {
                     return true;
                 }
             }
             case DELETE_CATEGORY: {
-                if (rating >= RATING_DELETE_CATEGORY) {
+                if (rating >= Permissions.RATING_DELETE_CATEGORY) {
                     return true;
                 }
             }
             case EDIT_CATEGORY: {
-                if (rating >= RATING_EDIT_CATEGORY) {
+                if (rating >= Permissions.RATING_EDIT_CATEGORY) {
                     return true;
                 }
             }
@@ -341,10 +324,10 @@ public class User extends Model {
             case DELETE_CARD: {
                 if (manipulated != null && manipulated.getClass() == FlashCard.class) {
                     FlashCard card = (FlashCard) manipulated;
-                    Logger.debug("isAuthor=" + (card.getAuthor() == this) + " | has Rating? " + (rating >= RATING_DELETE_CARD));
+                    Logger.debug("isAuthor=" + (card.getAuthor() == this) + " | has Rating? " + (rating >= Permissions.RATING_DELETE_CARD));
 
                     //can delete own cards OR any cards when this user's rating is over a specific value
-                    if (card.getAuthor() == this || rating >= RATING_DELETE_CARD) {
+                    if (card.getAuthor() == this || rating >= Permissions.RATING_DELETE_CARD) {
                         return true;
                     }
                 }
@@ -353,7 +336,7 @@ public class User extends Model {
                 if (manipulated != null && manipulated.getClass() == FlashCard.class) {
                     FlashCard card = (FlashCard) manipulated;
                     //can edit own cards OR any cards when this user's rating is over a specific value
-                    if (card.getAuthor() == this || rating >= RATING_EDIT_CARD) {
+                    if (card.getAuthor() == this || rating >= Permissions.RATING_EDIT_CARD) {
                         return true;
                     }
                 }
@@ -363,7 +346,7 @@ public class User extends Model {
                 if (manipulated != null && manipulated.getClass() == Answer.class) {
                     Answer answer = (Answer) manipulated;
                     //can delete own cards OR any cards when this user's rating is over a specific value
-                    if (answer.getAuthor() == this || rating >= RATING_DELETE_ANSWER) {
+                    if (answer.getAuthor() == this || rating >= Permissions.RATING_DELETE_ANSWER) {
                         return true;
                     }
                 }
@@ -372,7 +355,7 @@ public class User extends Model {
                 if (manipulated != null && manipulated.getClass() == Answer.class) {
                     Answer answer = (Answer) manipulated;
                     //can edit own cards OR any cards when this user's rating is over a specific value
-                    if (answer.getAuthor() == this || rating >= RATING_EDIT_ANSWER) {
+                    if (answer.getAuthor() == this || rating >= Permissions.RATING_EDIT_ANSWER) {
                         return true;
                     }
                 }
@@ -384,7 +367,7 @@ public class User extends Model {
                     UserGroup group = deck.getUserGroup();
 
                     //can delete own cards OR any cards when this user's rating is over a specific value
-                    if (rating >= RATING_DELETE_DECK || (group != null && group.getUsers().contains(this))) {
+                    if (rating >= Permissions.RATING_DELETE_DECK || (group != null && group.getUsers().contains(this))) {
                         return true;
                     }
                 }
@@ -396,7 +379,7 @@ public class User extends Model {
                     Logger.debug("group: " + group.getUsers());
                     //can delete own cards OR any cards when this user's rating is over a specific value
 
-                    if (rating >= RATING_EDIT_DECK || group.getUsers().contains(this)) {
+                    if (rating >= Permissions.RATING_EDIT_DECK || group.getUsers().contains(this)) {
                         return true;
                     }
                 }
@@ -404,7 +387,7 @@ public class User extends Model {
             case EDIT_USER: {
                 if (manipulated != null && manipulated.getClass() == User.class) {
                     User user = (User) manipulated;
-                    if (this.equals(user) || rating >= RATING_EDIT_USER)
+                    if (this.equals(user) || rating >= Permissions.RATING_EDIT_USER)
                         return true;
                 }
             }
@@ -418,9 +401,9 @@ public class User extends Model {
             case EDIT_GROUP: {
                 if (manipulated != null && manipulated.getClass() == UserGroup.class) {
                     UserGroup group = (UserGroup) manipulated;
-                    Logger.debug("First condition: " + group.getUsers().contains(this) + " | second condition: " + (rating > RATING_EDIT_GROUP));
+                    Logger.debug("First condition: " + group.getUsers().contains(this) + " | second condition: " + (rating > Permissions.RATING_EDIT_GROUP));
                     group.getUsers().forEach(u -> Logger.debug("u=" + u));
-                    if (group.getUsers().contains(this) || rating > RATING_EDIT_GROUP) {
+                    if (group.getUsers().contains(this) || rating > Permissions.RATING_EDIT_GROUP) {
                         return true;
                     }
                 }
@@ -428,7 +411,7 @@ public class User extends Model {
             case DELETE_GROUP: {
                 if (manipulated != null && manipulated instanceof UserGroup) {
                     UserGroup group = (UserGroup) manipulated;
-                    if (group.getUsers().contains(this) || rating > RATING_DELETE_GROUP) {
+                    if (group.getUsers().contains(this) || rating > Permissions.RATING_DELETE_GROUP) {
                         return true;
                     }
                 }

@@ -8,7 +8,6 @@ import play.libs.Json;
 import java.util.List;
 import java.util.Map;
 
-// TODO: 10.09.2016 Restructure
 public class JsonUtil {
 //	public final static String dateformat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 

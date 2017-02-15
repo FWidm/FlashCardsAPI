@@ -51,7 +51,6 @@ public class UserRepository {
                 String pwdGen = PasswordUtil.createHash(password);
                 Logger.debug("Password generated from input is: " + pwdGen);
 
-                // TODO: 29.12.2016  save salt <- ???
                 Logger.debug("Validation of password and hash returns: " + PasswordUtil.validatePassword(password, pwdGen));
                 tmp.setPassword(pwdGen);
             } catch (NoSuchAlgorithmException e) {
@@ -96,7 +95,7 @@ public class UserRepository {
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         // get the specific user we want to edit
         User editedUser = User.find.byId(id);
-        if (!author.hasRight(UserOperations.EDIT_USER, editedUser))
+        if (!author.hasPermission(UserOperations.EDIT_USER, editedUser))
             throw new NotAuthorizedException("This user is not authorized to modify the user with this id.");
 
         boolean appendMode = false;
@@ -138,7 +137,6 @@ public class UserRepository {
                 String pwdGen = PasswordUtil.createHash(password);
                 Logger.debug("Password generated from input is: " + pwdGen);
 
-                // TODO: 29.12.2016  save salt
                 Logger.debug("Validation of password and hash returns: " + PasswordUtil.validatePassword(password, pwdGen));
                 editedUser.setPassword(pwdGen);
             } catch (NoSuchAlgorithmException e) {
@@ -189,7 +187,7 @@ public class UserRepository {
      */
     public static void deleteUserById(Long id, String email) throws NotAuthorizedException {
         User u = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
-        if (u.hasRight(UserOperations.DELETE_USER, u))
+        if (u.hasPermission(UserOperations.DELETE_USER, u))
             User.find.ref(id).delete();
         else
             throw new NotAuthorizedException("This user is not authorized to delete the user with this id.");

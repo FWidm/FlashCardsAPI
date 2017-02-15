@@ -41,7 +41,7 @@ public class HomeController extends Controller {
         Logger.debug(file.getAbsolutePath());
 /*        User x = new User("HELLO","w1@amazon.com","xyz",0);
         x.save();
-        Logger.debug(String.valueOf(x.hasRight(UserOperations.EDIT_CARD_QUESTION,y)));
+        Logger.debug(String.valueOf(x.hasPermission(UserOperations.EDIT_CARD_QUESTION,y)));
         x.delete();*/
 
         return ok(file);

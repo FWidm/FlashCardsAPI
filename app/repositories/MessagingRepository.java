@@ -45,8 +45,6 @@ public class MessagingRepository {
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
             Date date = format.parse(textDate);
             Logger.debug("Got date=" + date);
-            // TODO: 10/02/17 query by date.
-
             messages = AbstractMessage.find.where().and(eq(JsonKeys.MESSAGE_RECIPIENT,user),between(JsonKeys.DATE_CREATED,date,new Date())).findList();
 
         } else {
@@ -67,7 +65,7 @@ public class MessagingRepository {
     public static AbstractMessage getMessage(Long id, String email) throws NotAuthorizedException {
         AbstractMessage msg = AbstractMessage.find.byId(id);
         User currentUser = UserRepository.findUserByEmail(email);
-        if (currentUser.hasRight(UserOperations.GET_MESSAGE, msg))
+        if (currentUser.hasPermission(UserOperations.GET_MESSAGE, msg))
             return msg;
         else throw new NotAuthorizedException("This user may not receive this message");
     }
@@ -117,7 +115,7 @@ public class MessagingRepository {
         AbstractMessage msg = AbstractMessage.find.byId(id);
         User currentUser = UserRepository.findUserByEmail(email);
 
-        if (msg !=null && currentUser.hasRight(UserOperations.GET_MESSAGE, msg)) {
+        if (msg !=null && currentUser.hasPermission(UserOperations.GET_MESSAGE, msg)) {
             msg.delete();
             return msg;
         }

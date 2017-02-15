@@ -145,7 +145,6 @@ public class CategoryRepository {
      */
     @BodyParser.Of(BodyParser.Json.class)
     public static Category updateCategory(Long id, String email, JsonNode json, String method) throws InvalidInputException, ObjectNotFoundException, PartiallyModifiedException, NotAuthorizedException, DuplicateKeyException {
-        // TODO: 06/02/17 prevent endless recursion from happening.
         String information = "";
         boolean append = UrlParamHelper.checkBool(RequestKeys.APPEND);
         Logger.debug("Appending? " + append);
@@ -158,7 +157,7 @@ public class CategoryRepository {
         // if the user has no rights to edit a category:
         //  1. he uses put - this is not allowed as he cannot change things other than append decks.
         //  2. he uses patch but does not append - this is not allowed as he may not change anything besides the decks.
-        if ((method.equals("PUT") || !append) && !author.hasRight(UserOperations.EDIT_CATEGORY, category))
+        if ((method.equals("PUT") || !append) && !author.hasPermission(UserOperations.EDIT_CATEGORY, category))
             throw new NotAuthorizedException("This user is not authorized to modify the category with this id.");
 
         //Check whether the request was a put and if it was check if a param is missing, if that is the case --> bad req.

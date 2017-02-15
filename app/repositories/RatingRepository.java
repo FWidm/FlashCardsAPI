@@ -171,7 +171,7 @@ public class RatingRepository {
         Rating rating = Rating.find.byId(id);
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         // get the specific user we want to edit
-        if (!author.hasRight(UserOperations.EDIT_RATING, rating))
+        if (!author.hasPermission(UserOperations.EDIT_RATING, rating))
             throw new NotAuthorizedException("This user is not authorized to modify the rating with this id.");
 
         Logger.debug("Rating=" + rating + " | class simple name=" + rating.getClass().getSimpleName());

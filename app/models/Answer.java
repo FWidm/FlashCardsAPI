@@ -30,12 +30,14 @@ public class Answer extends Model {
     @Constraints.Required
     @Column(name = JsonKeys.ANSWER_TEXT)
     @JsonProperty(JsonKeys.ANSWER_TEXT)
+    @Lob
     private String answerText;
     @JsonProperty(JsonKeys.ANSWER_HINT)
     @Column(name = JsonKeys.ANSWER_HINT)
+    @Lob
     private String hintText;
     @JsonProperty(JsonKeys.URI)
-    @Column(name = JsonKeys.URI)
+    @Column(name = JsonKeys.URI, length = 2048)
     private URI uri;
     @ManyToOne
     @JoinColumn(name = JsonKeys.USER_ID, referencedColumnName = JsonKeys.USER_ID)

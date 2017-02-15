@@ -26,9 +26,10 @@ public class Question extends Model {
     @Constraints.Required
     @JsonProperty(JsonKeys.QUESTION_TEXT)
     @Column(name = JsonKeys.QUESTION_TEXT)
+    @Lob
     private String questionText;
     @JsonProperty(JsonKeys.URI)
-    @Column(name = JsonKeys.URI)
+    @Column(name = JsonKeys.URI, length = 2048)
     private URI uri;
 //    @OneToOne(fetch= FetchType.LAZY)
 //    @JoinColumn(name="parent_card_id")

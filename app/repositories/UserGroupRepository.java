@@ -155,7 +155,7 @@ public class UserGroupRepository {
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         // get the specific user we want to edit
         UserGroup groupToUpdate = UserGroup.find.byId(id);
-        if (!author.hasRight(UserOperations.EDIT_GROUP, groupToUpdate))
+        if (!author.hasPermission(UserOperations.EDIT_GROUP, groupToUpdate))
             throw new NotAuthorizedException("This user is not authorized to modify the group with this id.");
 
         //Check whether the request was a put and if it was check if a param is missing, if that is the case --> bad req.
@@ -266,7 +266,7 @@ public class UserGroupRepository {
         User user = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         UserGroup group = UserGroup.find.byId(id);
 
-        if (user.hasRight(UserOperations.DELETE_GROUP, group)) {
+        if (user.hasPermission(UserOperations.DELETE_GROUP, group)) {
             group.update();
             group.delete();
         } else throw new NotAuthorizedException("This user is not authorized to delete the group with this id.");
