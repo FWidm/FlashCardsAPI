@@ -85,17 +85,6 @@ create table rating (
   constraint pk_rating primary key (ratingId))
 ;
 
-create table statistics (
-  statisticId               bigint auto_increment not null,
-  user                      bigint,
-  card                      bigint,
-  knowledge                 float,
-  drawer                    integer,
-  startDate                 datetime(6),
-  endDate                   datetime(6),
-  constraint pk_statistics primary key (statisticId))
-;
-
 create table tag (
   tagId                     bigint auto_increment not null,
   tagName                   varchar(255),
@@ -174,12 +163,8 @@ alter table rating add constraint fk_rating_ratedAnswer_14 foreign key (answerId
 create index ix_rating_ratedAnswer_14 on rating (answerId);
 alter table rating add constraint fk_rating_ratedFlashCard_15 foreign key (flashcardId) references flashCard (flashcardId) on delete restrict on update restrict;
 create index ix_rating_ratedFlashCard_15 on rating (flashcardId);
-alter table statistics add constraint fk_statistics_user_16 foreign key (user) references user (userId) on delete restrict on update restrict;
-create index ix_statistics_user_16 on statistics (user);
-alter table statistics add constraint fk_statistics_card_17 foreign key (card) references flashCard (flashcardId) on delete restrict on update restrict;
-create index ix_statistics_card_17 on statistics (card);
-alter table uploaded_media add constraint fk_uploaded_media_author_18 foreign key (userId) references user (userId) on delete restrict on update restrict;
-create index ix_uploaded_media_author_18 on uploaded_media (userId);
+alter table uploaded_media add constraint fk_uploaded_media_author_16 foreign key (userId) references user (userId) on delete restrict on update restrict;
+create index ix_uploaded_media_author_16 on uploaded_media (userId);
 
 
 
@@ -212,8 +197,6 @@ drop table cardTagJoinTable;
 drop table question;
 
 drop table rating;
-
-drop table statistics;
 
 drop table tag;
 

@@ -67,6 +67,14 @@ public class CardDeckRepository {
         return flashCards;
     }
 
+    /**
+     * Delete a carddeck by id
+     *
+     * @param id    of the deck
+     * @param email of the deleting user
+     * @return deck or exception
+     * @throws NotAuthorizedException if user is not authorized
+     */
     public static CardDeck deleteCardDeck(long id, String email) throws NotAuthorizedException {
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         CardDeck deck = CardDeck.find.byId(id);
@@ -79,6 +87,27 @@ public class CardDeckRepository {
         return deck;
     }
 
+    /**
+     * Adds a new carddeck via the passed jsonnode
+     *
+     * @param json content of the carddeck:
+     *             {
+     *             "cardDeckName": "{{cardDeckName}}",
+     *             "cardDeckDescpription": "",
+     *             "cards": [
+     *             {
+     *             "flashcardId": {{cardId1}}
+     *             }
+     *             ],
+     *             "userGroup":{
+     *             "groupId":{{groupId}}
+     *             }
+     *             }
+     * @return the newly created deck or an exception
+     * @throws InvalidInputException if no group is specified
+     * @throws DuplicateKeyException if the passed cards are already in another deck
+     * @throws NotAuthorizedException if the user is not authorized
+     */
     @BodyParser.Of(BodyParser.Json.class)
     public static CardDeck addCardDeck(JsonNode json) throws InvalidInputException, DuplicateKeyException, NotAuthorizedException {
 
@@ -87,9 +116,9 @@ public class CardDeckRepository {
 
         //retrieve the correct cards list by either parsing the id and getting the correct card or the attributes to a new card.
         List<FlashCard> cardList = parseCards(requestObject);
-
+        Logger.debug("Group="+requestObject.getUserGroup());
         CardDeck deck = new CardDeck(requestObject);
-        if (deck.getUserGroup() == null) {
+        if (requestObject.getUserGroup()==null || requestObject.getUserGroup().getId() == null) {
             throw new InvalidInputException("Could not create deck without specifying the group it belongs to.");
         }
 
@@ -118,6 +147,20 @@ public class CardDeckRepository {
 
         return deck;
 
+    }
+
+    /**
+     * Get the Usergroup of one deck by id.
+     *
+     * @param id of the deck
+     * @return usergroup of the deck
+     * @throws NullPointerException if deck does not exist.
+     */
+    public static UserGroup getDeckUserGroup(long id) throws NullPointerException {
+        CardDeck deck = CardDeck.find.byId(id);
+        Logger.debug("Deck found: " + deck);
+        UserGroup group = deck.getUserGroup();
+        return group;
     }
 
     @BodyParser.Of(BodyParser.Json.class)
@@ -150,7 +193,7 @@ public class CardDeckRepository {
             if (JsonKeys.debugging)
                 Logger.debug(!json.has(JsonKeys.CARDDECK_NAME) + " " + !json.has(JsonKeys.CARDDECK_CARDS)
                         + " " + !json.has(JsonKeys.CARDDECK_DESCRIPTION));
-            throw new InvalidInputException("The Update method needs all details of the carddeck: " + JsonKeys.CARDDECK_JSON_ELEMENTS);
+            throw new InvalidInputException("Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS);
         }
         ObjectMapper mapper = new ObjectMapper();
         CardDeck requestObject = mapper.convertValue(json, CardDeck.class);

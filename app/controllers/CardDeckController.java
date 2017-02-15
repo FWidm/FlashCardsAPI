@@ -3,6 +3,8 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import models.CardDeck;
 import models.FlashCard;
+import models.UserGroup;
+import play.Logger;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -107,11 +109,11 @@ public class CardDeckController extends Controller {
             if (JsonKeys.debugging && !e.getMessage().contains("did contain")) {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS + " | cause: " + e.getCause()));
+                                BAD_REQUEST, e.getMessage() + " | cause: " + e.getCause()));
             } else {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+                                BAD_REQUEST, e.getMessage()));
             }
         } catch (NotAuthorizedException e) {
             return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage()));
@@ -146,11 +148,11 @@ public class CardDeckController extends Controller {
             if (JsonKeys.debugging && !e.getMessage().contains("did contain")) {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS + " | cause: " + e.getCause()));
+                                BAD_REQUEST, e.getMessage()+ " | cause: " + e.getCause()));
             } else {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+                                BAD_REQUEST, e.getMessage()));
             }
         } catch (ObjectNotFoundException e) {
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, e.getMessage()));
@@ -159,4 +161,20 @@ public class CardDeckController extends Controller {
         }
     }
 
+
+    /**
+     * Get a deck's group by deck id.
+     * @param id
+     * @return ok with the group's content or notFound.
+     */
+    public Result getGroupOfDeck(long id){
+        try {
+            Logger.debug("DeckID="+id);
+            UserGroup group=CardDeckRepository.getDeckUserGroup(id);
+            Logger.debug("group="+group);
+            return ok(JsonUtil.toJson(group));
+        }catch (NullPointerException e){
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "CardDeck with the given id does not exist.", id));
+        }
+    }
 }

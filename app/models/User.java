@@ -382,7 +382,7 @@ public class User extends Model {
                 if (manipulated != null && manipulated.getClass() == CardDeck.class) {
                     CardDeck deck = (CardDeck) manipulated;
                     UserGroup group = deck.getUserGroup();
-                    Logger.debug("HasRights >> Deck="+deck.getId()+" group="+group.getId());
+
                     //can delete own cards OR any cards when this user's rating is over a specific value
                     if (rating >= RATING_DELETE_DECK || (group != null && group.getUsers().contains(this))) {
                         return true;

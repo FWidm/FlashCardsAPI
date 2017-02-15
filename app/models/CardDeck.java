@@ -72,9 +72,9 @@ public class CardDeck extends Model {
         this.description = otherDeck.getDescription();
         this.cards = otherDeck.getCards();
         this.userGroup = otherDeck.getUserGroup();
-        userGroup.addDeck(this);
+        if (userGroup != null)
+            userGroup.addDeck(this);
         this.visible = otherDeck.isVisible();
-        Logger.debug("constructor: " + this);
     }
 
 

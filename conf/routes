@@ -73,6 +73,7 @@ DELETE  /ratings/:id        controllers.RatingController.deleteRating(id:Long)
 GET     /cardDecks          controllers.CardDeckController.getCardDecks
 GET     /cardDecks/:id      controllers.CardDeckController.getCardDeck(id:Long)
 GET     /cardDecks/:id/cards controllers.CardDeckController.getCardDeckCards(id:Long)
+GET     /cardDecks/:id/group controllers.CardDeckController.getGroupOfDeck(id:Long)
 
 POST    /cardDecks          controllers.CardDeckController.addCardDeck
 PUT     /cardDecks/:id      controllers.CardDeckController.updateCardDeck(id:Long)
