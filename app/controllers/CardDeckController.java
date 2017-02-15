@@ -97,6 +97,7 @@ public class CardDeckController extends Controller {
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Request contained an element that is not " +
                     "expected for a card deck. Unknown Attribute=" + cause + ", expected Attributes=" + JsonKeys.CARDDECK_JSON_ELEMENTS));
         } catch (NullPointerException e) {
+            e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error while retrieving cards, " + e.getMessage()));
         } catch (DuplicateKeyException e) {
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Could not create deck with given cards, some of them already are in a deck.", JsonKeys.CARDDECK_CARDS, e.getObjects()));
