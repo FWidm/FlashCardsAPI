@@ -153,9 +153,12 @@ public class CategoryRepository {
 
         Category receivedCategory = mapper.convertValue(json, Category.class);
         Category category = Category.find.byId(id);
+
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
-        // get the specific user we want to edit
-        if (!author.hasRight(UserOperations.EDIT_CATEGORY, category))
+        // if the user has no rights to edit a category:
+        //  1. he uses put - this is not allowed as he cannot change things other than append decks.
+        //  2. he uses patch but does not append - this is not allowed as he may not change anything besides the decks.
+        if ((method.equals("PUT") || !append) && !author.hasRight(UserOperations.EDIT_CATEGORY, category))
             throw new NotAuthorizedException("This user is not authorized to modify the category with this id.");
 
         //Check whether the request was a put and if it was check if a param is missing, if that is the case --> bad req.

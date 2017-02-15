@@ -7,6 +7,7 @@ import play.Logger;
 import util.JsonKeys;
 import util.RequestKeys;
 import util.UserOperations;
+import util.UserRightManagement;
 import util.exceptions.*;
 
 import java.net.URI;
@@ -147,17 +148,21 @@ public class FlashCardRepository {
     public static FlashCard updateFlashCard(long id, String email, JsonNode json, Map<String, String[]> urlParams) throws InvalidInputException, ParameterNotSupportedException, NullPointerException, NotAuthorizedException {
         ObjectMapper mapper = new ObjectMapper();
         boolean appendMode = false;
-        int answersSize = -1;
+
         Question oldQuestion = null;
         List<Answer> oldAnswerList = null;
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
+        FlashCard toUpdate = FlashCard.find.byId(id);
+
+        //When using put we need to be able to edit everything inside our card.
+        if (request().method().equals("PUT") && !author.hasRight(UserOperations.EDIT_CARD, toUpdate))
+            throw new NotAuthorizedException("This user is not authorized to edit this card.");
 
         if (urlParams.containsKey(RequestKeys.APPEND)) {
             appendMode = Boolean.parseBoolean(urlParams.get(RequestKeys.APPEND)[0]);
         }
         if (JsonKeys.debugging) Logger.debug("Appending mode enabled? " + appendMode);
 
-        FlashCard toUpdate = FlashCard.find.byId(id);
         User requestOwner = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
 
 
@@ -182,47 +187,56 @@ public class FlashCardRepository {
                 mergedAnswers.addAll(retrieveAnswers(author, json));
 
                 toUpdate.setAnswers(mergedAnswers);
-            } else if (requestOwner.hasRight(UserOperations.EDIT_CARD_QUESTION, toUpdate)) {
+            } else if (requestOwner.hasRight(UserOperations.EDIT_CARD, toUpdate)) {
                 List<Answer> newAnswers = retrieveAnswers(author, json);
                 newAnswers.forEach(a -> Logger.debug("new: " + a));
 
                 toUpdate.setAnswers(newAnswers);
             } else
-                throw new NotAuthorizedException("This user is not authorized to delete this card.");
+                throw new NotAuthorizedException("This user is not authorized to edit this card. " +
+                        "You cannot replace the answers without having the a rating above " +
+                        UserRightManagement.RATING_EDIT_CARD + " points or being the owner of the card. " +
+                        "Please append new tags with '?append=true'");
+
 
         }
 
 
-        if (json.has(JsonKeys.FLASHCARD_QUESTION) && requestOwner.hasRight(UserOperations.EDIT_CARD_QUESTION, toUpdate)) {
-            if (json.get(JsonKeys.FLASHCARD_QUESTION).has(JsonKeys.QUESTION_ID)) {
-                throw new IllegalArgumentException("A questionId is not accepted while creating new cards," +
-                        " please provide a complete question object with the following components: "
-                        + JsonKeys.QUESTION_JSON_ELEMENTS);
-            } else {
-                try {
-                    Question q = Question.parseQuestion(null, json.get(JsonKeys.FLASHCARD_QUESTION));
-                    q.save();
-                    oldQuestion = toUpdate.getQuestion();
-                    Logger.debug("Deleted oldQuestion: " + oldQuestion);
-                    toUpdate.setQuestion(q);
+        if (json.has(JsonKeys.FLASHCARD_QUESTION)) {
+            if (author.hasRight(UserOperations.EDIT_CARD, toUpdate)) {
+                if (json.get(JsonKeys.FLASHCARD_QUESTION).has(JsonKeys.QUESTION_ID)) {
+                    throw new IllegalArgumentException("A questionId is not accepted while creating new cards," +
+                            " please provide a complete question object with the following components: "
+                            + JsonKeys.QUESTION_JSON_ELEMENTS);
+                } else {
+                    try {
+                        Question q = Question.parseQuestion(null, json.get(JsonKeys.FLASHCARD_QUESTION));
+                        q.save();
+                        oldQuestion = toUpdate.getQuestion();
+                        Logger.debug("Deleted oldQuestion: " + oldQuestion);
+                        toUpdate.setQuestion(q);
 
 
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        } else
-            throw new InvalidInputException("This user is not authorized to edit the card of another user. He may only append tags or answers.");
+            } else
+                throw new NotAuthorizedException("This user is not authorized to edit this card. You cannot modify the" +
+                        " question without having the a rating above " + UserRightManagement.RATING_EDIT_CARD + " points " +
+                        "or being the owner of the card.");
+        }
 
-        if (json.has(JsonKeys.AUTHOR) && requestOwner.hasRight(UserOperations.EDIT_CARD_QUESTION, toUpdate)) {
-            User u = mapper.convertValue(json.findValue(JsonKeys.AUTHOR), User.class);
-            author = User.find.byId(u.getId());
-            toUpdate.setAuthor(author);
-        } else
-            throw new NotAuthorizedException("This user is not authorized to delete this card.");
-
-
-        if (json.has(JsonKeys.FLASHCARD_TAGS)) {
+        if (json.has(JsonKeys.AUTHOR)) {
+            if (author.hasRight(UserOperations.EDIT_CARD, toUpdate)) {
+                User u = mapper.convertValue(json.findValue(JsonKeys.AUTHOR), User.class);
+                author = User.find.byId(u.getId());
+                toUpdate.setAuthor(author);
+            } else
+                throw new NotAuthorizedException("This user is not authorized to edit this card. You cannot modify the " +
+                        "author without having a rating above " + UserRightManagement.RATING_EDIT_CARD +
+                        " points or being the owner of the card.");
+        } else if (json.has(JsonKeys.FLASHCARD_TAGS)) {
             if (appendMode) {
                 List<Tag> mergedTags = new ArrayList<>();
                 mergedTags.addAll(toUpdate.getTags());
@@ -234,29 +248,28 @@ public class FlashCardRepository {
 //                    mergedTags.addAll(JsonUtil.retrieveOrCreateTags(json));
                 toUpdate.setTags(mergedTags);
                 if (JsonKeys.debugging) Logger.debug("append: " + mergedTags);
-            } else if (requestOwner.hasRight(UserOperations.EDIT_CARD_QUESTION, toUpdate)) {
+            } else if (requestOwner.hasRight(UserOperations.EDIT_CARD, toUpdate)) {
                 toUpdate.setTags(TagRepository.retrieveOrCreateTags(json));
+
             } else
-                throw new NotAuthorizedException("This user is not authorized to delete this card.");
+                throw new NotAuthorizedException("This user is not authorized to edit this card. You cannot replace the " +
+                        "tags without having a rating above " + UserRightManagement.RATING_EDIT_CARD + " points. " +
+                        "Please append new tags with '?append=true'");
         }
 
         if (json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)) {
-            toUpdate.setMultipleChoice(json.findValue(JsonKeys.FLASHCARD_MULTIPLE_CHOICE).asBoolean());
+            if (author.hasRight(UserOperations.EDIT_CARD, toUpdate)) {
+                toUpdate.setMultipleChoice(json.findValue(JsonKeys.FLASHCARD_MULTIPLE_CHOICE).asBoolean());
+            } else
+                throw new NotAuthorizedException("This user is not authorized to edit this card. You cannot modify the " +
+                        "multiple choice status without having the a rating above " + UserRightManagement.RATING_EDIT_CARD +
+                        " points or being the owner of the card.");
         }
 
         toUpdate.update();
         //delete old/replaced objects if no appendmode is enabled
         if (oldQuestion != null)
             oldQuestion.delete();
-        // TODO: 23.01.2017 find out why this works implicitly without my help
-        /*if (oldAnswerList != null && !appendMode) {
-            Logger.debug("oldList=" + oldAnswerList);
-            for (Answer answer : oldAnswerList) {
-                Logger.debug("delete answer with id=" + answer.getId()+" | card="+answer.getCard());
-                Answer.find.byId(answer.getId()).delete();
-                //answer.delete();
-            }
-        }*/
 
 
         if (JsonKeys.debugging)

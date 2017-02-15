@@ -349,7 +349,7 @@ public class User extends Model {
                     }
                 }
             }
-            case EDIT_CARD_QUESTION: {
+            case EDIT_CARD: {
                 if (manipulated != null && manipulated.getClass() == FlashCard.class) {
                     FlashCard card = (FlashCard) manipulated;
                     //can edit own cards OR any cards when this user's rating is over a specific value

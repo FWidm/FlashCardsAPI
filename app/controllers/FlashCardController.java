@@ -157,6 +157,7 @@ public class FlashCardController {
             e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         } catch (IllegalArgumentException e) {
+            e.printStackTrace();
             if (JsonKeys.debugging) {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
@@ -181,6 +182,7 @@ public class FlashCardController {
                                 BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
             }
         } catch (NotAuthorizedException e) {
+            e.printStackTrace();
             return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage(), id));
         }
     }
