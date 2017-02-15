@@ -250,7 +250,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": {{userId}}\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":{{userId}}\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
 						},
 						"description": "Inserts a question to the db instead of using one already created."
 					},
@@ -288,7 +288,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"hello world!\",\n      \"mediaURI\": \"www.google.de\",\n      \"author\": {\n        \"userId\": {{userId}}\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer\",\n        \"answerHint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":{{userId}}\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagId\":555\n    }]\n  }"
 						},
 						"description": "Inserts a question to the db instead of using one already created."
 					},
@@ -562,8 +562,8 @@
 						}
 					],
 					"request": {
-						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}?append=true&redirect=true",
-						"method": "PUT",
+						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}?append=true",
+						"method": "PATCH",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -578,7 +578,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"cardDeckName\": \"{{cardDeckName}}\",\n    \"cardDeckDescpription\": \"\",\n     \"userGroup\":{\n        \"groupId\":{{groupId}}\n    },\n    \"cards\": [\n      {\n        \"flashcardId\": {{cardId1}}\n      },\n      {\n        \"flashcardId\": {{cardId2}}\n      }\n    ]\n}"
+							"raw": "{\n    \"cards\": [\n      {\n        \"flashcardId\": {{cardId1}}\n      },\n      {\n        \"flashcardId\": {{cardId2}}\n      }\n    ]\n}"
 						},
 						"description": "Result: group with 4 cards"
 					},
@@ -610,6 +610,29 @@
 					"name": "get the first card of a carddeck (size & start param)",
 					"request": {
 						"url": "{{url}}{{port}}/cardDecks/1/cards?size=1&start=0",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "get the group of a deck",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}/group",
 						"method": "GET",
 						"header": [],
 						"body": {},
@@ -1180,7 +1203,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"categoryName\": \"{{randomString}}\",\n  \"cardDecks\": [],\n  \"parent\": {\"categoryId\": {{cardDeckId}}}\n}"
+							"raw": "{\n  \"categoryName\": \"{{randomString}}\",\n  \"cardDecks\": [],\n  \"parent\": {\"categoryId\": {{categoryId}}}\n}"
 						},
 						"description": ""
 					},
@@ -1201,7 +1224,7 @@
 						}
 					],
 					"request": {
-						"url": "{{url}}{{port}}/categories/{{categoryId}}",
+						"url": "{{url}}{{port}}/categories/{{categoryIdChild}}",
 						"method": "PUT",
 						"header": [
 							{
@@ -1217,7 +1240,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"categoryName\": \"{{randomString}}\",\n  \"cardDecks\": [],\n  \"parent\": {\"categoryId\": {{categoryIdChild}}}\n}"
+							"raw": "{\n  \"categoryName\": \"{{randomString}}\",\n  \"cardDecks\": [\n  \t{\"cardDeckId\":{{cardDeckId}}\n  \t}\n  \t],\n  \"parent\": {\"categoryId\": {{categoryId}}}\n}"
 						},
 						"description": ""
 					},
