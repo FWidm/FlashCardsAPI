@@ -151,9 +151,10 @@ public class FlashCardRepository {
         List<Answer> oldAnswerList = null;
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         FlashCard toUpdate = FlashCard.find.byId(id);
+        boolean hasPermission=author.hasPermission(UserOperations.EDIT_CARD, toUpdate);
 
         //When using put we need to be able to edit everything inside our card.
-        if (request().method().equals("PUT") && !author.hasPermission(UserOperations.EDIT_CARD, toUpdate))
+        if (request().method().equals("PUT") && !hasPermission)
             throw new NotAuthorizedException("This user is not authorized to edit this card.");
 
         if (urlParams.containsKey(RequestKeys.APPEND)) {
@@ -185,7 +186,7 @@ public class FlashCardRepository {
                 mergedAnswers.addAll(retrieveAnswers(author, json));
 
                 toUpdate.setAnswers(mergedAnswers);
-            } else if (requestOwner.hasPermission(UserOperations.EDIT_CARD, toUpdate)) {
+            } else if (hasPermission) {
                 List<Answer> newAnswers = retrieveAnswers(author, json);
                 newAnswers.forEach(a -> Logger.debug("new: " + a));
 
@@ -201,7 +202,7 @@ public class FlashCardRepository {
 
 
         if (json.has(JsonKeys.FLASHCARD_QUESTION)) {
-            if (author.hasPermission(UserOperations.EDIT_CARD, toUpdate)) {
+            if (hasPermission) {
                 if (json.get(JsonKeys.FLASHCARD_QUESTION).has(JsonKeys.QUESTION_ID)) {
                     throw new IllegalArgumentException("A questionId is not accepted while creating new cards," +
                             " please provide a complete question object with the following components: "
@@ -226,7 +227,7 @@ public class FlashCardRepository {
         }
 
         if (json.has(JsonKeys.AUTHOR)) {
-            if (author.hasPermission(UserOperations.EDIT_CARD, toUpdate)) {
+            if (hasPermission) {
                 User u = mapper.convertValue(json.findValue(JsonKeys.AUTHOR), User.class);
                 author = User.find.byId(u.getId());
                 toUpdate.setAuthor(author);
@@ -246,7 +247,7 @@ public class FlashCardRepository {
 //                    mergedTags.addAll(JsonUtil.retrieveOrCreateTags(json));
                 toUpdate.setTags(mergedTags);
                 if (JsonKeys.debugging) Logger.debug("append: " + mergedTags);
-            } else if (requestOwner.hasPermission(UserOperations.EDIT_CARD, toUpdate)) {
+            } else if (hasPermission) {
                 toUpdate.setTags(TagRepository.retrieveOrCreateTags(json));
 
             } else
@@ -256,7 +257,7 @@ public class FlashCardRepository {
         }
 
         if (json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)) {
-            if (author.hasPermission(UserOperations.EDIT_CARD, toUpdate)) {
+            if (hasPermission) {
                 toUpdate.setMultipleChoice(json.findValue(JsonKeys.FLASHCARD_MULTIPLE_CHOICE).asBoolean());
             } else
                 throw new NotAuthorizedException("This user is not authorized to edit this card. You cannot modify the " +

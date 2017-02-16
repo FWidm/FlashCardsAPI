@@ -179,6 +179,10 @@ public class HomeController extends Controller {
         return ok(request().username());
     }
 
+    /**
+     * Invalidates the token that was sent in the request.
+     * @return
+     */
     @Security.Authenticated(ActionAuthenticator.class)
     public Result invalidateToken(){
         String tokenString="";
@@ -188,7 +192,6 @@ public class HomeController extends Controller {
             if (tokenHeader.length == 2) {
                 tokenString=tokenHeader[1];
             }
-
         }
         Logger.debug("Token Value: "+tokenString);
         AuthToken authToken = AuthToken.find.where().eq(JsonKeys.TOKEN, tokenString).findUnique();
