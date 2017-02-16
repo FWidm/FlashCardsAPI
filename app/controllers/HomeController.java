@@ -15,6 +15,7 @@ import repositories.UserRepository;
 import util.ActionAuthenticator;
 import util.JsonKeys;
 import util.JsonUtil;
+import util.RequestKeys;
 import util.crypt.PasswordUtil;
 
 import java.io.File;
@@ -127,6 +128,184 @@ public class HomeController extends Controller {
         }
         return extension;
     }
+
+    /**
+     * Checks the credentials in the body - users password and email and returns a token if valid or forbidden if invalid.
+     *
+     * @return appropriate http result
+     */
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result login() {
+        JsonNode json = request().body().asJson();
+        if (json.has(JsonKeys.USER_PASSWORD) && json.has(JsonKeys.USER_EMAIL)) {
+            String pass = json.get(JsonKeys.USER_PASSWORD).asText();
+            String email = json.get(JsonKeys.USER_EMAIL).asText();
+
+            //User logInTo = User.find.where().and(like(JsonKeys.USER_EMAIL, email), like(JsonKeys.USER_PASSWORD, pass)).findUnique();
+            User logInTo = User.find.where().like(JsonKeys.USER_EMAIL, email).findUnique();
+            try {
+
+                Logger.debug("Login attempt with email=" + email + " User found=" + logInTo + " valid? " + PasswordUtil.validatePassword(pass, logInTo.getPassword()));
+                if (logInTo != null && PasswordUtil.validatePassword(pass, logInTo.getPassword())) {
+                    ObjectNode result = Json.newObject();
+                    result.put(JsonKeys.STATUS_CODE, OK);
+                    result.put(JsonKeys.DESCRIPTION, "Login succeeded.");
+                    Logger.debug("result=" + result);
+                    AuthToken token = new AuthToken(logInTo);
+                    token.save();
+                    Logger.debug("Token=" + token);
+                    logInTo.addAuthToken(token);
+                    Logger.debug("Added authtoken to user");
+                    result.put(JsonKeys.TOKEN, token.getToken());
+                    Logger.debug("finished result node: " + result);
+                    return ok(result);
+                }
+
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (InvalidKeySpecException e) {
+                e.printStackTrace();
+            } catch (NullPointerException e) {
+                return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "User does not exist."));
+            }
+        }
+        return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN, "Login failed, check email and password for errors."));
+    }
+
+
+
+    @Security.Authenticated(ActionAuthenticator.class)
+    public Result auth() {
+        return ok(request().username());
+    }
+
+    @Security.Authenticated(ActionAuthenticator.class)
+    public Result invalidateToken(){
+        String tokenString="";
+        String[] authTokenHeaderValues = request().headers().get(RequestKeys.TOKEN_HEADER);
+        if ((authTokenHeaderValues != null) && (authTokenHeaderValues.length == 1) && (authTokenHeaderValues[0] != null)) {
+            String[] tokenHeader = authTokenHeaderValues[0].split(" ");
+            if (tokenHeader.length == 2) {
+                tokenString=tokenHeader[1];
+            }
+
+        }
+        Logger.debug("Token Value: "+tokenString);
+        AuthToken authToken = AuthToken.find.where().eq(JsonKeys.TOKEN, tokenString).findUnique();
+        Logger.debug("Token: "+authToken);
+        authToken.delete();
+        return noContent();
+    }
+
+    public Result test() {
+        return ok(JsonUtil.prepareJsonStatus(OK, "hello world"));
+    }
+
+    public Result heartbeat() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("currentDate", "" + new Date());
+        return ok(JsonUtil.convertToJsonNode(map));
+    }
+
+    public Result testCardDeck() {
+        User tmp = User.find.where().eq("email", "hello1@world.com").findUnique();
+        if (tmp == null) {
+            tmp = new User("hello", "hello1@world.com", "passwörd", 1);
+            tmp.save();
+        }
+        CardDeck deck = new CardDeck("Deck 1", "This is a test");
+        deck.save();
+        List<FlashCard> flashCardList = new ArrayList<>();
+        for (int i = 0; i < 60; i++) {
+            List<String> tags = new ArrayList<>();
+            tags.add("Tag-" + i);
+
+            FlashCard fc = new FlashCard(tmp, false, tags);
+            fc.save();
+            Question q = new Question("Question-" + i, tmp);
+            q.save();
+            fc.setQuestion(q);
+            for (int j = 0; j < 20; j++) {
+                Answer a = new Answer("Answer-" + i + "|" + j, "none", tmp);
+                a.save();
+                fc.addAnswer(a);
+            }
+
+            fc.setDeck(deck);
+            fc.update();
+
+            flashCardList.add(fc);
+        }
+
+        return ok(JsonUtil.toJson(CardDeck.find.byId(deck.getId())));
+    }
+
+    public Result testCategories() {
+        Category root = new Category("0");
+        root.save();
+        Category firstLevel = new Category("1", root);
+        firstLevel.save();
+        Category secondLevel = new Category("2", firstLevel);
+        secondLevel.save();
+
+        List<CardDeck> cardDeckList = generateDeckList(2, 5, 5);
+        Category thirdLevel = new Category("3", secondLevel);
+        thirdLevel.save();
+
+        thirdLevel.setCardDecks(cardDeckList);
+        for (CardDeck deck : cardDeckList) {
+            deck.update();
+        }
+        thirdLevel.update();
+
+        Logger.debug("Root=" + root + "parent=" + root.getParent());
+        Logger.debug("1st Level=" + firstLevel + " parent=" + firstLevel.getParent());
+        Logger.debug("2nd Level=" + secondLevel + " parent=" + secondLevel.getParent());
+        Logger.debug("3rd Level=" + thirdLevel + " parent=" + thirdLevel.getParent() + "deck#=" + thirdLevel.getCardDecks().size());
+
+
+        return ok(JsonUtil.toJson(thirdLevel));
+    }
+
+    private List<CardDeck> generateDeckList(int noDecks, int noCards, int noAnswers) {
+        List<CardDeck> cardDeckList = new ArrayList<>();
+
+        User tmp = User.find.where().eq("email", "hello1@world.com").findUnique();
+        if (tmp == null) {
+            tmp = new User("hello", "hello1@world.com", "passwörd", 1);
+            tmp.save();
+        }
+        CardDeck deck;
+        for (int x = 0; x < noDecks; x++) {
+            deck = new CardDeck("Deck " + x, "This is a test");
+            deck.save();
+            List<FlashCard> flashCardList = new ArrayList<>();
+            for (int i = 0; i < noCards; i++) {
+                List<String> tags = new ArrayList<>();
+                tags.add("Tag-" + i);
+
+                FlashCard fc = new FlashCard(tmp, false, tags);
+                fc.save();
+                Question q = new Question("Question-" + i, tmp);
+                q.save();
+                fc.setQuestion(q);
+                for (int j = 0; j < noAnswers; j++) {
+                    Answer a = new Answer("Answer-" + i + "|" + j, "none", tmp);
+                    a.save();
+                    fc.addAnswer(a);
+                }
+
+                fc.setDeck(deck);
+                fc.update();
+
+                flashCardList.add(fc);
+            }
+            cardDeckList.add(deck);
+        }
+        Logger.debug("Finished creating " + cardDeckList.size() + " decks!");
+        return cardDeckList;
+    }
+
 
     public Result testRating() {
         User u = new User("Test", "test" + Math.random() + "@example.com", "habla", 0);
@@ -272,163 +451,6 @@ public class HomeController extends Controller {
         return ok(JsonUtil.prepareJsonStatus(OK,"Group test done!"));
     }
 
-    /**
-     * Checks the credentials in the body - users password and email and returns a token if valid or forbidden if invalid.
-     *
-     * @return appropriate http result
-     */
-    @BodyParser.Of(BodyParser.Json.class)
-    public Result login() {
-        JsonNode json = request().body().asJson();
-        if (json.has(JsonKeys.USER_PASSWORD) && json.has(JsonKeys.USER_EMAIL)) {
-            String pass = json.get(JsonKeys.USER_PASSWORD).asText();
-            String email = json.get(JsonKeys.USER_EMAIL).asText();
-
-            //User logInTo = User.find.where().and(like(JsonKeys.USER_EMAIL, email), like(JsonKeys.USER_PASSWORD, pass)).findUnique();
-            User logInTo = User.find.where().like(JsonKeys.USER_EMAIL, email).findUnique();
-            try {
-
-                Logger.debug("Login attempt with email=" + email + " User found=" + logInTo + " valid? " + PasswordUtil.validatePassword(pass, logInTo.getPassword()));
-                if (logInTo != null && PasswordUtil.validatePassword(pass, logInTo.getPassword())) {
-                    ObjectNode result = Json.newObject();
-                    result.put(JsonKeys.STATUS_CODE, OK);
-                    result.put(JsonKeys.DESCRIPTION, "Login succeeded.");
-                    Logger.debug("result=" + result);
-                    AuthToken token = new AuthToken(logInTo);
-                    token.save();
-                    Logger.debug("Token=" + token);
-                    logInTo.addAuthToken(token);
-                    Logger.debug("Added authtoken to user");
-                    result.put(JsonKeys.TOKEN, token.getToken());
-                    Logger.debug("finished result node: " + result);
-                    return ok(result);
-                }
-
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (InvalidKeySpecException e) {
-                e.printStackTrace();
-            } catch (NullPointerException e) {
-                return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "User does not exist."));
-            }
-        }
-        return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN, "Login failed, check email and password for errors."));
-    }
-
-    public Result testCardDeck() {
-        User tmp = User.find.where().eq("email", "hello1@world.com").findUnique();
-        if (tmp == null) {
-            tmp = new User("hello", "hello1@world.com", "passwörd", 1);
-            tmp.save();
-        }
-        CardDeck deck = new CardDeck("Deck 1", "This is a test");
-        deck.save();
-        List<FlashCard> flashCardList = new ArrayList<>();
-        for (int i = 0; i < 60; i++) {
-            List<String> tags = new ArrayList<>();
-            tags.add("Tag-" + i);
-
-            FlashCard fc = new FlashCard(tmp, false, tags);
-            fc.save();
-            Question q = new Question("Question-" + i, tmp);
-            q.save();
-            fc.setQuestion(q);
-            for (int j = 0; j < 20; j++) {
-                Answer a = new Answer("Answer-" + i + "|" + j, "none", tmp);
-                a.save();
-                fc.addAnswer(a);
-            }
-
-            fc.setDeck(deck);
-            fc.update();
-
-            flashCardList.add(fc);
-        }
-
-        return ok(JsonUtil.toJson(CardDeck.find.byId(deck.getId())));
-    }
-
-    @Security.Authenticated(ActionAuthenticator.class)
-    public Result auth() {
-        return ok(request().username());
-    }
-
-    public Result test() {
-        return ok(JsonUtil.prepareJsonStatus(OK, "hello world"));
-    }
-
-    public Result heartbeat() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("currentDate", "" + new Date());
-        return ok(JsonUtil.convertToJsonNode(map));
-    }
-
-
-    public Result testCategories() {
-        Category root = new Category("0");
-        root.save();
-        Category firstLevel = new Category("1", root);
-        firstLevel.save();
-        Category secondLevel = new Category("2", firstLevel);
-        secondLevel.save();
-
-        List<CardDeck> cardDeckList = generateDeckList(2, 5, 5);
-        Category thirdLevel = new Category("3", secondLevel);
-        thirdLevel.save();
-
-        thirdLevel.setCardDecks(cardDeckList);
-        for (CardDeck deck : cardDeckList) {
-            deck.update();
-        }
-        thirdLevel.update();
-
-        Logger.debug("Root=" + root + "parent=" + root.getParent());
-        Logger.debug("1st Level=" + firstLevel + " parent=" + firstLevel.getParent());
-        Logger.debug("2nd Level=" + secondLevel + " parent=" + secondLevel.getParent());
-        Logger.debug("3rd Level=" + thirdLevel + " parent=" + thirdLevel.getParent() + "deck#=" + thirdLevel.getCardDecks().size());
-
-
-        return ok(JsonUtil.toJson(thirdLevel));
-    }
-
-    private List<CardDeck> generateDeckList(int noDecks, int noCards, int noAnswers) {
-        List<CardDeck> cardDeckList = new ArrayList<>();
-
-        User tmp = User.find.where().eq("email", "hello1@world.com").findUnique();
-        if (tmp == null) {
-            tmp = new User("hello", "hello1@world.com", "passwörd", 1);
-            tmp.save();
-        }
-        CardDeck deck;
-        for (int x = 0; x < noDecks; x++) {
-            deck = new CardDeck("Deck " + x, "This is a test");
-            deck.save();
-            List<FlashCard> flashCardList = new ArrayList<>();
-            for (int i = 0; i < noCards; i++) {
-                List<String> tags = new ArrayList<>();
-                tags.add("Tag-" + i);
-
-                FlashCard fc = new FlashCard(tmp, false, tags);
-                fc.save();
-                Question q = new Question("Question-" + i, tmp);
-                q.save();
-                fc.setQuestion(q);
-                for (int j = 0; j < noAnswers; j++) {
-                    Answer a = new Answer("Answer-" + i + "|" + j, "none", tmp);
-                    a.save();
-                    fc.addAnswer(a);
-                }
-
-                fc.setDeck(deck);
-                fc.update();
-
-                flashCardList.add(fc);
-            }
-            cardDeckList.add(deck);
-        }
-        Logger.debug("Finished creating " + cardDeckList.size() + " decks!");
-        return cardDeckList;
-    }
 
     public Result testMessages() {
         User user = UserRepository.findUserByEmail("email1@email.com");

@@ -3,100 +3,100 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                   controllers.HomeController.index
+GET     /                           controllers.HomeController.index
 # An example controller showing how to write asynchronous code
-GET     /message            controllers.AsyncController.message
+#GET     /message                   controllers.AsyncController.message
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file       controllers.Assets.versioned(path="/public", file: Asset)
+#GET     /assets/*file              controllers.Assets.versioned(path="/public", file: Asset)
 
 #Flash Cards API
 ## Test single components
-GET     /testCards          controllers.HomeController.testCards
-GET     /testGroups         controllers.HomeController.testGroups
-GET     /testTokens         controllers.HomeController.testTokens
-GET     /testRating         controllers.HomeController.testRating
-GET     /testCardDeck         controllers.HomeController.testCardDeck
-GET     /testCategories     controllers.HomeController.testCategories
-GET     /testMessages       controllers.HomeController.testMessages
+GET     /test                       controllers.HomeController.test
+GET     /testCards                  controllers.HomeController.testCards
+GET     /testGroups                 controllers.HomeController.testGroups
+GET     /testTokens                 controllers.HomeController.testTokens
+GET     /testRating                 controllers.HomeController.testRating
+GET     /testCardDeck               controllers.HomeController.testCardDeck
+GET     /testCategories             controllers.HomeController.testCategories
+GET     /testMessages               controllers.HomeController.testMessages
 
 ## General methods
-GET     /test               controllers.HomeController.test
-GET     /heartbeat          controllers.HomeController.heartbeat
-POST    /auth               controllers.HomeController.auth
-POST    /login              controllers.HomeController.login
-#POST    /upload              controllers.HomeController.imageUpload
-POST     /upload     controllers.HomeController.upload
+GET     /heartbeat                  controllers.HomeController.heartbeat
+POST    /auth                       controllers.HomeController.auth
+POST    /login                      controllers.HomeController.login
+POST    /logout                     controllers.HomeController.invalidateToken
+POST    /upload                     controllers.HomeController.upload
 
 #Users
-GET		/users				controllers.UserController.getUserList
-GET		/users/:id          controllers.UserController.getUser(id:Long)
-GET		/users/:id/groups   controllers.UserController.getUserGroups(id:Long)
-GET		/users/e/:email     controllers.UserController.getUserByEmail(email:String)
-POST	/users				controllers.UserController.addUser
-PUT		/users/:id			controllers.UserController.updateUser(id:Long)
-PATCH	/users/:id			controllers.UserController.updateUser(id:Long)
+GET		/users				        controllers.UserController.getUserList
+GET		/users/:id                  controllers.UserController.getUser(id:Long)
+GET		/users/:id/groups           controllers.UserController.getUserGroups(id:Long)
+GET		/users/e/:email             controllers.UserController.getUserByEmail(email:String)
+POST	/users				        controllers.UserController.addUser
+PUT		/users/:id			        controllers.UserController.updateUser(id:Long)
+PATCH	/users/:id			        controllers.UserController.updateUser(id:Long)
 
-DELETE 	/users/:id			controllers.UserController.deleteUser(id:Long)
+DELETE 	/users/:id			        controllers.UserController.deleteUser(id:Long)
 
 #Groups
-GET 	/groups				controllers.UserGroupController.getUserGroupList
-GET 	/groups/:id			controllers.UserGroupController.getUserGroup(id:Long)
-GET 	/groups/:id/users	controllers.UserGroupController.getUsersInUserGroup(id:Long)
-GET 	/groups/:id/decks	controllers.UserGroupController.getDecksFromGroup(id:Long)
+GET 	/groups				        controllers.UserGroupController.getUserGroupList
+GET 	/groups/:id			        controllers.UserGroupController.getUserGroup(id:Long)
+GET 	/groups/:id/users	        controllers.UserGroupController.getUsersInUserGroup(id:Long)
+GET 	/groups/:id/decks	        controllers.UserGroupController.getDecksFromGroup(id:Long)
 
-PUT 	/groups/:id			controllers.UserGroupController.updateUserGroup(id:Long)
-PATCH 	/groups/:id			controllers.UserGroupController.updateUserGroup(id:Long)
-POST 	/groups				controllers.UserGroupController.addUserGroup
-DELETE	/groups/:id			controllers.UserGroupController.unSubscribe(id:Long)
+PUT 	/groups/:id			        controllers.UserGroupController.updateUserGroup(id:Long)
+PATCH 	/groups/:id			        controllers.UserGroupController.updateUserGroup(id:Long)
+POST 	/groups				        controllers.UserGroupController.addUserGroup
+DELETE	/groups/:id			        controllers.UserGroupController.unSubscribe(id:Long)
 
 #Flashcards
-GET     /cards              controllers.FlashCardController.getFlashCardList
-GET     /cards/:id          controllers.FlashCardController.getFlashCard(id:Long)
-GET     /cards/:id/question controllers.FlashCardController.getQuestion(id:Long)
-GET     /cards/:id/answers  controllers.FlashCardController.getAnswers(id:Long)
-GET     /cards/:id/author   controllers.FlashCardController.getAuthor(id:Long)
-GET     /cards/:id/tags     controllers.FlashCardController.getTags(id:Long)
-POST    /cards              controllers.FlashCardController.addFlashCard
-DELETE  /cards/:id          controllers.FlashCardController.deleteFlashCard(id:Long)
-PATCH   /cards/:id          controllers.FlashCardController.updateFlashCard(id:Long)
-PUT     /cards/:id          controllers.FlashCardController.updateFlashCard(id:Long)
+GET     /cards                      controllers.FlashCardController.getFlashCardList
+GET     /cards/:id                  controllers.FlashCardController.getFlashCard(id:Long)
+GET     /cards/:id/question         controllers.FlashCardController.getQuestion(id:Long)
+GET     /cards/:id/answers          controllers.FlashCardController.getAnswers(id:Long)
+GET     /cards/:id/author           controllers.FlashCardController.getAuthor(id:Long)
+GET     /cards/:id/tags             controllers.FlashCardController.getTags(id:Long)
+POST    /cards                      controllers.FlashCardController.addFlashCard
+DELETE  /cards/:id                  controllers.FlashCardController.deleteFlashCard(id:Long)
+PATCH   /cards/:id                  controllers.FlashCardController.updateFlashCard(id:Long)
+PUT     /cards/:id                  controllers.FlashCardController.updateFlashCard(id:Long)
 
 #Ratings
-GET     /ratings            controllers.RatingController.getRatingList
-GET     /ratings/:id        controllers.RatingController.getRating(id:Long)
-POST    /ratings            controllers.RatingController.addRating
-PATCH    /ratings/:id         controllers.RatingController.changeRating(id:Long)
-DELETE  /ratings/:id        controllers.RatingController.deleteRating(id:Long)
+GET     /ratings                    controllers.RatingController.getRatingList
+GET     /ratings/:id                controllers.RatingController.getRating(id:Long)
+POST    /ratings                    controllers.RatingController.addRating
+PATCH    /ratings/:id               controllers.RatingController.changeRating(id:Long)
+DELETE  /ratings/:id                controllers.RatingController.deleteRating(id:Long)
 
 #CardDecks
-GET     /cardDecks          controllers.CardDeckController.getCardDecks
-GET     /cardDecks/:id      controllers.CardDeckController.getCardDeck(id:Long)
-GET     /cardDecks/:id/cards controllers.CardDeckController.getCardDeckCards(id:Long)
-GET     /cardDecks/:id/group controllers.CardDeckController.getGroupOfDeck(id:Long)
+GET     /cardDecks                  controllers.CardDeckController.getCardDecks
+GET     /cardDecks/:id              controllers.CardDeckController.getCardDeck(id:Long)
+GET     /cardDecks/:id/cards        controllers.CardDeckController.getCardDeckCards(id:Long)
+GET     /cardDecks/:id/group        controllers.CardDeckController.getGroupOfDeck(id:Long)
 
-POST    /cardDecks          controllers.CardDeckController.addCardDeck
-PUT     /cardDecks/:id      controllers.CardDeckController.updateCardDeck(id:Long)
-PATCH   /cardDecks/:id      controllers.CardDeckController.updateCardDeck(id:Long)
-DELETE  /cardDecks/:id      controllers.CardDeckController.deleteCardDeck(id:Long)
+POST    /cardDecks                  controllers.CardDeckController.addCardDeck
+PUT     /cardDecks/:id              controllers.CardDeckController.updateCardDeck(id:Long)
+PATCH   /cardDecks/:id              controllers.CardDeckController.updateCardDeck(id:Long)
+DELETE  /cardDecks/:id              controllers.CardDeckController.deleteCardDeck(id:Long)
 
 #Categories
-GET     /categories         controllers.CategoryController.getCategoryList
-GET     /categories/:id     controllers.CategoryController.getCategory(id:Long)
-GET     /categories/:id/children     controllers.CategoryController.getChildren(id:Long)
+GET     /categories                 controllers.CategoryController.getCategoryList
+GET     /categories/:id             controllers.CategoryController.getCategory(id:Long)
+GET     /categories/:id/children    controllers.CategoryController.getChildren(id:Long)
 GET     /categories/:id/decks       controllers.CategoryController.getCategoryCardDecks(id:Long)
-POST    /categories         controllers.CategoryController.addCategory
-PATCH   /categories/:id     controllers.CategoryController.updateCategory(id:Long)
-PUT     /categories/:id     controllers.CategoryController.updateCategory(id:Long)
+POST    /categories                 controllers.CategoryController.addCategory
+PATCH   /categories/:id             controllers.CategoryController.updateCategory(id:Long)
+PUT     /categories/:id             controllers.CategoryController.updateCategory(id:Long)
 
 #Tags
-GET     /tags               controllers.TagController.getTags
-GET     /tags/cards         controllers.TagController.getAttachedCardsByTags
-GET     /tags/:id           controllers.TagController.getTag(id:Long)
-GET     /tags/:id/cards     controllers.TagController.getAttachedCards(id:Long)
+GET     /tags                       controllers.TagController.getTags
+GET     /tags/cards                 controllers.TagController.getAttachedCardsByTags
+GET     /tags/:id                   controllers.TagController.getTag(id:Long)
+GET     /tags/:id/cards             controllers.TagController.getAttachedCards(id:Long)
 
 #Messages
-GET /messages               controllers.MessagingController.getMessages
-GET /messages/:id           controllers.MessagingController.getMessage(id:Long)
-POST /messages              controllers.MessagingController.createMessage
-DELETE /messages/:id        controllers.MessagingController.deleteMessage(id:Long)
+GET /messages                       controllers.MessagingController.getMessages
+GET /messages/:id                   controllers.MessagingController.getMessage(id:Long)
+POST /messages                      controllers.MessagingController.createMessage
+DELETE /messages/:id                controllers.MessagingController.deleteMessage(id:Long)
