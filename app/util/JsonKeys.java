@@ -10,6 +10,7 @@ public class JsonKeys {
     public static final boolean debugging = true;
 
     //General
+    public static final String DATE_FORMAT="yyyy-MM-dd HH:mm:ss z";
     public static final String RATING = "rating";
     public static final String DATE_CREATED = "created";
     public static final String DATE_UPDATED = "lastUpdated";
@@ -121,4 +122,16 @@ public class JsonKeys {
     public static final String DECK_CHALLENGE_MESSAGE_DECK = "targetDeck";
 
     public static final String MESSAGE = "message";
+
+    //CardStatistics
+    public static final String STATISTICS_ID="statisticId";
+    public static final String STATISTICS_USER="user";
+
+    public static final String STATISTICS_CARD = "card";
+    public static final String STATISTICS_KNOWLEDGE = "knowledge";
+    public static final String STATISTICS_DRAWER = "drawer";
+
+    public static final String DATE_START = "startDate";
+    public static final String DATE_END = "endDate";
+
 }

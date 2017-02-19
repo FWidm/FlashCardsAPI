@@ -37,4 +37,5 @@ public class RequestKeys {
     public static final String START = "start";
 
     public static final String START_DATE = "startDate";
+    public static final String COUNT = "count";
 }

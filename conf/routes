@@ -100,3 +100,6 @@ GET /messages                       controllers.MessagingController.getMessages
 GET /messages/:id                   controllers.MessagingController.getMessage(id:Long)
 POST /messages                      controllers.MessagingController.createMessage
 DELETE /messages/:id                controllers.MessagingController.deleteMessage(id:Long)
+
+#CardStatistics
+GET /cardStatistics                 controllers.CardStatisticsController.getCardStatistics()
