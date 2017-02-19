@@ -83,6 +83,7 @@ public class MessagingRepository {
         String content = null;
 
         Logger.debug("Json="+json);
+        User sender = UserRepository.findUserByEmail(email);
 
         if (json.has(JsonKeys.MESSAGE_RECIPIENT)) {
             if(json.get(JsonKeys.MESSAGE_RECIPIENT).has(JsonKeys.USER_ID))
@@ -96,6 +97,7 @@ public class MessagingRepository {
                 CardDeck deck = CardDeckRepository.getCardDeck(json.get(JsonKeys.DECK_CHALLENGE_MESSAGE_DECK).get(JsonKeys.CARDDECK_ID).asLong());
                 if(recipient!=null){
                     message = new DeckChallengeMessage(recipient, content, deck);
+                    message.setSender(sender);
                     message.save();
                     return message;
                 }

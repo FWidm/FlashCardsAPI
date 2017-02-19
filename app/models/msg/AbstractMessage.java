@@ -26,13 +26,21 @@ public abstract class AbstractMessage extends Model {
     @Column(name = JsonKeys.MESSAGE_ID)
     @JsonProperty(JsonKeys.MESSAGE_ID)
     protected long id;
+
     @ManyToOne
     @JoinColumn(name = JsonKeys.MESSAGE_RECIPIENT, referencedColumnName = JsonKeys.USER_ID)
     @JsonProperty(JsonKeys.MESSAGE_RECIPIENT)
     protected User recipient;
+
+    @ManyToOne
+    @JoinColumn(name = JsonKeys.MESSAGE_SENDER, referencedColumnName = JsonKeys.USER_ID)
+    @JsonProperty(JsonKeys.MESSAGE_SENDER)
+    protected User sender;
+
     @Column(name = JsonKeys.MESSAGE_CONTENT)
     @JsonProperty(JsonKeys.MESSAGE_CONTENT)
     protected String content;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
     @CreatedTimestamp
     @Column(name = JsonKeys.DATE_CREATED)
@@ -50,6 +58,7 @@ public abstract class AbstractMessage extends Model {
         this.content = content;
     }
 
+
     //getter
     public long getId() {
         return id;
@@ -58,6 +67,15 @@ public abstract class AbstractMessage extends Model {
     public User getRecipient() {
         return recipient;
     }
+
+    public User getSender() {
+        return sender;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
 
     //setter
     public void setRecipient(User recipient) {
@@ -72,8 +90,9 @@ public abstract class AbstractMessage extends Model {
         this.content = content;
     }
 
-    public Date getTimestamp() {
-        return timestamp;
+
+    public void setSender(User sender) {
+        this.sender = sender;
     }
 
     @Override

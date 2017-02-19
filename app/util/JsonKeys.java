@@ -112,6 +112,8 @@ public class JsonKeys {
     //Messaging
     public static final String MESSAGE_ID = "messageId";
     public static final String MESSAGE_RECIPIENT = "recipient";
+    public static final String MESSAGE_SENDER = "sender";
+
     public static final String MESSAGE_CONTENT = "content";
     public static final String MESSAGE_TYPE = "messageType";
 
