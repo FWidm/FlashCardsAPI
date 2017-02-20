@@ -103,3 +103,4 @@ DELETE /messages/:id                controllers.MessagingController.deleteMessag
 
 #CardStatistics
 GET /cardStatistics                 controllers.CardStatisticsController.getCardStatistics()
+POST /cardStatistics                 controllers.CardStatisticsController.addCardStatistics()
