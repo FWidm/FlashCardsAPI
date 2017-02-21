@@ -9,6 +9,7 @@ import repositories.CardStatisticsRepository;
 import util.ActionAuthenticator;
 import util.JsonKeys;
 import util.JsonUtil;
+import util.UrlParamHelper;
 import util.exceptions.InvalidInputException;
 import util.exceptions.NotAuthorizedException;
 
@@ -23,8 +24,8 @@ public class CardStatisticsController extends Controller {
     @Security.Authenticated(ActionAuthenticator.class)
     public Result getCardStatistics() {
         try {
-            List<CardStatistics> messageList = CardStatisticsRepository.getCardStatistics(request().username());
-            return ok(JsonUtil.toJson(messageList));
+            List<CardStatistics> cardStatisticss = CardStatisticsRepository.getCardStatistics(request().username());
+            return ok(JsonUtil.toJson(cardStatisticss));
         } catch (NotAuthorizedException e) {
             return unauthorized(JsonUtil.prepareJsonStatus(UNAUTHORIZED, e.getMessage()));
         } catch (ParseException e) {
@@ -49,4 +50,6 @@ public class CardStatisticsController extends Controller {
         }
         return ok(JsonUtil.toJson(cardStatistics));
     }
+
+
 }

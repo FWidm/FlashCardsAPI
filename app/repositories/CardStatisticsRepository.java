@@ -1,6 +1,7 @@
 package repositories;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import models.CardDeck;
 import models.FlashCard;
 import models.User;
 import models.statistics.CardStatistics;
@@ -12,12 +13,14 @@ import util.UrlParamHelper;
 import util.exceptions.InvalidInputException;
 import util.exceptions.NotAuthorizedException;
 
+import javax.smartcardio.Card;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
+import static com.avaje.ebean.Expr.allEq;
+import static com.avaje.ebean.Expr.eq;
 
 /**
  * @author Fabian Widmann
@@ -38,7 +41,10 @@ public class CardStatisticsRepository {
         User user = UserRepository.findUserByEmail(email);
         if (user == null)
             throw new NotAuthorizedException("User has to be logged in to retrieve messages");
-
+        if(UrlParamHelper.checkForKey(RequestKeys.DECK_ID)){
+            Long deckId=Long.parseLong(UrlParamHelper.getValue(RequestKeys.DECK_ID));
+            return getCardStatisticsFromDeck(email,deckId);
+        }
         if (UrlParamHelper.checkForKey(RequestKeys.COUNT)) {
             Long count = Long.parseLong(UrlParamHelper.getValue(RequestKeys.COUNT));
             if (count < CardStatistics.finder.where().eq(JsonKeys.STATISTICS_USER, user).findRowCount())
@@ -118,5 +124,17 @@ public class CardStatisticsRepository {
         cardStatistics.save();
 
         return cardStatistics;
+    }
+
+
+    public static List<CardStatistics> getCardStatisticsFromDeck(String email,Long deckId) {
+        List<FlashCard> cards=FlashCard.find.where().eq(JsonKeys.FLASHCARD_DECK, CardDeck.find.byId(deckId)).findList();
+        List<CardStatistics> cardStatisticsList=new ArrayList<>();
+        cards.forEach(card-> {
+            Logger.debug("CardID="+card.getId());
+            cardStatisticsList.addAll(CardStatistics.finder.where().and(eq(JsonKeys.STATISTICS_USER, UserRepository.findUserByEmail(email)),/*allEq(queryMap)*/eq(JsonKeys.STATISTICS_CARD, card)).findList());
+        }
+        );
+        return cardStatisticsList;
     }
 }

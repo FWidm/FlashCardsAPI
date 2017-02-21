@@ -38,4 +38,5 @@ public class RequestKeys {
 
     public static final String START_DATE = "startDate";
     public static final String COUNT = "count";
+    public static final String DECK_ID = "deckId";
 }

@@ -1,6 +1,7 @@
 package models.statistics;
 
 import com.avaje.ebean.Model;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import models.FlashCard;
 import models.User;
@@ -28,6 +29,7 @@ public class CardStatistics extends Model{
     @JsonProperty(JsonKeys.STATISTICS_ID)
     private long id;
 
+    // TODO: 21.02.2017 Rename: Column name [user] is a suspected SQL reserved word for property models.statistics.CardStatistics.user
     @ManyToOne
     @JoinColumn(name = JsonKeys.STATISTICS_USER, referencedColumnName = JsonKeys.USER_ID)
     @JsonProperty(JsonKeys.STATISTICS_USER)
@@ -45,10 +47,12 @@ public class CardStatistics extends Model{
     @JsonProperty(JsonKeys.STATISTICS_DRAWER)
     private int drawer;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
     @Column(name = JsonKeys.DATE_START)
     @JsonProperty(JsonKeys.DATE_START)
     private Date startDate;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss z")
     @Column(name = JsonKeys.DATE_END)
     @JsonProperty(JsonKeys.DATE_END)
     private Date endDate;

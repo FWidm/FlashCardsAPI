@@ -777,6 +777,32 @@
 						"description": ""
 					},
 					"response": []
+				},
+				{
+					"name": "Get alll cardStatistics for one deckId",
+					"request": {
+						"url": "{{url}}{{port}}/cardStatistics?deckId=1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							},
+							{
+								"key": "//Content-Type",
+								"value": "application/json",
+								"description": "",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
 				}
 			]
 		},
