@@ -118,11 +118,14 @@ public class UserRepository {
 
         if (json.has(JsonKeys.USER_EMAIL) && emailValidator.isValid(json.get(JsonKeys.USER_EMAIL).asText())) {
             User checkEmail = findUserByEmail(json.get(JsonKeys.USER_EMAIL).asText());
-
+            Logger.debug("uCheck="+checkEmail);
+            Logger.debug("author="+author);
             if (JsonKeys.debugging) Logger.debug("does email exist? " + checkEmail);
             if (checkEmail == null)
                 editedUser.setEmail(json.get(JsonKeys.USER_EMAIL).asText());
-            else
+            else if (author.getEmail().equals(checkEmail.getEmail())) {
+                Logger.debug("same email");
+            } else
                 throw new InvalidInputException("The specified email can not be used to update this user.");
 
         }
