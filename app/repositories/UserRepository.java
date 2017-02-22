@@ -108,9 +108,7 @@ public class UserRepository {
         if (JsonKeys.debugging) Logger.debug("Update method=" + updateMethod);
         if (updateMethod.equals("PUT") && (!json.has(JsonKeys.USER_EMAIL) || !json.has(JsonKeys.RATING)
                 || !json.has(JsonKeys.USER_NAME) || !json.has(JsonKeys.USER_GROUPS) || !json.has(JsonKeys.USER_PASSWORD))) {
-            throw new InvalidInputException("The Update method needs all details of the user, such as email, " +
-                    "rating, name, group and password! An attribute was missing for id="
-                    + id + ".");
+            throw new InvalidInputException("Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS);
         }
 
         // check for new values
@@ -118,11 +116,14 @@ public class UserRepository {
 
         if (json.has(JsonKeys.USER_EMAIL) && emailValidator.isValid(json.get(JsonKeys.USER_EMAIL).asText())) {
             User checkEmail = findUserByEmail(json.get(JsonKeys.USER_EMAIL).asText());
-
+            Logger.debug("uCheck="+checkEmail);
+            Logger.debug("author="+author);
             if (JsonKeys.debugging) Logger.debug("does email exist? " + checkEmail);
             if (checkEmail == null)
                 editedUser.setEmail(json.get(JsonKeys.USER_EMAIL).asText());
-            else
+            else if (author.getEmail().equals(checkEmail.getEmail())) {
+                Logger.debug("same email");
+            } else
                 throw new InvalidInputException("The specified email can not be used to update this user.");
 
         }

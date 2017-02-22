@@ -65,11 +65,11 @@ public class UserController extends Controller {
             if (JsonKeys.debugging) {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS + " | cause: " + e.getCause()));
+                                BAD_REQUEST, e.getMessage() + " | cause: " + e.getCause()));
             } else {
                 return badRequest(JsonUtil
                         .prepareJsonStatus(
-                                BAD_REQUEST, "Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS));
+                                BAD_REQUEST, e.getMessage()));
             }
         } catch (NotAuthorizedException e) {
             e.printStackTrace();
