@@ -95,7 +95,6 @@ public class TagRepository {
      * @return a question object containing the information
      */
     public static Tag parseTag(JsonNode node) {
-        User author = null;
         String tagText = null;
 
         if (node.has(JsonKeys.TAG_NAME)) {

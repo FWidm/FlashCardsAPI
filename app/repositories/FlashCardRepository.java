@@ -212,7 +212,7 @@ public class FlashCardRepository {
                             + JsonKeys.QUESTION_JSON_ELEMENTS);
                 } else {
                     try {
-                        Question q = Question.parseQuestion(null, json.get(JsonKeys.FLASHCARD_QUESTION));
+                        Question q = Question.parseQuestion(author, json.get(JsonKeys.FLASHCARD_QUESTION));
                         q.save();
                         oldQuestion = toUpdate.getQuestion();
                         Logger.debug("Deleted oldQuestion: " + oldQuestion);
