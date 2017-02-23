@@ -138,6 +138,8 @@ public class HomeController extends Controller {
     public Result login() {
         Logger.debug("Login: json="+request().body().asText());
         JsonNode json = request().body().asJson();
+        if(request().secure())
+            Logger.debug("Secure!");
         if (json.has(JsonKeys.USER_PASSWORD) && json.has(JsonKeys.USER_EMAIL)) {
             String pass = json.get(JsonKeys.USER_PASSWORD).asText();
             String email = json.get(JsonKeys.USER_EMAIL).asText();

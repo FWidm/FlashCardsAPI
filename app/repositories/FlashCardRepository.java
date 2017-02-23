@@ -70,7 +70,9 @@ public class FlashCardRepository {
      */
     public static FlashCard addFlashCard(String email, JsonNode json) throws InvalidInputException, ParameterNotSupportedException, PartiallyModifiedException {
         ObjectMapper mapper = new ObjectMapper();
+
         FlashCard requestObject = mapper.convertValue(json, FlashCard.class);
+        requestObject.setTags(new ArrayList<>());
         String information = "";
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         requestObject.setAuthor(author);
@@ -104,27 +106,28 @@ public class FlashCardRepository {
                 }
             }
         }
+        List<Tag> tags = TagRepository.retrieveOrCreateTags(json);
 
         if (json.has(JsonKeys.FLASHCARD_TAGS)) {
 
-            List<Tag> tags = TagRepository.retrieveOrCreateTags(json);
             // TODO: 07.01.2017 revisit this process
             if (tags.contains(null)) {
                 if (JsonKeys.debugging) Logger.debug(">> null!");
                 information += " One or more tag ids where invalid!";
                 tags.remove(null);
             }
-            requestObject.setTags(tags);
-
         }
 
         if (json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)) {
             requestObject.setMultipleChoice(json.findValue(JsonKeys.FLASHCARD_MULTIPLE_CHOICE).asBoolean());
         }
+        Logger.debug("tags="+tags);
         FlashCard card = new FlashCard(requestObject);
         if (JsonKeys.debugging) Logger.debug("Tags=" + card.getTags().size());
         //Logger.debug(""+card);
         card.save();
+        card.setTags(tags);
+        card.update();
         if (information != "") {
             throw new PartiallyModifiedException("FlashCard has been created! Additional information: " + information, card.getId());
         }
@@ -237,6 +240,7 @@ public class FlashCardRepository {
                         " points or being the owner of the card.");
         } else if (json.has(JsonKeys.FLASHCARD_TAGS)) {
             if (appendMode) {
+                Logger.debug("Appending...:");
                 List<Tag> mergedTags = new ArrayList<>();
                 mergedTags.addAll(toUpdate.getTags());
                 for (Tag t : TagRepository.retrieveOrCreateTags(json)) {
@@ -248,6 +252,7 @@ public class FlashCardRepository {
                 toUpdate.setTags(mergedTags);
                 if (JsonKeys.debugging) Logger.debug("append: " + mergedTags);
             } else if (hasPermission) {
+                Logger.debug("User is the author. He can put.");
                 toUpdate.setTags(TagRepository.retrieveOrCreateTags(json));
 
             } else

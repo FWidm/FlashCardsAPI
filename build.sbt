@@ -2,7 +2,7 @@ name := """FlashCardsAPINew"""
 
 version := "1.0-SNAPSHOT"
 
-lazy val root = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
+lazy val root = (project in file(".")).enablePlugins(PlayJava, PlayEbean, LauncherJarPlugin)
 
 scalaVersion := "2.11.7"
 
