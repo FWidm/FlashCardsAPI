@@ -106,10 +106,10 @@ public class FlashCardRepository {
                 }
             }
         }
-        List<Tag> tags = TagRepository.retrieveOrCreateTags(json);
+        List<Tag> tags = new ArrayList<>();
 
         if (json.has(JsonKeys.FLASHCARD_TAGS)) {
-
+            tags= TagRepository.retrieveOrCreateTags(json);
             // TODO: 07.01.2017 revisit this process
             if (tags.contains(null)) {
                 if (JsonKeys.debugging) Logger.debug(">> null!");
