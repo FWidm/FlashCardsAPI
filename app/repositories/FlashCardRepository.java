@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import models.*;
 import play.Logger;
-import util.JsonKeys;
-import util.RequestKeys;
-import util.UserOperations;
-import util.Permissions;
+import util.*;
 import util.exceptions.*;
 
 import java.net.URI;
@@ -16,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.avaje.ebean.Expr.eq;
 import static play.mvc.Controller.request;
 
 /**
@@ -28,9 +26,15 @@ public class FlashCardRepository {
      * @return list of cards
      */
     public static List<FlashCard> getFlashCardList() {
-        List<FlashCard> flashCardList = FlashCard.find.all();
+        List<FlashCard> flashCardList=new ArrayList<>();
+        if (UrlParamHelper.checkForKey(RequestKeys.UNUSED_UNUSED_CARDS_FROM)) {
+            Long id= Long.valueOf(UrlParamHelper.getValue(RequestKeys.UNUSED_UNUSED_CARDS_FROM));
+            User author = UserRepository.findById(id);
+            flashCardList=FlashCard.find.where().and(eq(JsonKeys.AUTHOR,author),eq(JsonKeys.FLASHCARD_PARENT_ID,null)).findList();
+        } else
+            flashCardList = FlashCard.find.all();
         return flashCardList;
-    }
+    }   
 
     /**
      * Retrieves everything from a flashcard with the given id.
@@ -109,7 +113,7 @@ public class FlashCardRepository {
         List<Tag> tags = new ArrayList<>();
 
         if (json.has(JsonKeys.FLASHCARD_TAGS)) {
-            tags= TagRepository.retrieveOrCreateTags(json);
+            tags = TagRepository.retrieveOrCreateTags(json);
             // TODO: 07.01.2017 revisit this process
             if (tags.contains(null)) {
                 if (JsonKeys.debugging) Logger.debug(">> null!");
@@ -121,7 +125,7 @@ public class FlashCardRepository {
         if (json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)) {
             requestObject.setMultipleChoice(json.findValue(JsonKeys.FLASHCARD_MULTIPLE_CHOICE).asBoolean());
         }
-        Logger.debug("tags="+tags);
+        Logger.debug("tags=" + tags);
         FlashCard card = new FlashCard(requestObject);
         if (JsonKeys.debugging) Logger.debug("Tags=" + card.getTags().size());
         //Logger.debug(""+card);
@@ -154,7 +158,7 @@ public class FlashCardRepository {
         List<Answer> oldAnswerList = null;
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         FlashCard toUpdate = FlashCard.find.byId(id);
-        boolean hasPermission=author.hasPermission(UserOperations.EDIT_CARD, toUpdate);
+        boolean hasPermission = author.hasPermission(UserOperations.EDIT_CARD, toUpdate);
 
         //When using put we need to be able to edit everything inside our card.
         if (request().method().equals("PUT") && !hasPermission)
