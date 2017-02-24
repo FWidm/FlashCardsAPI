@@ -135,6 +135,26 @@
 						"description": ""
 					},
 					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"url": "{{url}}{{port}}/logout",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
 				}
 			]
 		},
@@ -1069,7 +1089,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"rating\": 0,\n    \"question\": {\n      \"question\": \"hello world!2\",\n      \"mediaURI\": \"www.google.de2\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"answer1\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      },\n      {\n        \"answerText\": \"answer2\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      },\n      {\n        \"answerText\": \"answer3\",\n        \"hint\": \"hint\",\n        \"mediaURI\": \"www.answer.com\",\n        \"author\": {\n            \"userId\":1\n        }\n          \n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": true\n  }"
+							"raw": "{\n\"tags\":[  \n      {  \n         \"tagId\":1\n      },\n      {  \n         \"tagName\":\"tagtest1\"\n      }\n   ]\n  }"
 						},
 						"description": "Inserts a question to the db instead of using one already created."
 					},
@@ -1144,6 +1164,81 @@
 							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
 						},
 						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "get cards without parent deck",
+					"request": {
+						"url": "{{url}}{{port}}/cards?deckId=null",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all cards"
+					},
+					"response": []
+				},
+				{
+					"name": "get cards from current user",
+					"request": {
+						"url": "{{url}}{{port}}/cards?authorId={{userId}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all cards"
+					},
+					"response": []
+				},
+				{
+					"name": "get deck-less cards of current user",
+					"request": {
+						"url": "{{url}}{{port}}/cards?authorId={{userId}}&deckId=null",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all cards"
 					},
 					"response": []
 				}

@@ -10,6 +10,8 @@ public class RequestKeys {
 
     public static final String TOKEN_HEADER = "Authorization";
     public static final String USER_ID = "userId";
+    public static final String AUTHOR_ID = "authorId";
+
 
     public static final String EMAIL = "email";
     public static final String NAME = "name";
@@ -39,5 +41,4 @@ public class RequestKeys {
     public static final String START_DATE = "startDate";
     public static final String COUNT = "count";
     public static final String DECK_ID = "deckId";
-    public static final String UNUSED_UNUSED_CARDS_FROM = "unusedCardsFrom";
 }

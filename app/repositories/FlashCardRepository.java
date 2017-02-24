@@ -22,19 +22,41 @@ import static play.mvc.Controller.request;
 public class FlashCardRepository {
     /**
      * Retrieves all Flashcards.
-     *
+     * - If ?authorId=id is set - return all cards of the author - return all cards without a user if null is set.
+     * - If ?deckId=id is set - return all cards with the specific deck - return all without a deck if null is set.
+     * - ?authorId=id&deckId=id - return all decks from a specific author and deck - see above for null handling.
      * @return list of cards
      */
     public static List<FlashCard> getFlashCardList() {
-        List<FlashCard> flashCardList=new ArrayList<>();
-        if (UrlParamHelper.checkForKey(RequestKeys.UNUSED_UNUSED_CARDS_FROM)) {
-            Long id= Long.valueOf(UrlParamHelper.getValue(RequestKeys.UNUSED_UNUSED_CARDS_FROM));
-            User author = UserRepository.findById(id);
-            flashCardList=FlashCard.find.where().and(eq(JsonKeys.AUTHOR,author),eq(JsonKeys.FLASHCARD_PARENT_ID,null)).findList();
+        List<FlashCard> flashCardList = new ArrayList<>();
+        if (UrlParamHelper.checkForKey(RequestKeys.AUTHOR_ID) && UrlParamHelper.checkForKey(RequestKeys.DECK_ID)) {
+            String userId = UrlParamHelper.getValue(RequestKeys.AUTHOR_ID), deckId = UrlParamHelper.getValue(RequestKeys.DECK_ID);
+            User author = null;
+            if (!userId.toLowerCase().equals("null"))
+                author = UserRepository.findById(Long.valueOf(userId));
+            CardDeck deck = null;
+            if (!deckId.toLowerCase().equals("null"))
+                deck = CardDeckRepository.getCardDeck(Long.parseLong(deckId));
+            flashCardList = FlashCard.find.where().and(eq(JsonKeys.AUTHOR, author), eq(JsonKeys.FLASHCARD_PARENT_ID, deck)).findList();
+        } else if (UrlParamHelper.checkForKey(RequestKeys.AUTHOR_ID)) {
+            String userId = UrlParamHelper.getValue(RequestKeys.AUTHOR_ID);
+            User author = null;
+            if (!userId.toLowerCase().equals("null"))
+                author = UserRepository.findById(Long.valueOf(userId));
+            flashCardList = FlashCard.find.where().eq(JsonKeys.AUTHOR, author).findList();
+
+        } else if (UrlParamHelper.checkForKey(RequestKeys.DECK_ID)) {
+            String deckId = UrlParamHelper.getValue(RequestKeys.DECK_ID);
+            CardDeck deck = null;
+            if (!deckId.toLowerCase().equals("null"))
+                deck = CardDeckRepository.getCardDeck(Long.parseLong(deckId));
+
+            flashCardList = FlashCard.find.where().eq(JsonKeys.FLASHCARD_PARENT_ID, deck).findList();
+
         } else
             flashCardList = FlashCard.find.all();
         return flashCardList;
-    }   
+    }
 
     /**
      * Retrieves everything from a flashcard with the given id.

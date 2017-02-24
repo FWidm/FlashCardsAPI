@@ -42,7 +42,11 @@ public class FlashCardController {
      * @return HTTPResult
      */
     public Result getFlashCardList() {
-        return ok(JsonUtil.toJson(FlashCardRepository.getFlashCardList()));
+        try {
+            return ok(JsonUtil.toJson(FlashCardRepository.getFlashCardList()));
+        } catch (NumberFormatException e) {
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage()));
+        }
     }
 
     /**
