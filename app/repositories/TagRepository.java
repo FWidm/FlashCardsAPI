@@ -95,7 +95,6 @@ public class TagRepository {
      * @return a question object containing the information
      */
     public static Tag parseTag(JsonNode node) {
-        User author = null;
         String tagText = null;
 
         if (node.has(JsonKeys.TAG_NAME)) {
@@ -120,7 +119,7 @@ public class TagRepository {
         // "users" key.
         for (JsonNode node : tagNode) {
             // when a user id is found we will get the object and add them to the userList.
-            System.out.println("Node=" + node);
+            Logger.debug("Node=" + node);
             if (node.has(JsonKeys.TAG_ID)) {
                 Tag found = Tag.find.byId(node.get(JsonKeys.TAG_ID).asLong());
                 if (found != null) {
@@ -131,22 +130,25 @@ public class TagRepository {
 
 
             } else {
-                Tag tmpT = TagRepository.parseTag(node);
-                Tag lookupTag = Tag.find.where().eq(JsonKeys.TAG_NAME, tmpT.getName()).findUnique();
+                Logger.debug("got name: "+node.get(JsonKeys.TAG_NAME).asText());
+                Tag lookupTag = Tag.find.where().eq(JsonKeys.TAG_NAME, node.get(JsonKeys.TAG_NAME).asText()).findUnique();
+                Logger.debug("LookupTag="+lookupTag);
                 //check if the tag is unique
                 if (lookupTag == null) {
+                    Tag tmpT = TagRepository.parseTag(node);
+
                     tmpT.save();
-                    System.out.println(">> tag: " + tmpT);
+                    System.out.println(">> found new tag: " + tmpT);
                     //save our new tag so that no foreign constraint fails
                     //((`flashcards`.`card_tag`, CONSTRAINT `fk_card_tag_tag_02` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tagId`))]]
                     tags.add(tmpT);
-                } else {
+                } else /*Looked up Tag exists */{
                     //check if tag name does not lead to the same tag being added twice. This would lead to a primary key constraint error.
                     boolean idExists = tags.stream()
                             .anyMatch(t -> t.getId() == lookupTag.getId());
                     //Logger.debug("TAGREPO ID="+tmpT.getId()+" EXISTS? "+idExists);
                     if (!idExists)
-                        tags.add(tmpT);
+                        tags.add(lookupTag);
                 }
 
             }

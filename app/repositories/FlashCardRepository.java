@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import models.*;
 import play.Logger;
-import util.JsonKeys;
-import util.RequestKeys;
-import util.UserOperations;
-import util.Permissions;
+import util.*;
 import util.exceptions.*;
 
 import java.net.URI;
@@ -16,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.avaje.ebean.Expr.eq;
 import static play.mvc.Controller.request;
 
 /**
@@ -24,11 +22,39 @@ import static play.mvc.Controller.request;
 public class FlashCardRepository {
     /**
      * Retrieves all Flashcards.
-     *
+     * - If ?authorId=id is set - return all cards of the author - return all cards without a user if null is set.
+     * - If ?deckId=id is set - return all cards with the specific deck - return all without a deck if null is set.
+     * - ?authorId=id&deckId=id - return all decks from a specific author and deck - see above for null handling.
      * @return list of cards
      */
     public static List<FlashCard> getFlashCardList() {
-        List<FlashCard> flashCardList = FlashCard.find.all();
+        List<FlashCard> flashCardList = new ArrayList<>();
+        if (UrlParamHelper.checkForKey(RequestKeys.AUTHOR_ID) && UrlParamHelper.checkForKey(RequestKeys.DECK_ID)) {
+            String userId = UrlParamHelper.getValue(RequestKeys.AUTHOR_ID), deckId = UrlParamHelper.getValue(RequestKeys.DECK_ID);
+            User author = null;
+            if (!userId.toLowerCase().equals("null"))
+                author = UserRepository.findById(Long.valueOf(userId));
+            CardDeck deck = null;
+            if (!deckId.toLowerCase().equals("null"))
+                deck = CardDeckRepository.getCardDeck(Long.parseLong(deckId));
+            flashCardList = FlashCard.find.where().and(eq(JsonKeys.AUTHOR, author), eq(JsonKeys.FLASHCARD_PARENT_ID, deck.getId())).findList();
+        } else if (UrlParamHelper.checkForKey(RequestKeys.AUTHOR_ID)) {
+            String userId = UrlParamHelper.getValue(RequestKeys.AUTHOR_ID);
+            User author = null;
+            if (!userId.toLowerCase().equals("null"))
+                author = UserRepository.findById(Long.valueOf(userId));
+            flashCardList = FlashCard.find.where().eq(JsonKeys.AUTHOR, author).findList();
+
+        } else if (UrlParamHelper.checkForKey(RequestKeys.DECK_ID)) {
+            String deckId = UrlParamHelper.getValue(RequestKeys.DECK_ID);
+            CardDeck deck = null;
+            if (!deckId.toLowerCase().equals("null"))
+                deck = CardDeckRepository.getCardDeck(Long.parseLong(deckId));
+
+            flashCardList = FlashCard.find.where().eq(JsonKeys.FLASHCARD_PARENT_ID, deck.getId()).findList();
+
+        } else
+            flashCardList = FlashCard.find.all();
         return flashCardList;
     }
 
@@ -70,7 +96,9 @@ public class FlashCardRepository {
      */
     public static FlashCard addFlashCard(String email, JsonNode json) throws InvalidInputException, ParameterNotSupportedException, PartiallyModifiedException {
         ObjectMapper mapper = new ObjectMapper();
+
         FlashCard requestObject = mapper.convertValue(json, FlashCard.class);
+        requestObject.setTags(new ArrayList<>());
         String information = "";
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         requestObject.setAuthor(author);
@@ -104,27 +132,28 @@ public class FlashCardRepository {
                 }
             }
         }
+        List<Tag> tags = new ArrayList<>();
 
         if (json.has(JsonKeys.FLASHCARD_TAGS)) {
-
-            List<Tag> tags = TagRepository.retrieveOrCreateTags(json);
+            tags = TagRepository.retrieveOrCreateTags(json);
             // TODO: 07.01.2017 revisit this process
             if (tags.contains(null)) {
                 if (JsonKeys.debugging) Logger.debug(">> null!");
                 information += " One or more tag ids where invalid!";
                 tags.remove(null);
             }
-            requestObject.setTags(tags);
-
         }
 
         if (json.has(JsonKeys.FLASHCARD_MULTIPLE_CHOICE)) {
             requestObject.setMultipleChoice(json.findValue(JsonKeys.FLASHCARD_MULTIPLE_CHOICE).asBoolean());
         }
+        Logger.debug("tags=" + tags);
         FlashCard card = new FlashCard(requestObject);
         if (JsonKeys.debugging) Logger.debug("Tags=" + card.getTags().size());
         //Logger.debug(""+card);
         card.save();
+        card.setTags(tags);
+        card.update();
         if (information != "") {
             throw new PartiallyModifiedException("FlashCard has been created! Additional information: " + information, card.getId());
         }
@@ -151,7 +180,7 @@ public class FlashCardRepository {
         List<Answer> oldAnswerList = null;
         User author = User.find.where().eq(JsonKeys.USER_EMAIL, email).findUnique();
         FlashCard toUpdate = FlashCard.find.byId(id);
-        boolean hasPermission=author.hasPermission(UserOperations.EDIT_CARD, toUpdate);
+        boolean hasPermission = author.hasPermission(UserOperations.EDIT_CARD, toUpdate);
 
         //When using put we need to be able to edit everything inside our card.
         if (request().method().equals("PUT") && !hasPermission)
@@ -209,7 +238,7 @@ public class FlashCardRepository {
                             + JsonKeys.QUESTION_JSON_ELEMENTS);
                 } else {
                     try {
-                        Question q = Question.parseQuestion(null, json.get(JsonKeys.FLASHCARD_QUESTION));
+                        Question q = Question.parseQuestion(author, json.get(JsonKeys.FLASHCARD_QUESTION));
                         q.save();
                         oldQuestion = toUpdate.getQuestion();
                         Logger.debug("Deleted oldQuestion: " + oldQuestion);
@@ -237,6 +266,7 @@ public class FlashCardRepository {
                         " points or being the owner of the card.");
         } else if (json.has(JsonKeys.FLASHCARD_TAGS)) {
             if (appendMode) {
+                Logger.debug("Appending...:");
                 List<Tag> mergedTags = new ArrayList<>();
                 mergedTags.addAll(toUpdate.getTags());
                 for (Tag t : TagRepository.retrieveOrCreateTags(json)) {
@@ -248,6 +278,7 @@ public class FlashCardRepository {
                 toUpdate.setTags(mergedTags);
                 if (JsonKeys.debugging) Logger.debug("append: " + mergedTags);
             } else if (hasPermission) {
+                Logger.debug("User is the author. He can put.");
                 toUpdate.setTags(TagRepository.retrieveOrCreateTags(json));
 
             } else

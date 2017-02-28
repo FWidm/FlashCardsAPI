@@ -108,9 +108,7 @@ public class UserRepository {
         if (JsonKeys.debugging) Logger.debug("Update method=" + updateMethod);
         if (updateMethod.equals("PUT") && (!json.has(JsonKeys.USER_EMAIL) || !json.has(JsonKeys.RATING)
                 || !json.has(JsonKeys.USER_NAME) || !json.has(JsonKeys.USER_GROUPS) || !json.has(JsonKeys.USER_PASSWORD))) {
-            throw new InvalidInputException("The Update method needs all details of the user, such as email, " +
-                    "rating, name, group and password! An attribute was missing for id="
-                    + id + ".");
+            throw new InvalidInputException("Body did contain elements that are not allowed/expected. A card can contain: " + JsonKeys.FLASHCARD_JSON_ELEMENTS);
         }
 
         // check for new values

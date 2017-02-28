@@ -17,6 +17,18 @@ $ play new Project // activator new Project
 $ cd /PathToProbject/Project
 $ play run // activator run
 ```
+
+### Projekt deployen
+Application secret in application.conf setzen oder später per `-Dplay.crypto.secret="secret"`. Danach die API packen:
+```bash
+$ cd /path/to/api/playAPI
+$ activator dist
+$ cp /path/to/api/playAPI/target/universal/playAPI-1.0-SNAPSHOT.zip /path/to/dir
+$ unzip /path/to/dir/playAPI-1.0-SNASPHOT.zip
+$ ./path/to/dir/playAPI-1.0-SNAPSHOT/bin/playAPI -Dplay.crypto.secret="secret"
+2017-02-23 14:18:18,849 [info] play.api.Play - Application started (Prod)
+2017-02-23 14:18:18,966 [info] p.c.s.NettyServer - Listening for HTTP on /0:0:0:0:0:0:0:0:9000
+```
 ### Projekt in IDEs nutzen
 ```bash
 $ cd /PathToProbject/Project

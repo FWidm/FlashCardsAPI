@@ -10,6 +10,8 @@ public class RequestKeys {
 
     public static final String TOKEN_HEADER = "Authorization";
     public static final String USER_ID = "userId";
+    public static final String AUTHOR_ID = "authorId";
+
 
     public static final String EMAIL = "email";
     public static final String NAME = "name";

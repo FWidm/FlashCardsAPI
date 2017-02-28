@@ -324,10 +324,10 @@ public class User extends Model {
             case DELETE_CARD: {
                 if (manipulated != null && manipulated.getClass() == FlashCard.class) {
                     FlashCard card = (FlashCard) manipulated;
-                    Logger.debug("isAuthor=" + (card.getAuthor() == this) + " | has Rating? " + (rating >= Permissions.RATING_DELETE_CARD));
+                    Logger.debug("isAuthor=" + (card.getAuthor().getId()==this.id) + " | has Rating? " + (rating >= Permissions.RATING_DELETE_CARD));
 
                     //can delete own cards OR any cards when this user's rating is over a specific value
-                    if (card.getAuthor() == this || rating >= Permissions.RATING_DELETE_CARD) {
+                    if (card.getAuthor().getId()==this.id || rating >= Permissions.RATING_DELETE_CARD) {
                         return true;
                     }
                 }
@@ -335,8 +335,10 @@ public class User extends Model {
             case EDIT_CARD: {
                 if (manipulated != null && manipulated.getClass() == FlashCard.class) {
                     FlashCard card = (FlashCard) manipulated;
+                    Logger.debug("isAuthor=" + (card.getAuthor().getId() == this.id) + " | has Rating? " + (rating >= Permissions.RATING_EDIT_CARD));
+
                     //can edit own cards OR any cards when this user's rating is over a specific value
-                    if (card.getAuthor() == this || rating >= Permissions.RATING_EDIT_CARD) {
+                    if (card.getAuthor().getId()==this.id || rating >= Permissions.RATING_EDIT_CARD) {
                         return true;
                     }
                 }
@@ -346,7 +348,7 @@ public class User extends Model {
                 if (manipulated != null && manipulated.getClass() == Answer.class) {
                     Answer answer = (Answer) manipulated;
                     //can delete own cards OR any cards when this user's rating is over a specific value
-                    if (answer.getAuthor() == this || rating >= Permissions.RATING_DELETE_ANSWER) {
+                    if (answer.getAuthor().getId()==this.id || rating >= Permissions.RATING_DELETE_ANSWER) {
                         return true;
                     }
                 }
@@ -355,7 +357,7 @@ public class User extends Model {
                 if (manipulated != null && manipulated.getClass() == Answer.class) {
                     Answer answer = (Answer) manipulated;
                     //can edit own cards OR any cards when this user's rating is over a specific value
-                    if (answer.getAuthor() == this || rating >= Permissions.RATING_EDIT_ANSWER) {
+                    if (answer.getAuthor().getId()==this.id || rating >= Permissions.RATING_EDIT_ANSWER) {
                         return true;
                     }
                 }
