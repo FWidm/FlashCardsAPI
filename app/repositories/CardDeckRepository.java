@@ -46,24 +46,27 @@ public class CardDeckRepository {
      * @return cards of a deck or an error.
      */
     public static List<FlashCard> getCardDeckCards(long id) {
-        List<FlashCard> flashCards = CardDeck.find.byId(id).getCards();
-        String limitVal = UrlParamHelper.getValue(RequestKeys.SIZE);
-        String startVal = UrlParamHelper.getValue(RequestKeys.START);
+        List<FlashCard> flashCards = new ArrayList<>();
 
-        if (limitVal != null) {
-            if (startVal != null) {
-                int start = Integer.parseInt(startVal);
-                if (start >= 0 && start < flashCards.size()) {
-                    flashCards = flashCards.subList(start,
-                            Math.min(Integer.parseInt(limitVal) + start, flashCards.size()));
-                } else
-                    flashCards = new LinkedList<>();
+        if (UrlParamHelper.checkForKey(RequestKeys.SIZE) && UrlParamHelper.checkForKey(RequestKeys.START)) {
+            String limitVal = UrlParamHelper.getValue(RequestKeys.SIZE);
+            String startVal = UrlParamHelper.getValue(RequestKeys.START);
+            if (limitVal != null) {
+                if (startVal != null) {
+                    int start = Integer.parseInt(startVal);
+                    if (start >= 0 && start < flashCards.size()) {
+                        flashCards = flashCards.subList(start,
+                                Math.min(Integer.parseInt(limitVal) + start, flashCards.size()));
+                    } else
+                        flashCards = new LinkedList<>();
 
-            } else {
-                flashCards = flashCards.subList(0,
-                        Math.min(Integer.parseInt(limitVal), flashCards.size()));
+                } else {
+                    flashCards = flashCards.subList(0,
+                            Math.min(Integer.parseInt(limitVal), flashCards.size()));
+                }
             }
-        }
+        } else
+            CardDeck.find.byId(id).getCards();
         return flashCards;
     }
 
@@ -104,8 +107,8 @@ public class CardDeckRepository {
      *             }
      *             }
      * @return the newly created deck or an exception
-     * @throws InvalidInputException if no group is specified
-     * @throws DuplicateKeyException if the passed cards are already in another deck
+     * @throws InvalidInputException  if no group is specified
+     * @throws DuplicateKeyException  if the passed cards are already in another deck
      * @throws NotAuthorizedException if the user is not authorized
      */
     @BodyParser.Of(BodyParser.Json.class)
@@ -116,9 +119,9 @@ public class CardDeckRepository {
 
         //retrieve the correct cards list by either parsing the id and getting the correct card or the attributes to a new card.
         List<FlashCard> cardList = parseCards(requestObject);
-        Logger.debug("Group="+requestObject.getUserGroup());
+        Logger.debug("Group=" + requestObject.getUserGroup());
         CardDeck deck = new CardDeck(requestObject);
-        if (requestObject.getUserGroup()==null || requestObject.getUserGroup().getId() == null) {
+        if (requestObject.getUserGroup() == null || requestObject.getUserGroup().getId() == null) {
             throw new InvalidInputException("Could not create deck without specifying the group it belongs to.");
         }
 

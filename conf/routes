@@ -12,14 +12,14 @@ GET     /                           controllers.HomeController.index
 
 #Flash Cards API
 ## Test single components
-GET     /test                       controllers.HomeController.test
-GET     /testCards                  controllers.HomeController.testCards
-GET     /testGroups                 controllers.HomeController.testGroups
-GET     /testTokens                 controllers.HomeController.testTokens
-GET     /testRating                 controllers.HomeController.testRating
-GET     /testCardDeck               controllers.HomeController.testCardDeck
-GET     /testCategories             controllers.HomeController.testCategories
-GET     /testMessages               controllers.HomeController.testMessages
+#GET     /test                       controllers.HomeController.test
+#GET     /testCards                  controllers.HomeController.testCards
+#GET     /testGroups                 controllers.HomeController.testGroups
+#GET     /testTokens                 controllers.HomeController.testTokens
+#GET     /testRating                 controllers.HomeController.testRating
+#GET     /testCardDeck               controllers.HomeController.testCardDeck
+#GET     /testCategories             controllers.HomeController.testCategories
+#GET     /testMessages               controllers.HomeController.testMessages
 
 ## General methods
 GET     /heartbeat                  controllers.HomeController.heartbeat
