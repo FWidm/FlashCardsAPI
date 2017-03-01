@@ -55,8 +55,10 @@ public class HomeController extends Controller {
      */
     @Security.Authenticated(ActionAuthenticator.class)
     public Result upload() {
+        Logger.debug("upload!");
         Http.MultipartFormData<File> body = request().body().asMultipartFormData();
         Http.MultipartFormData.FilePart<File> picture = body.getFile("picture");
+        Logger.debug("picture="+picture);
         if (picture != null) {
             String fileName = picture.getFilename();
             String contentType = picture.getContentType();
@@ -91,9 +93,15 @@ public class HomeController extends Controller {
                     return created(JsonUtil.toJson(mediaRecord));
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
+                    Logger.error(e.getMessage());
                 }
+
             }
+            else
+            Logger.debug("contenttype does not contain image!");
         }
+        else
+            Logger.debug("picture is null!");
         return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Request did not contain a 'picture' key or valid picture."));
 
     }
