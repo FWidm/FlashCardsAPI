@@ -25,6 +25,7 @@ public class FlashCardRepository {
      * - If ?authorId=id is set - return all cards of the author - return all cards without a user if null is set.
      * - If ?deckId=id is set - return all cards with the specific deck - return all without a deck if null is set.
      * - ?authorId=id&deckId=id - return all decks from a specific author and deck - see above for null handling.
+     *
      * @return list of cards
      */
     public static List<FlashCard> getFlashCardList() {
@@ -32,12 +33,16 @@ public class FlashCardRepository {
         if (UrlParamHelper.checkForKey(RequestKeys.AUTHOR_ID) && UrlParamHelper.checkForKey(RequestKeys.DECK_ID)) {
             String userId = UrlParamHelper.getValue(RequestKeys.AUTHOR_ID), deckId = UrlParamHelper.getValue(RequestKeys.DECK_ID);
             User author = null;
-            if (!userId.toLowerCase().equals("null"))
+            if (!userId.toLowerCase().equals("null")) {
                 author = UserRepository.findById(Long.valueOf(userId));
-            CardDeck deck = null;
-            if (!deckId.toLowerCase().equals("null"))
-                deck = CardDeckRepository.getCardDeck(Long.parseLong(deckId));
-            flashCardList = FlashCard.find.where().and(eq(JsonKeys.AUTHOR, author), eq(JsonKeys.FLASHCARD_PARENT_ID, deck.getId())).findList();
+
+                if (!deckId.toLowerCase().equals("null")) {
+                    CardDeck deck = CardDeckRepository.getCardDeck(Long.parseLong(deckId));
+                    flashCardList = FlashCard.find.where().and(eq(JsonKeys.AUTHOR, author), eq(JsonKeys.FLASHCARD_PARENT_ID, deck.getId())).findList();
+                } else
+                    flashCardList = FlashCard.find.where().and(eq(JsonKeys.AUTHOR, author), eq(JsonKeys.FLASHCARD_PARENT_ID, null)).findList();
+            } else
+                throw new NullPointerException("User cannot be null.");
         } else if (UrlParamHelper.checkForKey(RequestKeys.AUTHOR_ID)) {
             String userId = UrlParamHelper.getValue(RequestKeys.AUTHOR_ID);
             User author = null;
@@ -48,10 +53,11 @@ public class FlashCardRepository {
         } else if (UrlParamHelper.checkForKey(RequestKeys.DECK_ID)) {
             String deckId = UrlParamHelper.getValue(RequestKeys.DECK_ID);
             CardDeck deck = null;
-            if (!deckId.toLowerCase().equals("null"))
+            if (!deckId.toLowerCase().equals("null")) {
                 deck = CardDeckRepository.getCardDeck(Long.parseLong(deckId));
-
-            flashCardList = FlashCard.find.where().eq(JsonKeys.FLASHCARD_PARENT_ID, deck.getId()).findList();
+                flashCardList = FlashCard.find.where().eq(JsonKeys.FLASHCARD_PARENT_ID, deck.getId()).findList();
+            } else
+                flashCardList = FlashCard.find.where().eq(JsonKeys.FLASHCARD_PARENT_ID, null).findList();
 
         } else
             flashCardList = FlashCard.find.all();
