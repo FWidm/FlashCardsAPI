@@ -47,6 +47,7 @@ public class CardDeckRepository {
      */
     public static List<FlashCard> getCardDeckCards(long id) {
         List<FlashCard> flashCards = new ArrayList<>();
+        flashCards=CardDeck.find.byId(id).getCards();
 
         if (UrlParamHelper.checkForKey(RequestKeys.SIZE) && UrlParamHelper.checkForKey(RequestKeys.START)) {
             String limitVal = UrlParamHelper.getValue(RequestKeys.SIZE);
@@ -54,7 +55,9 @@ public class CardDeckRepository {
             if (limitVal != null) {
                 if (startVal != null) {
                     int start = Integer.parseInt(startVal);
+                    Logger.debug("start="+start+" | size="+flashCards.size());
                     if (start >= 0 && start < flashCards.size()) {
+                        Logger.debug("gettingSublist");
                         flashCards = flashCards.subList(start,
                                 Math.min(Integer.parseInt(limitVal) + start, flashCards.size()));
                     } else
@@ -65,8 +68,7 @@ public class CardDeckRepository {
                             Math.min(Integer.parseInt(limitVal), flashCards.size()));
                 }
             }
-        } else
-            CardDeck.find.byId(id).getCards();
+        }
         return flashCards;
     }
 
