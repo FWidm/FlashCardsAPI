@@ -150,6 +150,7 @@ public class UserRepository {
 
         if (json.has(JsonKeys.RATING))
             editedUser.setRating(json.get(JsonKeys.RATING).asInt());
+
         if (json.has(JsonKeys.USER_NAME) && minLengthValidator.isValid(json.get(JsonKeys.USER_NAME).asText()))
             editedUser.setName(json.get(JsonKeys.USER_NAME).asText());
         if (json.has(JsonKeys.USER_GROUPS)) {
@@ -176,6 +177,7 @@ public class UserRepository {
             if (JsonKeys.debugging) if (JsonKeys.debugging) Logger.debug("avatar=" + json.get(JsonKeys.USER_AVATAR));
             editedUser.setAvatar(json.get(JsonKeys.USER_AVATAR).asText());
         }
+
         editedUser.update();
         return editedUser;
     }

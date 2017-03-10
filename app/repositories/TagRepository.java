@@ -3,11 +3,12 @@ package repositories;
 import com.fasterxml.jackson.databind.JsonNode;
 import models.FlashCard;
 import models.Tag;
-import models.User;
 import play.Logger;
 import util.JsonKeys;
 import util.RequestKeys;
 import util.UrlParamHelper;
+import util.exceptions.InvalidInputException;
+import util.exceptions.ParameterNotSupportedException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,13 +25,33 @@ public class TagRepository {
      *
      * @return HTTPResult
      */
-    public static List<Tag> getTags() {
+    public static List<Tag> getTags() throws ParameterNotSupportedException {
         String requestInformation = "";
         List<Tag> tagList;
 
-        if (UrlParamHelper.checkForKey(RequestKeys.SORT_BY)) {
+        int buffer = -1;
+        int start = 0;
+
+        try {
+            if (UrlParamHelper.checkForKey(RequestKeys.SIZE))
+                buffer = Integer.parseInt(UrlParamHelper.getValue(RequestKeys.SIZE));
+
+            if (UrlParamHelper.checkForKey(RequestKeys.START))
+                start = Math.max(0,Integer.parseInt(UrlParamHelper.getValue(RequestKeys.START)));
+        }catch (NumberFormatException e){
+            throw new ParameterNotSupportedException("Invalid number for '?size=y' or '?start=x' request parameter. Please re-check your request");
+        }
+
+        if (UrlParamHelper.checkForKey(RequestKeys.STARTS_WITH)) {
+            requestInformation = UrlParamHelper.getValue(RequestKeys.STARTS_WITH);
+            Logger.debug("startswith=" + requestInformation);
+            //match everything starting with the requestinformation -> searching for he* should return hell,help, ...
+            tagList = Tag.find.where().like(JsonKeys.TAG_NAME, requestInformation + "%").findList();
+        } else
             tagList = Tag.find.all();
 
+
+        if (UrlParamHelper.checkForKey(RequestKeys.SORT_BY)) {
             requestInformation = UrlParamHelper.getValue(RequestKeys.SORT_BY);
             if (requestInformation.toUpperCase().contains(RequestKeys.USAGE_COUNT.toUpperCase())) {
                 Logger.debug("Sortby=" + requestInformation);
@@ -40,18 +61,12 @@ public class TagRepository {
                 if (requestInformation.toUpperCase().contains(RequestKeys.DESC))
                     Collections.reverse(tagList);
             }
+        }
 
-            //Tag.find.where().eq(tag.key,tag.val).findRowCount();
-            return tagList;
-        }
-        if (UrlParamHelper.checkForKey(RequestKeys.STARTS_WITH)) {
-            requestInformation = UrlParamHelper.getValue(RequestKeys.STARTS_WITH);
-            Logger.debug("startswith=" + requestInformation);
-            //match everything starting with the requestinformation -> searching for he* should return hell,help, ...
-            tagList = Tag.find.where().like(JsonKeys.TAG_NAME, requestInformation + "%").findList();
-            return tagList;
-        }
-        return Tag.find.all();
+        //.subList(Math.max(0, start), Math.min(tagList.size(), start + buffer)
+        if (buffer == -1)
+            buffer = tagList.size();
+        return tagList.subList(Math.max(0, start), Math.min(tagList.size(), start + buffer));
     }
 
     /**
@@ -130,9 +145,9 @@ public class TagRepository {
 
 
             } else {
-                Logger.debug("got name: "+node.get(JsonKeys.TAG_NAME).asText());
+                Logger.debug("got name: " + node.get(JsonKeys.TAG_NAME).asText());
                 Tag lookupTag = Tag.find.where().eq(JsonKeys.TAG_NAME, node.get(JsonKeys.TAG_NAME).asText()).findUnique();
-                Logger.debug("LookupTag="+lookupTag);
+                Logger.debug("LookupTag=" + lookupTag);
                 //check if the tag is unique
                 if (lookupTag == null) {
                     Tag tmpT = TagRepository.parseTag(node);
@@ -142,7 +157,7 @@ public class TagRepository {
                     //save our new tag so that no foreign constraint fails
                     //((`flashcards`.`card_tag`, CONSTRAINT `fk_card_tag_tag_02` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`tagId`))]]
                     tags.add(tmpT);
-                } else /*Looked up Tag exists */{
+                } else /*Looked up Tag exists */ {
                     //check if tag name does not lead to the same tag being added twice. This would lead to a primary key constraint error.
                     boolean idExists = tags.stream()
                             .anyMatch(t -> t.getId() == lookupTag.getId());

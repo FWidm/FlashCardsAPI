@@ -92,6 +92,7 @@ PUT     /categories/:id             controllers.CategoryController.updateCategor
 #Tags
 GET     /tags                       controllers.TagController.getTags
 GET     /tags/cards                 controllers.TagController.getAttachedCardsByTags
+GET     /tags/chunked                 controllers.TagController.getTagsChunked
 GET     /tags/:id                   controllers.TagController.getTag(id:Long)
 GET     /tags/:id/cards             controllers.TagController.getAttachedCards(id:Long)
 
