@@ -41,6 +41,7 @@ public class TagRepository {
         }catch (NumberFormatException e){
             throw new ParameterNotSupportedException("Invalid number for '?size=y' or '?start=x' request parameter. Please re-check your request");
         }
+        Logger.debug("start="+start+", buffer="+buffer);
 
         if (UrlParamHelper.checkForKey(RequestKeys.STARTS_WITH)) {
             requestInformation = UrlParamHelper.getValue(RequestKeys.STARTS_WITH);
@@ -66,7 +67,7 @@ public class TagRepository {
         //.subList(Math.max(0, start), Math.min(tagList.size(), start + buffer)
         if (buffer == -1)
             buffer = tagList.size();
-        return tagList.subList(Math.max(0, start), Math.min(tagList.size(), start + buffer));
+        return tagList.subList(Math.min(Math.max(0, start),tagList.size()), Math.min(tagList.size(), start + buffer));
     }
 
     /**
