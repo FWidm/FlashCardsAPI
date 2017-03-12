@@ -54,4 +54,14 @@ public class UrlParamHelper {
 
         return urlParams.keySet().contains(key);
     }
+
+    public static String[] getValues(String key) {
+        Map<String, String[]> urlParams = Controller.request().queryString();
+        Logger.debug("params contain " + key + "? " + urlParams.keySet().contains(key));
+
+        if (urlParams.keySet().contains(key)) {
+            return urlParams.get(key);
+        }
+        return null;
+    }
 }

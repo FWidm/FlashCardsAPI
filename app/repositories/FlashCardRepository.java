@@ -28,11 +28,12 @@ public class FlashCardRepository {
      *
      * @return list of cards
      */
-    public static List<FlashCard> getFlashCardList() {
+    public static List<FlashCard> getFlashCardList() throws InvalidInputException {
         List<FlashCard> flashCardList = new ArrayList<>();
         if (UrlParamHelper.checkForKey(RequestKeys.AUTHOR_ID) && UrlParamHelper.checkForKey(RequestKeys.DECK_ID)) {
             String userId = UrlParamHelper.getValue(RequestKeys.AUTHOR_ID), deckId = UrlParamHelper.getValue(RequestKeys.DECK_ID);
             User author = null;
+
             if (!userId.toLowerCase().equals("null")) {
                 author = UserRepository.findById(Long.valueOf(userId));
 
@@ -59,6 +60,18 @@ public class FlashCardRepository {
             } else
                 flashCardList = FlashCard.find.where().eq(JsonKeys.FLASHCARD_PARENT_ID, null).findList();
 
+        } else if (UrlParamHelper.checkForKey(RequestKeys.GET_BY_ID)) {
+            String[] ids = UrlParamHelper.getValues(RequestKeys.GET_BY_ID);
+            for (String id : ids) {
+                try {
+                    FlashCard currentCard = FlashCard.find.byId(Long.parseLong(id));
+                    if (currentCard != null)
+                        flashCardList.add(currentCard);
+
+                } catch (NumberFormatException e) {
+                    throw new InvalidInputException("Error while processing id. Please re-check your query string. IDs have to be >0. Cause: id=" + id+".");
+                }
+            }
         } else
             flashCardList = FlashCard.find.all();
         return flashCardList;
