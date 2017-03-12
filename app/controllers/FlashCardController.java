@@ -46,6 +46,8 @@ public class FlashCardController {
             return ok(JsonUtil.toJson(FlashCardRepository.getFlashCardList()));
         } catch (NumberFormatException e) {
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage()));
+        } catch (InvalidInputException e) {
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage()));
         }
     }
 

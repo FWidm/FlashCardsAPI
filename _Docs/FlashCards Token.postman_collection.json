@@ -1241,6 +1241,31 @@
 						"description": "Retrieves all cards"
 					},
 					"response": []
+				},
+				{
+					"name": "get cards in a specific deck",
+					"request": {
+						"url": "{{url}}{{port}}/cards?deckId=1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"mwahaha\",\n    \"description\": \"xyz\",\n    \"users\":[{\"userId\":8},{\"userId\":9}]\n}"
+						},
+						"description": "Retrieves all cards"
+					},
+					"response": []
 				}
 			]
 		},
@@ -2727,6 +2752,17 @@
 					"name": "Get all Cards that have the given tags (name)",
 					"request": {
 						"url": "{{url}}{{port}}/tags/cards?name=testTag&name=halp",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get chunked response",
+					"request": {
+						"url": "{{url}}{{port}}/tags?start=-1&size=1&startsWith=t&sortBy=usageCount%20asc",
 						"method": "GET",
 						"header": [],
 						"body": {},

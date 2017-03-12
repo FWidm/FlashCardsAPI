@@ -7,6 +7,7 @@ import play.mvc.Result;
 import repositories.TagRepository;
 import util.JsonUtil;
 import util.RequestKeys;
+import util.exceptions.ParameterNotSupportedException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,9 +25,16 @@ public class TagController extends Controller {
      * @return ok - contains a list of tags or an empty list
      */
     public Result getTags() {
-        List<Tag> tagList = TagRepository.getTags();
-        return ok(JsonUtil.toJson(tagList));
+        List<Tag> tagList = null;
+        try {
+            tagList = TagRepository.getTags();
+            return ok(JsonUtil.toJson(tagList));
+        } catch (ParameterNotSupportedException e) {
+            return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, e.getMessage()));
+        }
+
     }
+
 
     /**
      * Returns either one tag
