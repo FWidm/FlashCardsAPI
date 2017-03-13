@@ -42,7 +42,7 @@ public class MessagingRepository {
 
         if (UrlParamHelper.checkForKey(RequestKeys.START_DATE)) {
             String textDate = UrlParamHelper.getValue(RequestKeys.START_DATE);
-            DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+            DateFormat format = new SimpleDateFormat(JsonKeys.DATE_FORMAT);
             Date date = format.parse(textDate);
             Logger.debug("Got date=" + date);
             messages = AbstractMessage.find.where().and(eq(JsonKeys.MESSAGE_RECIPIENT,user),between(JsonKeys.DATE_CREATED,date,new Date())).findList();

@@ -26,6 +26,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -218,7 +220,7 @@ public class HomeController extends Controller {
 
     public Result heartbeat() {
         Map<String, Object> map = new HashMap<>();
-        map.put("currentDate", "" + new Date());
+        map.put("currentDate", "" + new SimpleDateFormat(JsonKeys.DATE_FORMAT).format(new Date()));
         return ok(JsonUtil.convertToJsonNode(map));
     }
 
