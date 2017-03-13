@@ -1,0 +1,462 @@
+# Example YAML to get you started quickly.
+# Be aware that YAML has indentation based scoping.
+# Code completion support is available so start typing for available options.
+swagger: '2.0'
+host: 134.60.51.194:9000
+# This is your document metadata
+info:
+  version: "1.0.0"
+  title: Flashcards API
+  
+# Describe your paths here
+paths:
+  # --- Generic ---
+  /heartbeat:
+    get:
+      summary: Returns the curent server time - acts as a means to check if the server is online
+      operationId: getHeartbeat
+      tags:
+        - util
+      parameters:
+          - name: Authorization
+            in: header
+            required: true
+            description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+            type: string
+      responses:
+        "200":
+          description: "Current Date"
+          schema:
+            $ref: "#/definitions/HeartbeatResponse"
+            
+
+  /login:
+    post:
+      summary: Login with password and username, retrieve a new token for the current user
+      operationId: loginUser
+      tags:
+        - util
+        - authorization
+      parameters:
+          - name: loginRequest
+            in: body
+            required: true
+            description: Requires a valid password and email of the user to login
+            schema:
+              $ref: '#/definitions/LoginRequest'              
+      responses:
+        "200":
+          description: "Response contains one new Token to use for further requests"
+          schema:
+              $ref: '#/definitions/LoginResponse' 
+
+  /auth:
+    get:
+      summary: Returns the email of the logged in user if a valid token is provided
+      operationId: getEmailViaToken
+      tags:
+        - util
+        - authorization
+      responses:
+        "200":
+          description: "Email from the token owner"
+          schema:
+            type: string
+        
+  
+  /logout:
+    post:
+      summary: "Invalidates the currently sent token"
+      operationId: logoutViaToken
+      tags:
+        - util
+        - authorization
+      responses:
+        "204": 
+          description: token has been deleted
+        "401":
+            description: Request sent without "Bearer_Token"
+            schema:
+              $ref: '#/definitions/UnauthorizedResponse'      
+              
+  /upload:
+    post:
+      summary: "Upload media onto the current server"
+      operationId: uploadMedia
+      tags:
+        - util
+        - authorization
+      consumes:
+        - "multipart/form-data"
+      parameters:
+        - name: picture
+          in: formData
+          description: file to upload
+          required: false
+          type: file
+
+      responses:
+        "200":
+          description: "ok"
+          schema: 
+            $ref: '#/definitions/UploadedMediaResponse'
+        "401":
+            description: Request sent without "Bearer_Token"
+            schema:
+              $ref: '#/definitions/UnauthorizedResponse'      
+              
+  # --- Users ---            
+  /users:
+    get:
+      summary: List users
+      operationId: listUsers
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: query
+          description: Loads all card specified by the ids (/users?id=x&id=y&...)
+          required: false
+          type: integer
+          
+      responses:
+        "200":
+          description: A list of users
+          schema:
+            $ref: '#/definitions/Users'
+
+    post:
+      description: Creates a new User. Email is unique
+      operationId: addUser
+      parameters:
+        - name: name
+          in: body
+          description: Name of the user
+          required: true
+          schema:
+            $ref: '#/definitions/NewUser'
+      responses:
+        "200":
+          description: Success Message
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "400":
+          description: User input is not valid - description message contains more info.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "403":
+          description: Problems with the used password util. Should not happen.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+            
+  /users/{userId}:
+    get:
+      summary: Info for a specific user
+      operationId: showUserById
+      tags:
+        - users
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id of the user to change
+          type: string
+      responses:
+        "200":
+          description: Expected response to a valid request
+          schema:
+            $ref: '#/definitions/User'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+            
+    put:
+        summary: Completely modify one user
+        operationId: putUserById
+        tags:
+          - users
+          - authorization
+        parameters:
+          - name: userId
+            in: path
+            required: true
+            description: The id of the user to modify completely
+            type: string
+          - name: user
+            in: body
+            description: Name of the user
+            required: true
+            schema:
+              $ref: '#/definitions/PutUser'
+          - name: Authorization
+            in: header
+            required: true
+            description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+            type: string
+        responses:
+          "200":
+            description: Success Message
+            schema:
+              $ref: '#/definitions/GenericResponse'
+          "400":
+            description: User input is not valid - description message contains more info.
+            schema:
+              $ref: '#/definitions/GenericResponse'
+          "403":
+            description: Problems with the used password util. Should not happen.
+            schema:
+              $ref: '#/definitions/GenericResponse'
+      
+    patch:
+          summary: Patch one specific user
+          operationId: patchUserById
+          tags:
+            - users
+            - authorization
+          parameters:
+            - name: userId
+              in: path
+              required: true
+              description: The id of the user to modify partially
+              type: string
+            - name: user
+              in: body
+              description: Name of the user
+              required: true
+              schema:
+                $ref: '#/definitions/PutUser'
+            - name: Authorization
+              in: header
+              required: true
+              description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+              type: string
+          responses:
+            "200":
+              description: Success Message
+              schema:
+                $ref: '#/definitions/GenericResponse'
+            "400":
+              description: User input is not valid - description message contains more info.
+              schema:
+                $ref: '#/definitions/GenericResponse'
+            "401":
+              description: Request sent without "Bearer_Token"
+              schema:
+                $ref: '#/definitions/UnauthorizedResponse'
+            "403":
+              description: Problems with the used password util. Should not happen.
+              schema:
+                $ref: '#/definitions/GenericResponse'
+                
+    delete:
+          summary: Delete on specific user
+          operationId: deleteUserById
+          tags:
+            - users
+            - authorization
+          parameters:
+            - name: userId
+              in: path
+              required: true
+              description: The id of the user to modify partially
+              type: string
+            - name: Authorization
+              in: header
+              required: true
+              description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+              type: string
+              
+          responses:
+            "200":
+              description: Success Message
+              schema:
+                $ref: '#/definitions/GenericResponse'
+            "400":
+              description: User input is not valid - description message contains more info.
+              schema:
+                $ref: '#/definitions/GenericResponse'
+            "401":
+              description: Request sent without "Bearer_Token"
+              schema:
+                $ref: '#/definitions/UnauthorizedResponse'
+            "403":
+              description: Problems with the used password util. Should not happen.
+              schema:
+                $ref: '#/definitions/GenericResponse'
+                
+  /users/e/{userEmail}:
+    get:
+      summary: Info for a specific user
+      operationId: showUserByEmail
+      tags:
+        - users
+      parameters:
+        - name: userEmail
+          in: path
+          required: true
+          description: The email of the user to retrieve
+          type: string
+      responses:
+        "200":
+          description: Expected response to a valid request
+          schema:
+            $ref: '#/definitions/User'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+            
+  /users/{userId}/groups:
+    get:
+      summary: Info for a specific user
+      operationId: showUsersGroups
+      tags:
+        - users
+        - groups
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id of the user we want to retrieve groups from
+          type: string
+      responses:
+        "200":
+          description: Expected response to a valid request
+          schema:
+            $ref: '#/definitions/Groups'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+            
+definitions:
+  HeartbeatResponse:
+    properties:
+      currentDate:
+        type: string
+        format: date "yyyy-MM-dd HH:mm:ss z"
+        
+  LoginRequest:
+    required:
+      - email
+      - password
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+
+  LoginResponse:
+    properties:
+      statuscode:
+        type: integer
+      description:
+        type: string
+      token:
+        type: string
+  
+  UnauthorizedResponse:
+    properties:
+      statuscode:
+        type: integer
+      description:
+        type: string
+    
+  UploadedMediaResponse:
+    properties:
+      mediaId:
+        type: integer
+      mediaURI:
+        type: string
+        format: URI
+      author:
+        $ref: '#/definitions/User'
+      created:
+        type: string
+        format: date "yyyy-MM-dd HH:mm:ss z"
+      mediaType:
+        type: string
+        format: media type e.g. "image/png"
+          
+                
+  User:
+    required:
+      - userId
+      - name
+    properties:
+      userId:
+        type: integer
+        format: int64
+      avatar:
+        type: string
+        format: uri
+      name:
+        type: string
+      email:
+        type: string
+      rating:
+        type: string
+      created:
+        type: string
+        format: date "yyyy-MM-dd HH:mm:ss z"
+      lastLogin:
+        type: string
+        format: date "yyyy-MM-dd HH:mm:ss z"
+        
+  PutUser:
+    description: For "PUT" all values have to exist, else an error is thrown. For "PATCH" you can change single values. Either use name+description to create a new one when put/patching users or specify groupId to add the user to an existing group.
+    properties:
+      name:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      rating:
+        type: string
+      groups:
+        $ref: '#/definitions/Groups'
+          
+  NewUser:
+    required:
+      - name
+      - password
+      - email
+    properties:
+      name:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      rating:
+        type: string
+  
+  GenericResponse:
+    properties:
+      statuscode:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+        
+  Users:
+    type: array
+    items:
+      $ref: '#/definitions/User'
+  
+  Group:
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      groupId:
+        type: integer
+  
+  Groups:
+    type: array
+    items:
+      $ref: '#/definitions/Group'

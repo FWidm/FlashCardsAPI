@@ -23,7 +23,7 @@ GET     /                           controllers.HomeController.index
 
 ## General methods
 GET     /heartbeat                  controllers.HomeController.heartbeat
-POST    /auth                       controllers.HomeController.auth
+GET    /auth                       controllers.HomeController.auth
 POST    /login                      controllers.HomeController.login
 POST    /logout                     controllers.HomeController.invalidateToken
 POST    /upload                     controllers.HomeController.upload
