@@ -675,6 +675,10 @@ paths:
           description: A specific Deck
           schema:
             $ref: '#/definitions/DeckResponse'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
 
     put:
       summary: Completely modify one deck
@@ -1317,6 +1321,168 @@ paths:
           description: queried object
           schema:
             $ref: '#/definitions/DeckResponseList'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+  /ratings:
+    get:
+      summary: List ratings. Queries can be used to target specific cards/ratings/answers. Queries can be conjoined - you can search for the rating in one answer/card of one specific user.
+      operationId: listRatings
+      tags:
+        - ratings
+      parameters:
+        - name: flashCardId
+          in: query
+          description: Loads all ratings for one card
+          required: false
+          type: integer
+        - name: answerId
+          in: query
+          description: Loads all ratings for one answer
+          required: false
+          type: integer
+        - name: userId
+          in: query
+          description: Loads all ratings for one card
+          required: false
+          type: integer
+      responses:
+        "200":
+          description: A list of ratings
+          schema:
+            $ref: '#/definitions/CategoryResponseList'
+
+    post:
+      description: Create a rating
+      operationId: addRating
+      tags:
+        - ratings
+        - authorization
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+          type: string
+        - name: rating
+          in: body
+          description: rating to add
+          required: true
+          schema:
+            $ref: '#/definitions/CategoryRequest'
+      responses:
+        "201":
+          description: Success Message
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "400":
+          description: User input is not valid - description message contains more info.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "401":
+          description: Request sent without a (valid) "Bearer_Token"
+          schema:
+            $ref: '#/definitions/UnauthorizedResponse'
+        "403":
+          description: Problems with the used password util. Should not happen.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+  /ratings/{rationgId}:
+    get:
+      summary: Get a specific rating by id
+      operationId: getRatingById
+      tags:
+        - ratings
+      parameters:
+        - name: rationgId
+          in: path
+          required: true
+          description: The id of the rating we want to query
+          type: string
+      responses:
+        "200":
+          description: A specific Rating
+          schema:
+            $ref: '#/definitions/RatingResponse'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+    patch:
+      summary: Patch one specific rating's attributes
+      operationId: patchRatingById
+      tags:
+        - ratings
+        - authorization
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Only authorized users may modify - expected value="Bearer {{token}}"
+          type: string
+        - name: rationgId
+          in: path
+          required: true
+          description: The id of the rating we want to query
+          type: string
+        - name: rating
+          in: body
+          description: whole new group object
+          required: true
+          schema:
+            $ref: '#/definitions/RatingRequest'
+      responses:
+        "200":
+          description: Success Message
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "400":
+          description: User input is not valid - description message contains more info.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "401":
+          description: Request sent without a (valid) "Bearer_Token"
+          schema:
+            $ref: '#/definitions/UnauthorizedResponse'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+    delete:
+      summary: Delete one specific rating. This also compensates all affected objects - if the user rated an object with -1, after deleting the rating it is now returned to the orgiinal state.
+      operationId: deleteRatingById
+      tags:
+        - ratings
+        - authorization
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Only authorized users may modify - expected value="Bearer {{token}}"
+          type: string
+        - name: rationgId
+          in: path
+          required: true
+          description: The id of the rating we want to query
+          type: string
+      responses:
+        "200":
+          description: Success Message
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "400":
+          description: User input is not valid - description message contains more info.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "403":
+          description: Problems with the used password util. Should not happen.
+          schema:
+            $ref: '#/definitions/GenericResponse'
         "404":
           description: Object not found
           schema:
