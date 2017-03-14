@@ -35,7 +35,7 @@ paths:
   /login:
     post:
       summary: Login with password and username, retrieve a new token for the current user
-      operationId: loginUser
+      operationId: loginUserResponse
       tags:
         - util
         - authorization
@@ -135,7 +135,7 @@ paths:
         "200":
           description: A list of users
           schema:
-            $ref: '#/definitions/Users'
+            $ref: '#/definitions/UserResponseList'
         "404":
           description: User not found
           schema:
@@ -152,7 +152,7 @@ paths:
           description: user object
           required: true
           schema:
-            $ref: '#/definitions/NewUser'
+            $ref: '#/definitions/UserRequest'
       responses:
         "200":
           description: Success Message
@@ -183,7 +183,7 @@ paths:
         "200":
           description: Expected response to a valid request
           schema:
-            $ref: '#/definitions/User'
+            $ref: '#/definitions/UserResponse'
         "404":
           description: User not found
           schema:
@@ -330,7 +330,7 @@ paths:
         "200":
           description: Expected response to a valid request
           schema:
-            $ref: '#/definitions/User'
+            $ref: '#/definitions/UserResponse'
         "404":
           description: User not found
           schema:
@@ -386,7 +386,7 @@ paths:
         "200":
           description: A list of users
           schema:
-            $ref: '#/definitions/Users'
+            $ref: '#/definitions/UserResponseList'
 
     post:
       description: Creates a new Group. Duplicate names and descriptions can exist.
@@ -584,7 +584,7 @@ paths:
         "200":
           description: Expected response to a valid request
           schema:
-            $ref: '#/definitions/Users'
+            $ref: '#/definitions/UserResponseList'
         "404":
           description: User not found
           schema:
@@ -607,7 +607,7 @@ paths:
         "200":
           description: Expected response to a valid request
           schema:
-            $ref: '#/definitions/DeckListResponse'
+            $ref: '#/definitions/DeckResponseList'
         "404":
           description: User not found
           schema:
@@ -624,7 +624,7 @@ paths:
         "200":
           description: A list of decks or an empty list
           schema:
-            $ref: '#/definitions/DeckListResponse'
+            $ref: '#/definitions/DeckResponseList'
 
     post:
       description: Create a new deck
@@ -1069,7 +1069,7 @@ paths:
         "200":
           description: queried object
           schema:
-            $ref: '#/definitions/User'
+            $ref: '#/definitions/UserResponse'
         "404":
           description: Object not found
           schema:
@@ -1173,6 +1173,154 @@ paths:
           schema:
             $ref: '#/definitions/GenericResponse'
 
+  /categories/{categoryId}:
+    get:
+      summary: Get a specific category by id
+      operationId: getCategoryById
+      tags:
+        - categories
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: The id of the category we want to query
+          type: string
+      responses:
+        "200":
+          description: queried object
+          schema:
+            $ref: '#/definitions/CategoryResponse'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+    put:
+      summary: Completely modify one category's attributes
+      operationId: putCategoryById
+      tags:
+        - categories
+        - authorization
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Only authorized users may modify - expected value="Bearer {{token}}"
+          type: string
+        - name: categoryId
+          in: path
+          required: true
+          description: Id of the object we want to query
+          type: string
+        - name: category
+          in: body
+          description: all attributes needed to update the resource completely
+          required: true
+          schema:
+            $ref: '#/definitions/CategoryRequest'
+      responses:
+        "200":
+          description: Success Message
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "400":
+          description: User input is not valid - description message contains more info.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "401":
+          description: Request sent without a (valid) "Bearer_Token"
+          schema:
+            $ref: '#/definitions/UnauthorizedResponse'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+    patch:
+      summary: Patch one specific category's attributes
+      operationId: patchCategoryById
+      tags:
+        - categories
+        - authorization
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Only authorized users may modify - expected value="Bearer {{token}}"
+          type: string
+        - name: categoryId
+          in: path
+          required: true
+          description: Id of the object we want to query
+          type: string
+        - name: category
+          in: body
+          description: all attributes we want to change in the resource
+          required: true
+          schema:
+            $ref: '#/definitions/CategoryRequest'
+      responses:
+        "200":
+          description: Success Message
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "400":
+          description: User input is not valid - description message contains more info.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "401":
+          description: Request sent without a (valid) "Bearer_Token"
+          schema:
+            $ref: '#/definitions/UnauthorizedResponse'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+  /categories/{categoryId}/children:
+    get:
+      summary: Get children of a specific category
+      operationId: getCategoryChildrenById
+      tags:
+        - categories
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: The id of the category we want to query
+          type: string
+      responses:
+        "200":
+          description: queried object
+          schema:
+            $ref: '#/definitions/CategoryResponseList'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+  /categories/{categoryId}/decks:
+    get:
+      summary: Get carddecks that are assorted under this category
+      operationId: getCategoryDecksById
+      tags:
+        - categories
+        - decks
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: The id of the category we want to query
+          type: string
+      responses:
+        "200":
+          description: queried object
+          schema:
+            $ref: '#/definitions/DeckResponseList'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
 definitions:
   HeartbeatResponse:
     properties:
@@ -1214,7 +1362,7 @@ definitions:
         type: string
         format: URI
       author:
-        $ref: '#/definitions/User'
+        $ref: '#/definitions/UserResponse'
       created:
         type: string
         format: date "yyyy-MM-dd HH:mm:ss z"
@@ -1222,10 +1370,7 @@ definitions:
         type: string
         format: media type e.g. "image/png"
 
-  User:
-    required:
-      - userId
-      - name
+  UserResponse:
     properties:
       userId:
         type: integer
@@ -1246,6 +1391,12 @@ definitions:
         type: string
         format: date "yyyy-MM-dd HH:mm:ss z"
 
+
+  UserResponseList:
+    type: array
+    items:
+      $ref: '#/definitions/UserResponse'
+
   PutUser:
     description: For "PUT" all values have to exist, else an error is thrown. For "PATCH" you can change single values. Either use name+description to create a new one when put/patching users or specify groupId to add the user to an existing group.
     properties:
@@ -1260,7 +1411,7 @@ definitions:
       groups:
         $ref: '#/definitions/Groups'
 
-  NewUser:
+  UserRequest:
     required:
       - name
       - password
@@ -1284,10 +1435,6 @@ definitions:
       id:
         type: integer
 
-  Users:
-    type: array
-    items:
-      $ref: '#/definitions/User'
 
   Group:
     properties:
@@ -1303,15 +1450,15 @@ definitions:
     items:
       $ref: '#/definitions/Group'
 
-  UserResponse:
+  UserIdRequest:
     properties:
       userId:
         type: integer
 
-  UserResponseList:
+  UserIdRequestList:
     type: array
     items:
-      $ref: '#/definitions/UserResponse'
+      $ref: '#/definitions/UserIdRequest'
 
   NewGroup:
     properties:
@@ -1320,7 +1467,7 @@ definitions:
       description:
         type: string
       users:
-        $ref: '#/definitions/UserResponseList'
+        $ref: '#/definitions/UserIdRequestList'
 
   GroupIdRequest:
     properties:
@@ -1340,7 +1487,7 @@ definitions:
       visible:
         type: boolean
 
-  DeckListResponse:
+  DeckResponseList:
     type: array
     items:
       $ref: '#/definitions/DeckResponse'
@@ -1368,7 +1515,7 @@ definitions:
       mediaURI:
         type: string
       author:
-        $ref: '#/definitions/User'
+        $ref: '#/definitions/UserResponse'
 
   QuestionRequest:
     properties:
@@ -1419,6 +1566,10 @@ definitions:
     items:
       $ref: '#/definitions/AnswerResponse'
 
+  AnswerIdRequest:
+    properties:
+      answerId:
+        type: integer
 
   TagRequest:
     properties:
@@ -1437,7 +1588,7 @@ definitions:
        question:
          $ref: '#/definitions/QuestionRequest'
        author:
-         $ref: '#/definitions/User'
+         $ref: '#/definitions/UserResponse'
        answers:
          $ref: '#/definitions/AnswerRequestList'
        tags:
@@ -1462,7 +1613,7 @@ definitions:
       question:
         $ref: '#/definitions/QuestionResponse'
       author:
-        $ref: '#/definitions/User'
+        $ref: '#/definitions/UserResponse'
       multipleChoice:
         type: boolean
 
@@ -1518,3 +1669,41 @@ definitions:
         $ref: '#/definitions/DeckIdRequestList'
       parent:
         $ref: '#/definitions/CategoryIdRequest'
+
+  RatingResponse:
+    description: will either contain an answerId or flashCardId.
+    required:
+      - ratingId
+      - ratingModifier
+      - author
+    properties:
+      ratingId:
+        type: integer
+      author:
+        $ref: '#/definitions/UserResponse'
+      ratingModifier:
+        type: integer
+      answer:
+        $ref: '#/definitions/AnswerResponse'
+      flashcard:
+        $ref: '#/definitions/CardResponse'
+
+  ratingResponseList:
+    type: array
+    items:
+      $ref: '#/definitions/RatingResponse'
+
+  RatingRequest:
+    description: has to either contain an answerId or flashCardId. The api will save the correct version.
+    required:
+      - ratingModifier
+      - author
+    properties:
+      author:
+        $ref: '#/definitions/UserIdRequest'
+      ratingModifier:
+        type: integer
+      answer:
+        $ref: '#/definitions/AnswerIdRequest'
+      flashcard:
+        $ref: '#/definitions/CardIdRequest'
