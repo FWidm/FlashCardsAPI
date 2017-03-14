@@ -590,7 +590,6 @@ paths:
           schema:
             $ref: '#/definitions/GenericResponse'
 
-
   /groups/{groupId}/decks:
     get:
       summary: retrieve all cards from one deck
@@ -614,6 +613,7 @@ paths:
           schema:
             $ref: '#/definitions/GenericResponse'
 
+  # --- decks ---
   /cardDecks:
     get:
       summary: List decks
@@ -759,7 +759,7 @@ paths:
             $ref: '#/definitions/GenericResponse'
 
     delete:
-      summary: Delete on specific deck
+      summary: Delete one specific deck
       operationId: deleteDeckById
       tags:
         - decks
@@ -775,12 +775,6 @@ paths:
           required: true
           description: The id of the deck we want to query
           type: string
-        - name: deck
-          in: body
-          description: whole new group object
-          required: true
-          schema:
-            $ref: '#/definitions/DeckRequest'
       responses:
         "200":
           description: Success Message
@@ -854,6 +848,8 @@ paths:
             description: Group of the given deck
             schema:
               $ref: '#/definitions/Group'
+
+  # --- Cards ---
   /cards:
     get:
       summary: List cards
@@ -896,7 +892,7 @@ paths:
           type: string
         - name: card
           in: body
-          description: whole new group object
+          description: whole new card object
           required: true
           schema:
             $ref: '#/definitions/CardRequest'
@@ -918,6 +914,264 @@ paths:
           schema:
             $ref: '#/definitions/GenericResponse'
 
+  /cards/{cardId}:
+    get:
+      summary: Get a specific card by id
+      operationId: getCardById
+      tags:
+        - cards
+      parameters:
+        - name: cardId
+          in: path
+          required: true
+          description: The id of the card we want to query
+          type: string
+      responses:
+        "200":
+          description: queried object
+          schema:
+            $ref: '#/definitions/CardResponse'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+    put:
+      summary: Completely modify one card's attributes
+      operationId: putCardById
+      tags:
+        - cards
+        - authorization
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Only authorized users may modify - expected value="Bearer {{token}}"
+          type: string
+        - name: cardId
+          in: path
+          required: true
+          description: Id of the object we want to query
+          type: string
+        - name: card
+          in: body
+          description: all attributes needed to update the resource completely
+          required: true
+          schema:
+            $ref: '#/definitions/CardRequest'
+      responses:
+        "200":
+          description: Success Message
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "400":
+          description: User input is not valid - description message contains more info.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "401":
+          description: Request sent without a (valid) "Bearer_Token"
+          schema:
+            $ref: '#/definitions/UnauthorizedResponse'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+    patch:
+      summary: Patch one specific card's attributes
+      operationId: patchCardById
+      tags:
+        - cards
+        - authorization
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Only authorized users may modify - expected value="Bearer {{token}}"
+          type: string
+        - name: cardId
+          in: path
+          required: true
+          description: Id of the object we want to query
+          type: string
+        - name: card
+          in: body
+          description: all attributes we want to change in the resource
+          required: true
+          schema:
+            $ref: '#/definitions/CardRequest'
+      responses:
+        "200":
+          description: Success Message
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "400":
+          description: User input is not valid - description message contains more info.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "401":
+          description: Request sent without a (valid) "Bearer_Token"
+          schema:
+            $ref: '#/definitions/UnauthorizedResponse'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+    delete:
+      summary: Delete one specific card
+      operationId: deleteCardById
+      tags:
+        - cards
+        - authorization
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Only authorized users may modify - expected value="Bearer {{token}}"
+          type: string
+        - name: cardId
+          in: path
+          required: true
+          description: The id of the card we want to query
+          type: string
+      responses:
+        "200":
+          description: Success Message
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "400":
+          description: User input is not valid - description message contains more info.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "403":
+          description: Problems with the used password util. Should not happen.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+  /cards/{cardId}/author:
+    get:
+      summary: Get a specific card by id and return it's author
+      operationId: getCardAuthorById
+      tags:
+        - cards
+      parameters:
+        - name: cardId
+          in: path
+          required: true
+          description: The id of the card we want to query
+          type: string
+      responses:
+        "200":
+          description: queried object
+          schema:
+            $ref: '#/definitions/User'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+  /cards/{cardId}/qustion:
+    get:
+      summary: Get a specific card by id and return it's question
+      operationId: getCardQuestionById
+      tags:
+        - cards
+      parameters:
+        - name: cardId
+          in: path
+          required: true
+          description: The id of the card we want to query
+          type: string
+      responses:
+        "200":
+          description: queried object
+          schema:
+            $ref: '#/definitions/QuestionResponse'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+  /cards/{cardId}/answers:
+    get:
+      summary: Get a specific card by id
+      operationId: getCardAnswersById
+      tags:
+        - cards
+      parameters:
+        - name: cardId
+          in: path
+          required: true
+          description: The id of the card we want to query
+          type: string
+      responses:
+        "200":
+          description: queried object
+          schema:
+            $ref: '#/definitions/AnswerResponseList'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+  /categories:
+    get:
+      summary: List categories
+      operationId: listCategories
+      tags:
+        - categories
+      parameters:
+        - name: root
+          in: query
+          description: Loads all categories whose parents are set to null.
+          required: false
+          type: boolean
+      responses:
+        "200":
+          description: A list of categories
+          schema:
+            $ref: '#/definitions/CategoryResponseList'
+
+    post:
+      description: Create a category
+      operationId: addCategory
+      tags:
+        - categories
+        - authorization
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+          type: string
+        - name: category
+          in: body
+          description: category to add
+          required: true
+          schema:
+            $ref: '#/definitions/CategoryRequest'
+      responses:
+        "201":
+          description: Success Message
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "400":
+          description: User input is not valid - description message contains more info.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "401":
+          description: Request sent without a (valid) "Bearer_Token"
+          schema:
+            $ref: '#/definitions/UnauthorizedResponse'
+        "403":
+          description: Problems with the used password util. Should not happen.
+          schema:
+            $ref: '#/definitions/GenericResponse'
 
 definitions:
   HeartbeatResponse:
@@ -1068,6 +1322,11 @@ definitions:
       users:
         $ref: '#/definitions/UserResponseList'
 
+  GroupIdRequest:
+    properties:
+      groupId:
+        type: integer
+
   DeckResponse:
     properties:
       cardDeckId:
@@ -1095,7 +1354,7 @@ definitions:
       cards:
         $ref: '#/definitions/CardIdRequestList'
       userGroup:
-        $ref: '#/definitions/Group'
+        $ref: '#/definitions/GroupIdRequest'
       visible:
         type: boolean
 
@@ -1139,6 +1398,27 @@ definitions:
     type: array
     items:
       $ref: '#/definitions/AnswerRequest'
+
+  AnswerResponse:
+    properties:
+      answerId:
+        type: integer
+      answerText:
+        type: string
+      answerHint:
+        type: string
+      mediaURI:
+        type: string
+      author:
+        $ref: '#/definitions/UserResponse'
+      answerCorrect:
+        type: boolean
+
+  AnswerResponseList:
+    type: array
+    items:
+      $ref: '#/definitions/AnswerResponse'
+
 
   TagRequest:
     properties:
@@ -1200,3 +1480,41 @@ definitions:
     type: array
     items:
       $ref: '#/definitions/CardResponse'
+
+  DeckIdRequest:
+    properties:
+      cardDeckId:
+        type: integer
+
+  DeckIdRequestList:
+    type: array
+    items:
+      $ref: '#/definitions/DeckIdRequest'
+
+  CategoryIdRequest:
+    properties:
+      categoryId:
+        type: integer
+
+  CategoryResponse:
+    properties:
+      categoryId:
+        type: integer
+      categoryName:
+        type: string
+      parent:
+        $ref: '#/definitions/CategoryResponse'
+
+  CategoryResponseList:
+    type: array
+    items:
+      $ref: '#/definitions/CategoryResponse'
+
+  CategoryRequest:
+    properties:
+      categoryName:
+        type: string
+      cardDecks:
+        $ref: '#/definitions/DeckIdRequestList'
+      parent:
+        $ref: '#/definitions/CategoryIdRequest'
