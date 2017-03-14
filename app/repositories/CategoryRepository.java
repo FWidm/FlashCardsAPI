@@ -87,7 +87,8 @@ public class CategoryRepository {
         if (json.has(JsonKeys.CATEGORY_PARENT) && json.get(JsonKeys.CATEGORY_PARENT).has(JsonKeys.CATEGORY_ID)) {
             Long parentId = json.get(JsonKeys.CATEGORY_PARENT).get(JsonKeys.CATEGORY_ID).asLong();
             category.setParent(parseParent(parentId));
-        }
+        } else
+            category.setParent(null);
 
         //handle cardDeck list
         List<CardDeck> cardDeckList = new ArrayList<>();
