@@ -1516,42 +1516,77 @@ paths:
           type: string
       responses:
         "200":
-          description: A list of ratings
+          description: A list of tags
           schema:
             $ref: '#/definitions/TagResponseList'
 
   /tags/cards:
     get:
-      summary: Get cards that have exactly the same tags. e.g. all cards with tag1 and tag2.
+      summary: Get cards that all have the same tags that are specified via query parameters. Those can be chained again. "?id=1&?name=example" returns all cards that have the tag with id 1 and the tag with name example. Any non existant tags are ignored. Thus if you specify two tag names but one is invalid its the same as just querying for that one.
       operationId: getCardsByTags
       tags:
         - tags
       parameters:
-        - name: size
+        - name: id
           in: query
           description: Determine the size of the response
           required: false
           type: integer
-        - name: start
+        - name: name
           in: query
           description: Return tags after the index start
-          required: false
-          type: integer
-        - name: startsWith
-          in: query
-          description: Return tags that start with the string given string
-          required: false
-          type: string
-        - name: sortBy
-          in: query
-          description: Sort by can be used currently to sort by usage count. The correct Value would be 'sortBy=usageCount%20asc'
           required: false
           type: string
       responses:
         "200":
-          description: A list of ratings
+          description: A list of tags
           schema:
             $ref: '#/definitions/TagResponseList'
+
+  /tags/{tagId}:
+    get:
+      summary: Get a specific tag by id
+      operationId: getTagById
+      tags:
+        - tags
+      parameters:
+        - name: tagId
+          in: path
+          required: true
+          description: The id of the tag we want to query
+          type: string
+      responses:
+        "200":
+          description: queried object
+          schema:
+            $ref: '#/definitions/TagResponse'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+  /tags/{tagId}/cards:
+    get:
+      summary: Get all cards from one specific tag by id
+      operationId: getTagsCardsById
+      tags:
+        - tags
+        - cards
+      parameters:
+        - name: tagId
+          in: path
+          required: true
+          description: The id of the tag we want to query
+          type: string
+      responses:
+        "200":
+          description: queried object
+          schema:
+            $ref: '#/definitions/CardResponseList'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
 
 definitions:
   HeartbeatResponse:
