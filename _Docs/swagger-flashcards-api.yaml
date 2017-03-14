@@ -23,7 +23,7 @@ paths:
           - name: Authorization
             in: header
             required: true
-            description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+            description: Requires authentication via header "Authorization":"Bearer {{token}}"
             type: string
       responses:
         "200":
@@ -74,7 +74,7 @@ paths:
           - name: Authorization
             in: header
             required: true
-            description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+            description: Requires authentication via header "Authorization":"Bearer {{token}}"
             type: string
       tags:
         - util
@@ -105,7 +105,7 @@ paths:
         - name: Authorization
           in: header
           required: true
-          description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+          description: Requires authentication via header "Authorization":"Bearer {{token}}"
           type: string
       responses:
         "200":
@@ -199,7 +199,7 @@ paths:
           - name: Authorization
             in: header
             required: true
-            description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+            description: Requires authentication via header "Authorization":"Bearer {{token}}"
             type: string
           - name: userId
             in: path
@@ -240,7 +240,7 @@ paths:
             - name: Authorization
               in: header
               required: true
-              description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+              description: Requires authentication via header "Authorization":"Bearer {{token}}"
               type: string
             - name: userId
               in: path
@@ -285,7 +285,7 @@ paths:
             - name: Authorization
               in: header
               required: true
-              description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+              description: Requires authentication via header "Authorization":"Bearer {{token}}"
               type: string
             - name: userId
               in: path
@@ -398,7 +398,7 @@ paths:
         - name: Authorization
           in: header
           required: true
-          description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+          description: Requires authentication via header "Authorization":"Bearer {{token}}"
           type: string
         - name: group content
           in: body
@@ -456,7 +456,7 @@ paths:
           - name: Authorization
             in: header
             required: true
-            description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+            description: Requires authentication via header "Authorization":"Bearer {{token}}"
             type: string
           - name: groupId
             in: path
@@ -498,7 +498,7 @@ paths:
             - name: Authorization
               in: header
               required: true
-              description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+              description: Requires authentication via header "Authorization":"Bearer {{token}}"
               type: string
             - name: groupId
               in: path
@@ -542,7 +542,7 @@ paths:
             - name: Authorization
               in: header
               required: true
-              description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+              description: Requires authentication via header "Authorization":"Bearer {{token}}"
               type: string
             - name: groupId
               in: path
@@ -636,7 +636,7 @@ paths:
         - name: Authorization
           in: header
           required: true
-          description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+          description: Requires authentication via header "Authorization":"Bearer {{token}}"
           type: string
         - name: deck
           in: body
@@ -892,7 +892,7 @@ paths:
         - name: Authorization
           in: header
           required: true
-          description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+          description: Requires authentication via header "Authorization":"Bearer {{token}}"
           type: string
         - name: card
           in: body
@@ -1152,7 +1152,7 @@ paths:
         - name: Authorization
           in: header
           required: true
-          description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+          description: Requires authentication via header "Authorization":"Bearer {{token}}"
           type: string
         - name: category
           in: body
@@ -1366,7 +1366,7 @@ paths:
         - name: Authorization
           in: header
           required: true
-          description: Only authorized users may delete their own profile expected value="Bearer {{token}}"
+          description: Requires authentication via header "Authorization":"Bearer {{token}}"
           type: string
         - name: rating
           in: body
@@ -1392,14 +1392,14 @@ paths:
           schema:
             $ref: '#/definitions/GenericResponse'
 
-  /ratings/{rationgId}:
+  /ratings/{ratingId}:
     get:
       summary: Get a specific rating by id
       operationId: getRatingById
       tags:
         - ratings
       parameters:
-        - name: rationgId
+        - name: ratingId
           in: path
           required: true
           description: The id of the rating we want to query
@@ -1426,7 +1426,7 @@ paths:
           required: true
           description: Only authorized users may modify - expected value="Bearer {{token}}"
           type: string
-        - name: rationgId
+        - name: ratingId
           in: path
           required: true
           description: The id of the rating we want to query
@@ -1467,7 +1467,7 @@ paths:
           required: true
           description: Only authorized users may modify - expected value="Bearer {{token}}"
           type: string
-        - name: rationgId
+        - name: ratingId
           in: path
           required: true
           description: The id of the rating we want to query
@@ -1588,12 +1588,231 @@ paths:
           schema:
             $ref: '#/definitions/GenericResponse'
 
+  # --- Messages ---
+  /messages:
+    get:
+      summary: List Messages of the currently logged in user.
+      operationId: listMessages
+      tags:
+        - messages
+        - authorization
+      parameters:
+        - name: startDate
+          in: query
+          description: Loads all ratings for one card
+          required: false
+          type: string
+          format: date-time
+      responses:
+        "200":
+          description: A list of ratings
+          schema:
+            $ref: '#/definitions/MessageResponseList'
+        "401":
+          description: Request sent without a (valid) "Bearer_Token"
+          schema:
+            $ref: '#/definitions/UnauthorizedResponse'
+    post:
+      description: Create a new message
+      operationId: addMessage
+      tags:
+        - messages
+        - authorization
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Requires authentication via header "Authorization":"Bearer {{token}}"
+          type: string
+        - name: message
+          in: body
+          description: message to add
+          required: true
+          schema:
+            $ref: '#/definitions/MessageRequest'
+      responses:
+        "201":
+          description: Success Message
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "400":
+          description: User input is not valid - description message contains more info.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "401":
+          description: Request sent without a (valid) "Bearer_Token"
+          schema:
+            $ref: '#/definitions/UnauthorizedResponse'
+        "403":
+          description: Problems with the used password util. Should not happen.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+  /messages/{messageId}:
+    get:
+      summary: Get a specific message by id
+      operationId: getMessageById
+      tags:
+        - messages
+        - authorization
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          description: The id of the message we want to query
+          type: string
+      responses:
+        "200":
+          description: A specific Message
+          schema:
+            $ref: '#/definitions/MessageResponse'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+    patch:
+      summary: Patch one specific message's attributes
+      operationId: patchMessageById
+      tags:
+        - messages
+        - authorization
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Only authorized users may modify - expected value="Bearer {{token}}"
+          type: string
+        - name: messageId
+          in: path
+          required: true
+          description: The id of the message we want to query
+          type: string
+        - name: message
+          in: body
+          description: whole new group object
+          required: true
+          schema:
+            $ref: '#/definitions/MessageRequest'
+      responses:
+        "200":
+          description: Success Message
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "400":
+          description: User input is not valid - description message contains more info.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "401":
+          description: Request sent without a (valid) "Bearer_Token"
+          schema:
+            $ref: '#/definitions/UnauthorizedResponse'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+    delete:
+      summary: Delete one specific message. This also compensates all affected objects - if the user rated an object with -1, after deleting the message it is now returned to the orgiinal state.
+      operationId: deleteMessageById
+      tags:
+        - messages
+        - authorization
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Only authorized users may modify - expected value="Bearer {{token}}"
+          type: string
+        - name: messageId
+          in: path
+          required: true
+          description: The id of the message we want to query
+          type: string
+      responses:
+        "200":
+          description: Success Message
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "400":
+          description: User input is not valid - description message contains more info.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "404":
+          description: Object not found
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
+  # --- CardStatistics ---
+  /cardStatistics:
+    get:
+      summary: List cardStatistics of the currently logged in user.
+      operationId: listCardStatistics
+      tags:
+        - cardStatistics
+        - authorization
+      parameters:
+        - name: deckId
+          in: query
+          description: Loads all cardStatistics for one Deck
+          required: false
+          type: integer
+        - name: count
+          in: query
+          description: Only send all statistics on the server if the client count is lower than the database count for this user.
+          required: false
+          type: integer
+      responses:
+        "200":
+          description: A list of ratings
+          schema:
+            $ref: '#/definitions/CardStatisticResponse'
+        "401":
+          description: Request sent without a (valid) "Bearer_Token"
+          schema:
+            $ref: '#/definitions/UnauthorizedResponse'
+    post:
+      description: Create a new cardStatistic object for the current user (determined by token).
+      operationId: addCardStatistics
+      tags:
+        - cardStatistics
+        - authorization
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Requires authentication via header "Authorization":"Bearer {{token}}"
+          type: string
+        - name: statistic
+          in: body
+          description: cardStatistic to add
+          required: true
+          schema:
+            $ref: '#/definitions/CardStatisticRequest'
+      responses:
+        "201":
+          description: Success Message
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "400":
+          description: User input is not valid - description message contains more info.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+        "401":
+          description: Request sent without a (valid) "Bearer_Token"
+          schema:
+            $ref: '#/definitions/UnauthorizedResponse'
+        "403":
+          description: Problems with the used password util. Should not happen.
+          schema:
+            $ref: '#/definitions/GenericResponse'
+
 definitions:
   HeartbeatResponse:
     properties:
       currentDate:
         type: string
-        format: date "yyyy-MM-dd HH:mm:ss z"
+        format: date-time
 
   LoginRequest:
     required:
@@ -1632,7 +1851,7 @@ definitions:
         $ref: '#/definitions/UserResponse'
       created:
         type: string
-        format: date "yyyy-MM-dd HH:mm:ss z"
+        format: date-time
       mediaType:
         type: string
         format: media type e.g. "image/png"
@@ -1653,11 +1872,10 @@ definitions:
         type: string
       created:
         type: string
-        format: date "yyyy-MM-dd HH:mm:ss z"
+        format: date-time
       lastLogin:
         type: string
-        format: date "yyyy-MM-dd HH:mm:ss z"
-
+        format: date-time
 
   UserResponseList:
     type: array
@@ -1871,10 +2089,10 @@ definitions:
         type: integer
       created:
         type: string
-        format: date "yyyy-MM-dd HH:mm:ss z"
+        format: date-time
       lastUpdated:
         type: string
-        format: date "yyyy-MM-dd HH:mm:ss z"
+        format: date-time
       question:
         $ref: '#/definitions/QuestionResponse'
       author:
@@ -1984,3 +2202,71 @@ definitions:
     type: array
     items:
       $ref: '#/definitions/TagResponse'
+
+  MessageResponse:
+    properties:
+      messageId:
+        type: integer
+      recipient:
+        $ref: '#/definitions/UserResponse'
+      sender:
+        $ref: '#/definitions/UserResponse'
+      content:
+        type: string
+      created:
+        type: string
+        format: date-time
+      targetDeck:
+        $ref: '#/definitions/DeckResponse'
+
+  MessageResponseList:
+    type: array
+    items:
+      $ref: '#/definitions/MessageResponse'
+
+  MessageRequest:
+    properties:
+      recipient:
+        $ref: '#/definitions/UserIdRequest'
+      sender:
+        $ref: '#/definitions/UserIdRequest'
+      content:
+        type: string
+      targetDeck:
+        $ref: '#/definitions/DeckIdRequest'
+
+  CardStatisticRequest:
+    properties:
+      card:
+        $ref: '#/definitions/CardIdRequest'
+      knowledge:
+        type: number
+        format: float - Expected values are between 0 and 1. where 0=remembered nothing and 1=remembered everything
+      startDate:
+        type: string
+        format: date-time
+      endDate:
+        type: string
+        format: date-time
+      drawer:
+        type: integer
+
+  CardStatisticResponse:
+    properties:
+      cardStatisticId:
+        type: integer
+      user:
+        $ref: '#/definitions/UserResponse'
+      card:
+        $ref: '#/definitions/CardResponse'
+      knowledge:
+        type: number
+        format: float - Expected values are between 0 and 1. where 0=remembered nothing and 1=remembered everything
+      startDate:
+        type: string
+        format: date-time
+      endDate:
+        type: string
+        format: date-time
+      drawer:
+        type: integer
