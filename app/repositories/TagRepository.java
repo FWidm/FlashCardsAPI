@@ -91,15 +91,21 @@ public class TagRepository {
         return Tag.find.byId(id);
     }
 
-    public static List<FlashCard> getCardByTagArray(List<Long> ids, List<String> names) {
-        List<FlashCard> cardList = new ArrayList<>();
+    public static List<FlashCard> getCardsByTagArray(List<Long> ids, List<String> names) {
+        List<FlashCard> cardList=new ArrayList<>();
         List<Tag> tagList = retrieveTags(ids, names);
 
         Logger.debug("Tags found=" + tagList);
-        cardList = tagList.get(0).getCards();
-        for (int i = 1; i < tagList.size(); i++) {
+        for (int i = 0; i < tagList.size(); i++) {
             List<FlashCard> retrievedCardList = tagList.get(i).getCards();
+            if(cardList.isEmpty()){
+                cardList=retrievedCardList;
+            }
+            Logger.debug("i="+i+" | retrievedCards: ");
+            FlashCard tmp = retrievedCardList.get(i);
             cardList.retainAll(retrievedCardList); // keeps only values that are both in cardList AND retrievedCardlist
+            Logger.debug("retrievedList="+cardList);
+
         }
         return cardList;
     }
@@ -143,7 +149,6 @@ public class TagRepository {
                     if (!tags.contains(found))
                         tags.add(found);
                 } else tags.add(null);
-
 
             } else {
                 Logger.debug("got name: " + node.get(JsonKeys.TAG_NAME).asText());
@@ -189,6 +194,8 @@ public class TagRepository {
         }
         for (String tagName : names) {
             tmpTag = Tag.find.where().eq(JsonKeys.TAG_NAME, tagName).findUnique();
+            Logger.debug("retrieveTags: found tmpTag="+tmpTag);
+
             if (tmpTag != null)
                 tags.add(tmpTag);
         }

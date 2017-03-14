@@ -44,7 +44,6 @@ GET 	/groups				        controllers.UserGroupController.getUserGroupList
 GET 	/groups/:id			        controllers.UserGroupController.getUserGroup(id:Long)
 GET 	/groups/:id/users	        controllers.UserGroupController.getUsersInUserGroup(id:Long)
 GET 	/groups/:id/decks	        controllers.UserGroupController.getDecksFromGroup(id:Long)
-
 PUT 	/groups/:id			        controllers.UserGroupController.updateUserGroup(id:Long)
 PATCH 	/groups/:id			        controllers.UserGroupController.updateUserGroup(id:Long)
 POST 	/groups				        controllers.UserGroupController.addUserGroup

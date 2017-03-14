@@ -1123,6 +1123,7 @@ paths:
           schema:
             $ref: '#/definitions/GenericResponse'
 
+  # --- Categories ---
   /categories:
     get:
       summary: List categories
@@ -1326,6 +1327,7 @@ paths:
           schema:
             $ref: '#/definitions/GenericResponse'
 
+  # --- Ratings ---
   /ratings:
     get:
       summary: List ratings. Queries can be used to target specific cards/ratings/answers. Queries can be conjoined - you can search for the rating in one answer/card of one specific user.
@@ -1352,7 +1354,7 @@ paths:
         "200":
           description: A list of ratings
           schema:
-            $ref: '#/definitions/CategoryResponseList'
+            $ref: '#/definitions/RatingResponseList'
 
     post:
       description: Create a rating
@@ -1371,7 +1373,7 @@ paths:
           description: rating to add
           required: true
           schema:
-            $ref: '#/definitions/CategoryRequest'
+            $ref: '#/definitions/RatingRequest'
       responses:
         "201":
           description: Success Message
@@ -1479,14 +1481,78 @@ paths:
           description: User input is not valid - description message contains more info.
           schema:
             $ref: '#/definitions/GenericResponse'
-        "403":
-          description: Problems with the used password util. Should not happen.
-          schema:
-            $ref: '#/definitions/GenericResponse'
         "404":
           description: Object not found
           schema:
             $ref: '#/definitions/GenericResponse'
+
+  # --- Tags ---
+  /tags:
+    get:
+      summary: List Tags.
+      operationId: listTags
+      tags:
+        - tags
+      parameters:
+        - name: size
+          in: query
+          description: Determine the size of the response
+          required: false
+          type: integer
+        - name: start
+          in: query
+          description: Return tags after the index start
+          required: false
+          type: integer
+        - name: startsWith
+          in: query
+          description: Return tags that start with the string given string
+          required: false
+          type: string
+        - name: sortBy
+          in: query
+          description: Sort by can be used currently to sort by usage count. The correct Value would be 'sortBy=usageCount%20asc'
+          required: false
+          type: string
+      responses:
+        "200":
+          description: A list of ratings
+          schema:
+            $ref: '#/definitions/TagResponseList'
+
+  /tags/cards:
+    get:
+      summary: Get cards that have exactly the same tags. e.g. all cards with tag1 and tag2.
+      operationId: getCardsByTags
+      tags:
+        - tags
+      parameters:
+        - name: size
+          in: query
+          description: Determine the size of the response
+          required: false
+          type: integer
+        - name: start
+          in: query
+          description: Return tags after the index start
+          required: false
+          type: integer
+        - name: startsWith
+          in: query
+          description: Return tags that start with the string given string
+          required: false
+          type: string
+        - name: sortBy
+          in: query
+          description: Sort by can be used currently to sort by usage count. The correct Value would be 'sortBy=usageCount%20asc'
+          required: false
+          type: string
+      responses:
+        "200":
+          description: A list of ratings
+          schema:
+            $ref: '#/definitions/TagResponseList'
+
 definitions:
   HeartbeatResponse:
     properties:
@@ -1601,7 +1667,6 @@ definitions:
       id:
         type: integer
 
-
   Group:
     properties:
       name:
@@ -1670,7 +1735,6 @@ definitions:
         $ref: '#/definitions/GroupIdRequest'
       visible:
         type: boolean
-
 
   QuestionResponse:
     properties:
@@ -1854,7 +1918,7 @@ definitions:
       flashcard:
         $ref: '#/definitions/CardResponse'
 
-  ratingResponseList:
+  RatingResponseList:
     type: array
     items:
       $ref: '#/definitions/RatingResponse'
@@ -1873,3 +1937,15 @@ definitions:
         $ref: '#/definitions/AnswerIdRequest'
       flashcard:
         $ref: '#/definitions/CardIdRequest'
+
+  TagResponse:
+    properties:
+      tagId:
+        type: integer
+      tagName:
+        type: string
+
+  TagResponseList:
+    type: array
+    items:
+      $ref: '#/definitions/TagResponse'

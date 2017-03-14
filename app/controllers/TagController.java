@@ -87,7 +87,7 @@ public class TagController extends Controller {
                         "This method does only work when ids and/or names of tags are passed via URL parameters '"
                                 + RequestKeys.GET_BY_ID + "' or '" + RequestKeys.GET_BY_NAME + "' example: 'tags//cards?id=1&id=2&id=3...'"));
 
-            return ok(JsonUtil.toJson(TagRepository.getCardByTagArray(ids, names)));
+            return ok(JsonUtil.toJson(TagRepository.getCardsByTagArray(ids, names)));
         } catch (NumberFormatException e) {
             e.printStackTrace();
             return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST,
