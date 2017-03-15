@@ -171,6 +171,7 @@ public class HomeController extends Controller {
                     Logger.debug("Added authtoken to user");
                     result.put(JsonKeys.TOKEN, token.getToken());
                     Logger.debug("finished result node: " + result);
+                    result.put(JsonKeys.USER_ID, logInTo.getId());
                     return ok(result);
                 }
 
@@ -181,6 +182,8 @@ public class HomeController extends Controller {
             } catch (NullPointerException e) {
                 e.printStackTrace();
                 return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "User does not exist."));
+            } catch (NumberFormatException e){
+                return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Using old legacy plaintext passwords. Please create a new user if that happens."));
             }
         }
         return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN, "Login failed, check email and password for errors."));

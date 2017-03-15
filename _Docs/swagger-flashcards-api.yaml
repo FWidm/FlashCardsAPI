@@ -51,7 +51,15 @@ paths:
           description: "Response contains one new Token to use for further requests"
           schema:
               $ref: '#/definitions/LoginResponse'
-
+         "400":
+           description: User input is not valid - description message contains more info.
+           schema:
+             $ref: '#/definitions/GenericResponse'
+         "401":
+           description: Request sent without a (valid) "Bearer_Token"
+           schema:
+             $ref: '#/definitions/UnauthorizedResponse'
+             
   /auth:
     get:
       summary: Returns the email of the logged in user if a valid token is provided
@@ -1832,6 +1840,8 @@ definitions:
         type: string
       token:
         type: string
+      userId:
+        type: integer
 
   UnauthorizedResponse:
     properties:
