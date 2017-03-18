@@ -281,4 +281,13 @@ public class CategoryRepository {
         } else
             return null;
     }
+
+    /**
+     * Returns either the existing category or null
+     * @param value
+     * @return category if existing or null
+     */
+    public static Category findCategoryByName(String value) {
+        return Category.find.where().eq(JsonKeys.CATEGORY_NAME,value).findUnique();
+    }
 }

@@ -275,4 +275,8 @@ public class CardDeckRepository {
         Logger.debug("cards=" + cardList);
         return cardList;
     }
+
+    public static CardDeck findDeckByName(String name) {
+        return CardDeck.find.where().eq(JsonKeys.CARDDECK_NAME,name).findUnique();
+    }
 }

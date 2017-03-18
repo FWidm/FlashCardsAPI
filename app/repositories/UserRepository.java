@@ -46,18 +46,12 @@ public class UserRepository {
 
         String password = json.get(JsonKeys.USER_PASSWORD).asText();
         if (json.has(JsonKeys.USER_PASSWORD) && password.length() >= JsonKeys.USER_PASSWORD_MIN_LENGTH) {
-            try {
-                // format iterations:salt:hash
-                String pwdGen = PasswordUtil.createHash(password);
-                Logger.debug("Password generated from input is: " + pwdGen);
+            String hashedPw=hashPassword(password);
+            if(hashedPw!=null)
+                tmp.setPassword(hashedPw);
+            else
+                throw new InvalidInputException("Error while setting the password, please retry the request again. If it fails again contact us.");
 
-                Logger.debug("Validation of password and hash returns: " + PasswordUtil.validatePassword(password, pwdGen));
-                tmp.setPassword(pwdGen);
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (InvalidKeySpecException e) {
-                e.printStackTrace();
-            }
         } else if (json.has(JsonKeys.USER_PASSWORD) && password.length() < JsonKeys.USER_PASSWORD_MIN_LENGTH)
             throw new InvalidInputException("The specified password is too short it has to be " + JsonKeys.USER_PASSWORD_MIN_LENGTH + " characters long.");
 
@@ -132,19 +126,12 @@ public class UserRepository {
         if (json.has(JsonKeys.USER_PASSWORD) && minLengthValidator.isValid(json.get(JsonKeys.USER_PASSWORD).asText())) {
             String password = json.get(JsonKeys.USER_PASSWORD).asText();
             Logger.debug("Pass=" + password);
+            String hashedPw=hashPassword(password);
+            if(hashedPw!=null)
+                editedUser.setPassword(hashedPw);
+            else
+                throw new InvalidInputException("Error while setting the password, please retry the request again. If it fails again contact us.");
 
-            try {
-                // format iterations:salt:hash
-                String pwdGen = PasswordUtil.createHash(password);
-                Logger.debug("Password generated from input is: " + pwdGen);
-
-                Logger.debug("Validation of password and hash returns: " + PasswordUtil.validatePassword(password, pwdGen));
-                editedUser.setPassword(pwdGen);
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (InvalidKeySpecException e) {
-                e.printStackTrace();
-            }
         } else if (json.has(JsonKeys.USER_PASSWORD) && !minLengthValidator.isValid(json.get(JsonKeys.USER_PASSWORD).asText()))
             throw new InvalidInputException("The specified password is too short it has to be " + JsonKeys.USER_PASSWORD_MIN_LENGTH + " characters long.");
 
@@ -268,5 +255,23 @@ public class UserRepository {
         if (node.has(JsonKeys.USER_EMAIL))
             u = UserRepository.findUserByEmail(node.get(JsonKeys.USER_EMAIL).asText());
         return u;
+    }
+
+    public static String hashPassword(String password){
+        String pwdGen = null;
+        try {
+            // format iterations:salt:hash
+            pwdGen = PasswordUtil.createHash(password);
+            Logger.debug("Password generated from input is: " + pwdGen);
+
+            Logger.debug("Validation of password and hash returns: " + PasswordUtil.validatePassword(password, pwdGen));
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+
+        return pwdGen;
     }
 }

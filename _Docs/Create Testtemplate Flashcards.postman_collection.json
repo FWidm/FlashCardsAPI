@@ -1,0 +1,1258 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Create Testtemplate Flashcards",
+		"_postman_id": "566dde96-23d8-e43f-4e4a-ddc1f0e59be8",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1 Create Categories",
+			"description": "",
+			"item": [
+				{
+					"name": "Create a new User copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var uname=Math.random().toString(36).substr(2, 5);\r",
+									"postman.setEnvironmentVariable(\"userEmail\",uname +\"@test.com\")\r",
+									"postman.setEnvironmentVariable(\"userName\",uname);\r",
+									"postman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"10000\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve token for current User copy copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"token\", jsonData.token);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/login",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check Uni Cat",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"for(var i in jsonData){",
+									"    if(jsonData[i].categoryName==\"Universität\"){",
+									"        tests[\"Uni exists\"] = true;",
+									"        postman.setNextRequest(\"Check HS Cat\");",
+									"        break;",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories?root=true",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"0\",\n  \"name\": \"0\",\n  \"cardDecks\": [\n    {\n      \"cardDeckId\": 29\n    }],\n  \"parent\": {\"categoryId\": 1}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create Uni Cat",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"uniCatId\", jsonData.id);",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"Universität\",\n  \"cardDecks\": [],\n  \"parent\": null\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check HS Cat",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"for(var i in jsonData){",
+									"    if(jsonData[i].categoryName==\"Hochschule\"){",
+									"        tests[\"HS exists\"] = true;",
+									"        postman.setNextRequest(\"Check Uni Ulm 1st Level\");",
+									"        break;",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories?root=true",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"0\",\n  \"name\": \"0\",\n  \"cardDecks\": [\n    {\n      \"cardDeckId\": 29\n    }],\n  \"parent\": {\"categoryId\": 1}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create HS Cat",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"hsCatId\", jsonData.id);",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"Hochschule\",\n  \"cardDecks\": [],\n  \"parent\": null\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check Uni Ulm 1st Level",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"for(var i in jsonData){",
+									"    if(jsonData[i].categoryName==\"Universität Ulm\"){",
+									"        postman.setNextRequest(\"Check UStuttg\");",
+									"        break;",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"0\",\n  \"name\": \"0\",\n  \"cardDecks\": [\n    {\n      \"cardDeckId\": 29\n    }],\n  \"parent\": {\"categoryId\": 1}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create UUlm",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"uulmCatId\", jsonData.id);",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"Universität Ulm\",\n  \"cardDecks\": [],\n  \"parent\": {\"categoryId\": {{uniCatId}}}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check UStuttg",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"for(var i in jsonData){",
+									"    if(jsonData[i].categoryName==\"Universität Stuttgart\"){",
+									"        postman.setNextRequest(\"Check TUM\");",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"0\",\n  \"name\": \"0\",\n  \"cardDecks\": [\n    {\n      \"cardDeckId\": 29\n    }],\n  \"parent\": {\"categoryId\": 1}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create UStuttg",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"UStuttgCatId\", jsonData.id);",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"Universität Stuttgart\",\n  \"cardDecks\": [],\n  \"parent\": {\"categoryId\": {{uniCatId}}}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check TUM",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"for(var i in jsonData){",
+									"    if(jsonData[i].categoryName==\"TU München\"){",
+									"        postman.setNextRequest(\"Check Informatik Ulm\");",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"0\",\n  \"name\": \"0\",\n  \"cardDecks\": [\n    {\n      \"cardDeckId\": 29\n    }],\n  \"parent\": {\"categoryId\": 1}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create TUM",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"TUMuenchenCatId\", jsonData.id);",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"TU München\",\n  \"cardDecks\": [],\n  \"parent\": {\"categoryId\": {{uniCatId}}}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check Informatik Ulm",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"for(var i in jsonData){",
+									"    if(jsonData[i].categoryName==\"Informatik\"){",
+									"        postman.setNextRequest(\"Check Medieninformatik Ulm\");",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"0\",\n  \"name\": \"0\",\n  \"cardDecks\": [\n    {\n      \"cardDeckId\": 29\n    }],\n  \"parent\": {\"categoryId\": 1}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create Informatik Ulm",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"InformatikUlmCatId\", jsonData.id);",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"Informatik\",\n  \"cardDecks\": [],\n  \"parent\": {\"categoryId\": {{uulmCatId}}}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check Medieninformatik Ulm",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"for(var i in jsonData){",
+									"    if(jsonData[i].categoryName==\"Medieninformatik\"){",
+									"        postman.setNextRequest(null);",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"0\",\n  \"name\": \"0\",\n  \"cardDecks\": [\n    {\n      \"cardDeckId\": 29\n    }],\n  \"parent\": {\"categoryId\": 1}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create Medieninformatik Ulm",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"MedienInformatikUlmCatId\", jsonData.id);",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"Medieninformatik\",\n  \"cardDecks\": [],\n  \"parent\": {\"categoryId\": {{uulmCatId}}}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2 Ceate Deck and cards",
+			"description": "",
+			"item": [
+				{
+					"name": "check if deck exists, if yes abort all other calls",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"for(var i in jsonData){",
+									"    console.log(jsonData[i]);",
+									"    if(jsonData[i].cardDeckName==\"Mobile und Ubiquitous Computing\"){",
+									"        tests[\"exists!\"]=true;",
+									"        postman.setNextRequest(null);",
+									"        ",
+									"    }",
+									"}",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create a new User copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"userId\", jsonData.id);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var uname=Math.random().toString(36).substr(2, 5);\r",
+									"postman.setEnvironmentVariable(\"userEmail\",uname +\"@test.com\")\r",
+									"postman.setEnvironmentVariable(\"userName\",uname);\r",
+									"postman.setEnvironmentVariable(\"userPassword\", Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/users",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"email\": \"{{userEmail}}\",\n    \"rating\": \"10000\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve token for current User copy copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"token\", jsonData.token);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/login",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"{{userEmail}}\",\n    \"password\":\"{{userPassword}}\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "CreateGroup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"groupId\", jsonData.id);\r",
+									"tests[\"created group with id=\"+jsonData.id]=true;"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"groupName\", \"Group \"+Math.random().toString(36).substr(2, 5));",
+									"postman.setEnvironmentVariable(\"groupDescription\", \"Description \"+Math.random().toString(36).substr(2, 5));"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/groups",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"Mobile und Ubiquitous Computing Group\",\n    \"description\": \"MUC SS15\",\n    \"users\":[\n    \t{\n    \t\t\"userId\":{{userId}}\n    \t}\n    ]\n}"
+						},
+						"description": "Creates a new Group and adds two users."
+					},
+					"response": []
+				},
+				{
+					"name": "Create a new Carddeck copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardDeckId\", jsonData.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cardDeckName\": \"Mobile und Ubiquitous Computing\",\n    \"cardDeckDescpription\": \"SS15\",\n    \"cards\": [\n    ],\n    \"userGroup\":{\n        \"groupId\":{{groupId}}\n    }\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "card 1 - standard Text",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId\", jsonData.id);\r",
+									"\r",
+									"\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"Welche Unterschiede gibt es zwischen UbiComp und Mobile Computing?\",\n      \"mediaURI\": \"\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"Ubicomp nutzt Mobile Computing, UbiComp kombiniert Post Desktop HCI, Mobile Comp., Sensor(-netzwerke), KI, ... während Mobile Comp. sich mit Wireless Networking, mobiler Kommunikation, Software und Geräten beschäftigt.\",\n        \"answerHint\": \"\",\n        \"mediaURI\": \"\",\n        \"author\": {\n            \"userId\":{{userId}}\n        },\n        \"answerCorrect\": true\n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagName\":\"UbiComp\"\n    }]\n  }"
+						},
+						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Carddeck, moves cards, appends copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardDeckId\", jsonData.id);\r",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}?append=true",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cards\": [\n      {\n        \"flashcardId\": {{cardId}}\n      }\n    ]\n}"
+						},
+						"description": "Result: group with 4 cards"
+					},
+					"response": []
+				},
+				{
+					"name": "card2 - Pic Question",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId\", jsonData.id);\r",
+									"\r",
+									"\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"In welche vier Teile lässt sich der Systemzyklus trennen?\",\n      \"mediaURI\": \"http://134.60.51.194/img/2017/2/img2495114066024358303.png\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"Sammeln, Analysieren und Aggregieren, Entscheiden, Handeln und Anpassen.\",\n        \"answerHint\": \"\",\n        \"mediaURI\": \"\",\n        \"author\": {\n            \"userId\":{{userId}}\n        },\n        \"answerCorrect\": true\n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagName\":\"UbiComp\"\n    }]\n  }"
+						},
+						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Carddeck, moves cards, appends copy copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardDeckId\", jsonData.id);\r",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}?append=true",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cards\": [\n      {\n        \"flashcardId\": {{cardId}}\n      }\n    ]\n}"
+						},
+						"description": "Result: group with 4 cards"
+					},
+					"response": []
+				},
+				{
+					"name": "card3 - Video Answer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId\", jsonData.id);\r",
+									"\r",
+									"\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"Wie funktioniert K-Means Clustering?\",\n      \"mediaURI\": \"\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"See tutorial on youtube.\",\n        \"answerHint\": \"\",\n        \"mediaURI\": \"https://www.youtube.com/watch?v=RD0nNK51Fp8\",\n        \"author\": {\n            \"userId\":{{userId}}\n        },\n        \"answerCorrect\": true\n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagName\":\"UbiComp\"\n    }]\n  }"
+						},
+						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Carddeck, moves cards, appends copy copy copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardDeckId\", jsonData.id);\r",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}?append=true",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cards\": [\n      {\n        \"flashcardId\": {{cardId}}\n      }\n    ]\n}"
+						},
+						"description": "Result: group with 4 cards"
+					},
+					"response": []
+				},
+				{
+					"name": "card4 - Web Answer copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId\", jsonData.id);\r",
+									"\r",
+									"\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"Was sind Ambient Interfaces, nenne ein Beispiel?\",\n      \"mediaURI\": \"\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"Interfaces werden auf die Umgebung Projiziert.\",\n        \"answerHint\": \"\",\n        \"mediaURI\": \"http://www.koert.com/work/datafountain/\",\n        \"author\": {\n            \"userId\":{{userId}}\n        },\n        \"answerCorrect\": true\n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": false,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagName\":\"UbiComp\"\n    }]\n  }"
+						},
+						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Carddeck, moves cards, appends copy copy copy copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardDeckId\", jsonData.id);\r",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}?append=true",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cards\": [\n      {\n        \"flashcardId\": {{cardId}}\n      }\n    ]\n}"
+						},
+						"description": "Result: group with 4 cards"
+					},
+					"response": []
+				},
+				{
+					"name": "card5 - Multiple Choice",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardId\", jsonData.id);\r",
+									"\r",
+									"\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cards",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 0,\n    \"question\": {\n      \"questionText\": \"Was trifft auf BT Scatternetze zu?\",\n      \"mediaURI\": \"\",\n      \"author\": {\n        \"userId\": 1\n      }\n    },\n    \"answers\": [\n      {\n        \"answerText\": \"Verbinedet Piconetze über Brücken-Knoten\",\n        \"answerHint\": \"\",\n        \"mediaURI\": \"\",\n        \"author\": {\n            \"userId\":{{userId}}\n        },\n        \"answerCorrect\": true\n      },\n      {\n        \"answerText\": \"Verringern die Bandbreite.\",\n        \"answerHint\": \"\",\n        \"mediaURI\": \"\",\n        \"author\": {\n            \"userId\":{{userId}}\n        },\n        \"answerCorrect\": false\n      },\n      {\n        \"answerText\": \"Verbindet Master mit Master\",\n        \"answerHint\": \"\",\n        \"mediaURI\": \"http://www.koert.com/work/datafountain/\",\n        \"author\": {\n            \"userId\":{{userId}}\n        },\n        \"answerCorrect\": false\n      },\n      {\n        \"answerText\": \"Es wird kein Routingalgorithmus vorgeschlagen.\",\n        \"answerHint\": \"\",\n        \"mediaURI\": \"http://www.koert.com/work/datafountain/\",\n        \"author\": {\n            \"userId\":{{userId}}\n        },\n        \"answerCorrect\": true\n      }\n    ],\n    \"author\": {\n      \"userId\": 1\n    },\n    \"multipleChoice\": true,\n    \"marked\": false,\n    \"selected\": false,\n    \"tags\":[{\n        \"tagName\":\"UbiComp\"\n    }]\n  }"
+						},
+						"description": "Inserts a question to the db instead of using one already created."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Carddeck, moves cards, appends copy copy copy copy copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"cardDeckId\", jsonData.id);\r",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"cardDeckName\", \"Deck \"+Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/cardDecks/{{cardDeckId}}?append=true",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cards\": [\n      {\n        \"flashcardId\": {{cardId}}\n      }\n    ]\n}"
+						},
+						"description": "Result: group with 4 cards"
+					},
+					"response": []
+				},
+				{
+					"name": "update category with a child. copy",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"randomString\", \"cat\"+Math.random().toString(36).substr(2, 5));\r",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}{{port}}/categories/{{MedienInformatikUlmCatId}}",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cardDecks\": [\n  \t{\n  \t\t\"cardDeckId\":{{cardDeckId}}\n  \t}\n  ]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

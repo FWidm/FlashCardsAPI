@@ -51,15 +51,7 @@ paths:
           description: "Response contains one new Token to use for further requests"
           schema:
               $ref: '#/definitions/LoginResponse'
-         "400":
-           description: User input is not valid - description message contains more info.
-           schema:
-             $ref: '#/definitions/GenericResponse'
-         "401":
-           description: Request sent without a (valid) "Bearer_Token"
-           schema:
-             $ref: '#/definitions/UnauthorizedResponse'
-             
+
   /auth:
     get:
       summary: Returns the email of the logged in user if a valid token is provided
@@ -705,6 +697,11 @@ paths:
           required: true
           description: The id of the deck we want to query
           type: string
+        - name: append
+          in: query
+          required: false
+          description: whether we want to append or replace the existing list elements. Default is replace.
+          type: boolean
         - name: deck
           in: body
           description: whole new group object
@@ -965,6 +962,11 @@ paths:
           required: true
           description: Id of the object we want to query
           type: string
+        - name: append
+          in: query
+          required: false
+          description: whether we want to append or replace the existing list elements. Default is replace.
+          type: boolean
         - name: card
           in: body
           description: all attributes needed to update the resource completely
@@ -1006,6 +1008,11 @@ paths:
           required: true
           description: Id of the object we want to query
           type: string
+        - name: append
+          in: query
+          required: false
+          description: whether we want to append or replace the existing list elements. Default is replace.
+          type: boolean
         - name: card
           in: body
           description: all attributes we want to change in the resource
@@ -1840,8 +1847,6 @@ definitions:
         type: string
       token:
         type: string
-      userId:
-        type: integer
 
   UnauthorizedResponse:
     properties:

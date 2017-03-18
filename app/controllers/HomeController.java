@@ -11,6 +11,8 @@ import models.rating.Rating;
 import play.Logger;
 import play.libs.Json;
 import play.mvc.*;
+import repositories.CardDeckRepository;
+import repositories.CategoryRepository;
 import repositories.UserRepository;
 import util.ActionAuthenticator;
 import util.JsonKeys;
@@ -26,7 +28,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -60,7 +61,7 @@ public class HomeController extends Controller {
         Logger.debug("upload!");
         Http.MultipartFormData<File> body = request().body().asMultipartFormData();
         Http.MultipartFormData.FilePart<File> picture = body.getFile("picture");
-        Logger.debug("picture="+picture);
+        Logger.debug("picture=" + picture);
         if (picture != null) {
             String fileName = picture.getFilename();
             String contentType = picture.getContentType();
@@ -98,11 +99,9 @@ public class HomeController extends Controller {
                     Logger.error(e.getMessage());
                 }
 
-            }
-            else
-            Logger.debug("contenttype does not contain image!");
-        }
-        else
+            } else
+                Logger.debug("contenttype does not contain image!");
+        } else
             Logger.debug("picture is null!");
         return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Request did not contain a 'picture' key or valid picture."));
 
@@ -146,9 +145,9 @@ public class HomeController extends Controller {
      */
     @BodyParser.Of(BodyParser.Json.class)
     public Result login() {
-        Logger.debug("Login: json="+request().body().asText());
+        Logger.debug("Login: json=" + request().body().asText());
         JsonNode json = request().body().asJson();
-        if(request().secure())
+        if (request().secure())
             Logger.debug("Secure!");
         if (json.has(JsonKeys.USER_PASSWORD) && json.has(JsonKeys.USER_EMAIL)) {
             String pass = json.get(JsonKeys.USER_PASSWORD).asText();
@@ -182,13 +181,12 @@ public class HomeController extends Controller {
             } catch (NullPointerException e) {
                 e.printStackTrace();
                 return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "User does not exist."));
-            } catch (NumberFormatException e){
+            } catch (NumberFormatException e) {
                 return badRequest(JsonUtil.prepareJsonStatus(BAD_REQUEST, "Using old legacy plaintext passwords. Please create a new user if that happens."));
             }
         }
         return forbidden(JsonUtil.prepareJsonStatus(FORBIDDEN, "Login failed, check email and password for errors."));
     }
-
 
 
     @Security.Authenticated(ActionAuthenticator.class)
@@ -198,21 +196,22 @@ public class HomeController extends Controller {
 
     /**
      * Invalidates the token that was sent in the request.
+     *
      * @return
      */
     @Security.Authenticated(ActionAuthenticator.class)
-    public Result invalidateToken(){
-        String tokenString="";
+    public Result invalidateToken() {
+        String tokenString = "";
         String[] authTokenHeaderValues = request().headers().get(RequestKeys.TOKEN_HEADER);
         if ((authTokenHeaderValues != null) && (authTokenHeaderValues.length == 1) && (authTokenHeaderValues[0] != null)) {
             String[] tokenHeader = authTokenHeaderValues[0].split(" ");
             if (tokenHeader.length == 2) {
-                tokenString=tokenHeader[1];
+                tokenString = tokenHeader[1];
             }
         }
-        Logger.debug("Token Value: "+tokenString);
+        Logger.debug("Token Value: " + tokenString);
         AuthToken authToken = AuthToken.find.where().eq(JsonKeys.TOKEN, tokenString).findUnique();
-        Logger.debug("Token: "+authToken);
+        Logger.debug("Token: " + authToken);
         authToken.delete();
         return noContent();
     }
@@ -361,7 +360,7 @@ public class HomeController extends Controller {
         f.delete();
         a.delete();
         u.delete();*/
-        return ok(JsonUtil.prepareJsonStatus(OK,"Rating test done!"));
+        return ok(JsonUtil.prepareJsonStatus(OK, "Rating test done!"));
     }
 
     /**
@@ -389,7 +388,7 @@ public class HomeController extends Controller {
         u.deleteTokens();
         u.delete();
         Logger.debug(output);
-        return ok(JsonUtil.prepareJsonStatus(OK,"Token test done! output="+output));
+        return ok(JsonUtil.prepareJsonStatus(OK, "Token test done! output=" + output));
     }
 
     public Result testCards() {
@@ -434,7 +433,7 @@ public class HomeController extends Controller {
         Logger.debug("Card tags: " + fc.getTags());
         List<Tag> fc_tags = FlashCard.find.byId(fc.getId()).getTags();
 
-        return ok(JsonUtil.prepareJsonStatus(OK,"Card test done!"));
+        return ok(JsonUtil.prepareJsonStatus(OK, "Card test done!"));
     }
 
     public Result testGroups() {
@@ -468,7 +467,7 @@ public class HomeController extends Controller {
             u.getUserGroups().forEach((group) -> Logger.debug(u.getId() + ":" + group));
         }
 
-        return ok(JsonUtil.prepareJsonStatus(OK,"Group test done!"));
+        return ok(JsonUtil.prepareJsonStatus(OK, "Group test done!"));
     }
 
 
