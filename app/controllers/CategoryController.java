@@ -110,6 +110,8 @@ public class CategoryController extends Controller {
         try {
             Category updateCategory = CategoryRepository.updateCategory(id, request().username(), json, request().method());
             return ok(JsonUtil.prepareJsonStatus(OK, "Category has been updated.", updateCategory.getId()));
+        } catch (NullPointerException e) {
+            return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             if (JsonKeys.debugging) {
