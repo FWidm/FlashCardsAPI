@@ -80,7 +80,7 @@ public class FlashCardController {
             return ok(JsonUtil.prepareJsonStatus(OK, "The card with the id=" + deleted.getId()
                     + " has been deleted. This includes questions and answers. All Tags for this card were disconnected and persist."));
         } catch (NullPointerException e) {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return notFound(JsonUtil.prepareJsonStatus(NOT_FOUND, "Error, no card with id=" + id + " exists."));
         } catch (IllegalArgumentException e) {
             return badRequest(JsonUtil

@@ -11,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import models.statistics.CardStatistics;
+import play.Logger;
 import util.JsonKeys;
 
 import javax.persistence.*;
@@ -289,6 +291,16 @@ public class FlashCard extends Model {
             tmptag.removeFlashCard(this);
             System.out.println("Removing link to tag=" + tmptag);
         }
+        //answers.forEach(answer -> answer.delete());
+        Question question=this.question;
+        this.question=null;
+        this.update();
+        Logger.debug("q="+question);
+        if(question!=null)question.delete();
+
+        List<CardStatistics> cardStatisticsList=CardStatistics.finder.where().eq(JsonKeys.STATISTICS_CARD,this).findList();
+        Logger.debug("statistics:"+ cardStatisticsList);
+        cardStatisticsList.forEach(cardStatistics -> cardStatistics.delete());
         super.delete();
     }
 }
