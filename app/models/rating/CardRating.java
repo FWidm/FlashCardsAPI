@@ -50,6 +50,7 @@ public class CardRating extends Rating {
     /**
      * Changes the rating to either add or substract the ratingmodifier. Updates the answer object to save those changes.
      */
+    @Override
     public void apply() {
 //        System.out.println("Modifying rating of ratedFlashCard="+ ratedFlashCard.getId()+": "+ratedFlashCard.getRating()+" to: "+(ratedFlashCard.getRating()+ratingModifier));
         Logger.debug("Modifying by " + (ratingModifier));
@@ -60,6 +61,7 @@ public class CardRating extends Rating {
     /**
      * Changes the rating to either add or substract the ratingmodifier. Updates the answer object to save those changes.
      */
+    @Override
     public void compensate() {
 //        System.out.println("Compensating rating of answer="+ ratedFlashCard.getId()+": "+ratedFlashCard.getRating()+" to: "+(ratedFlashCard.getRating()-ratingModifier));
         Logger.debug("Compensating by " + (-1 * ratingModifier));

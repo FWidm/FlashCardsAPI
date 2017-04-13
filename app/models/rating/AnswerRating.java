@@ -49,15 +49,18 @@ public class AnswerRating extends Rating {
     /**
      * Changes the rating to either add or substract the ratingmodifier. Updates the answer object to save those changes.
      */
+    @Override
     public void apply() {
         //System.out.println("Modifying rating of answer="+ ratedAnswer.getId()+": "+ratedAnswer.getRating()+" to: "+(ratedAnswer.getRating()+ratingModifier));
         ratedAnswer.updateRating(ratingModifier);
         ratedAnswer.update();
     }
 
+
     /**
      * Changes the rating to either add or substract the ratingmodifier. Updates the answer object to save those changes.
      */
+    @Override
     public void compensate() {
 //        System.out.println("Compensating rating of answer="+ ratedAnswer.getId()+": "+ratedAnswer.getRating()+" to: "+(ratedAnswer.getRating()-ratingModifier));
         ratedAnswer.updateRating(-1 * ratingModifier);

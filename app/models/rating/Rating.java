@@ -37,6 +37,16 @@ public abstract class Rating extends Model {
         return id;
     }
 
+    /**
+     * Applies the incluence of this rating on both the user and the object it rates.
+     */
+    public abstract void apply();
+
+    /**
+     * Removes all influences of this rating object on both the user and the object it rates.
+     */
+    public abstract void compensate();
+
     public User getAuthor() {
         return author;
     }
